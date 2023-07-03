@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Diminou.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">#2E3338</item>
+        <item name="colorControlActivated">#2E3338</item>
+    </style>
+</resources>

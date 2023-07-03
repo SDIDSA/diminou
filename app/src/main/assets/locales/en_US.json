@@ -1,0 +1,63 @@
+{
+  "en_us" : "English",
+  "fr_fr" : "French",
+  "ar_ar" : "Arabic",
+
+  "yes" : "Yes",
+  "no" : "No",
+  "cancel" : "Cancel",
+
+  "exit_confirm" : "Do you really want to exit ?",
+
+  "select_avatar" : "Select Your Avatar",
+  "displayed_name": "Displayed name",
+  "join": "Join",
+  "host" : "Create",
+  "settings" : "Settings",
+  "exit" : "Exit",
+
+  "set_app_theme" : "Set App Theme",
+  "app_theme" : "App Theme",
+  "theme_system" : "Follow System",
+  "theme_dark" : "Dark",
+  "theme_light" : "Light",
+
+  "set_ui_scale" : "Set UI Scale",
+  "ui_scale" : "UI Scale",
+  "1.25" : "Large",
+  "1.0" : "Normal",
+  "0.75" : "Small",
+
+  "set_language" : "Set Language",
+  "language" : "Language",
+
+  "set_4_players_mode" : "Set 4 Players Mode",
+  "4_players_mode" : "4 Players Mode",
+  "ask_everytime" : "Ask everytime",
+  "normal_mode" : "Normal mode",
+  "team_mode" : "Team mode",
+
+  "kick_confirm" : "Do you want to kick this player from the party?",
+
+  "dont_ask" : "Don't ask again",
+  "start_game" : "Start",
+  "empty" : "Empty",
+  "create_party" : "Create party",
+
+  "join_party" : "Join Party",
+  "scanning_network" : "Scanning the network...",
+  "joining_as" : "Joining as",
+
+  "leave" : "Leave",
+  "stock" : "Stock {$0}",
+  "continue" : "Continue",
+  "waiting_for_host" : "- waiting for host to contiue -",
+  "kicked" : "You have been kicked out from the party",
+
+  "set_play_timer" : "Set Timer",
+  "play_timer" : "Timer",
+  "play_timer_very_short" : "20 seconds",
+  "play_timer_short" : "30 seconds",
+  "play_timer_default" : "40 seconds",
+  "play_timer_long" : "50 seconds"
+}

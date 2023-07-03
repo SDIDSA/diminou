@@ -1,0 +1,11 @@
+{
+  "textDanger": "#EC4144FF",
+  "textMuted": "#72767DFF",
+  "channelsDefault": "#8E9297FF",
+  "backgroundTertiary": "#202225FF",
+  "secondaryButtonBack": "#4F545CFF",
+  "backgroundPrimary": "#36393FFF",
+  "textPositive": "#4EDB7BFF",
+  "textWarning": "#F9A719FF",
+  "textNormal": "#DCDDDEFF"
+}

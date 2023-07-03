@@ -1,0 +1,39 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:viewportWidth="120"
+    android:viewportHeight="120"
+    android:width="200dp"
+    android:height="200dp">
+    <path
+        android:pathData="M0 0H120V120H0V0Z"
+        android:fillColor="#FFB300" />
+    <group
+        android:translateX="22"
+        android:translateY="68">
+        <path
+            android:pathData="M9 5H67A5 5 0 0 1 72 10V22A5 5 0 0 1 67 27H9A5 5 0 0 1 4 22V10A5 5 0 0 1 9 5Z"
+            android:fillColor="#000000"
+            android:fillAlpha="0.2" />
+        <path
+            android:pathData="M10 9H66A2 2 0 0 1 68 11V21A2 2 0 0 1 66 23H10A2 2 0 0 1 8 21V11A2 2 0 0 1 10 9Z"
+            android:fillColor="#000000"
+            android:fillAlpha="0.6" />
+        <path
+            android:pathData="M20 17l6 -8H14l6 8ZM32 17l6 -8H26l6 8ZM44 17l6 -8H38l6 8ZM56 17l6 -8H50l6 8Z"
+            android:fillType="evenOdd"
+            android:fillColor="#E1E6E8" />
+    </group>
+    <group
+        android:translateX="8"
+        android:translateY="20">
+        <path
+            android:pathData="M16 12H88A16 16 0 0 1 104 28V28A16 16 0 0 1 88 44H16A16 16 0 0 1 0 28V28A16 16 0 0 1 16 12Z"
+            android:fillColor="#000000"
+            android:fillAlpha="0.8" />
+        <path
+            android:pathData="M26 22H32A2 2 0 0 1 34 24V32A2 2 0 0 1 32 34H26A2 2 0 0 1 24 32V24A2 2 0 0 1 26 22Z"
+            android:fillColor="#F4F4F4" />
+        <path
+            android:pathData="M72 22H78A2 2 0 0 1 80 24V32A2 2 0 0 1 78 34H72A2 2 0 0 1 70 32V24A2 2 0 0 1 72 22Z"
+            android:fillColor="#F4F4F4" />
+    </group>
+</vector>

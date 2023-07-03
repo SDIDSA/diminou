@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Diminou.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorAccent">#DCDDDE</item>
+        <item name="colorControlActivated">#DCDDDE</item>
+    </style>
+</resources>
