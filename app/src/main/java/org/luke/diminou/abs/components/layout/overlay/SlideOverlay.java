@@ -14,7 +14,7 @@ import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.property.Property;
 
@@ -104,9 +104,9 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
     @Override
     public void show() {
         owner.addOverlay(this);
-        Threaded.runBack(() -> {
+        Platform.runBack(() -> {
             while(list.getHeight() < ViewUtils.dipToPx(100, owner)) {
-                Threaded.sleep(10);
+                Platform.sleep(10);
             }
             Platform.runLater(() -> {
                 owner.removeOverlay(this);

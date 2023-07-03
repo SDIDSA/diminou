@@ -6,24 +6,17 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.ViewUtils;
 
 public abstract class PartialSlideOverlay extends SlideOverlay {
-
     public PartialSlideOverlay(App owner, double heightFactor) {
         super(owner);
-
         list.setCornerRadius(10);
-
         setElevation(ViewUtils.dipToPx(20, owner));
-
         setHeightFactor(heightFactor);
     }
 
     public PartialSlideOverlay(App owner, int height) {
         super(owner);
-
         list.setCornerRadius(10);
-
         setElevation(ViewUtils.dipToPx(20, owner));
-
         setHeight(height);
     }
 
@@ -34,7 +27,6 @@ public abstract class PartialSlideOverlay extends SlideOverlay {
 
     @Override
     public void show() {
-        owner.hideKeyboard();
         super.show();
     }
 

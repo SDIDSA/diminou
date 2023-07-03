@@ -3,7 +3,7 @@ package org.luke.diminou.abs.animation.base;
 import android.view.View;
 
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,11 +12,11 @@ public abstract class ViewAnimation extends ValueAnimation {
     private static final HashMap<String, HashMap<View, ViewAnimation>> running = new HashMap<>();
 
     static {
-        Threaded.runBack(ViewAnimation::clear);
+        Platform.runBack(ViewAnimation::clear);
     }
 
     private static void clear() {
-        Threaded.sleep(10000);
+        Platform.sleep(10000);
         running.values().forEach(val -> {
             ArrayList<View> toClear = new ArrayList<>();
             val.keySet().forEach(view -> {

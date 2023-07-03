@@ -1,7 +1,6 @@
 package org.luke.diminou.abs;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -40,7 +39,7 @@ import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.PlaySound;
@@ -53,7 +52,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class App extends AppCompatActivity {
     private final HashMap<String, Object> data = new HashMap<>();
     private final ArrayList<Overlay> loadedOverlay = new ArrayList<>();
-    private final HashMap<Integer, Runnable> onPermission = new HashMap<>();
     public Style dark, light;
     public Style dark_auto, light_auto;
     public Locale fr_fr, en_us, ar_ar;
@@ -73,9 +71,6 @@ public class App extends AppCompatActivity {
         int green = Color.green(color);
         int blue = Color.blue(color);
         return Color.argb(alpha, red, green, blue);
-    }
-
-    protected void postInit() {
     }
 
     @Override
@@ -107,15 +102,14 @@ public class App extends AppCompatActivity {
 
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, ins) -> {
             this.systemInsets = ins.getInsets(WindowInsetsCompat.Type.systemBars());
-
             if (loaded != null) {
                 loaded.applyInsets(systemInsets);
             }
-
             if (!loadedOverlay.isEmpty()) {
-                loadedOverlay.get(0).applySystemInsets(systemInsets);
+                for (Overlay overlay : loadedOverlay) {
+                    overlay.applySystemInsets(systemInsets);
+                }
             }
-
             return WindowInsetsCompat.CONSUMED;
         });
 
@@ -148,8 +142,6 @@ public class App extends AppCompatActivity {
             for(PlaySound s : PlaySound.values()) {
                 loadSound(s.getRes());
             }
-
-            postInit();
         }, "app_init_thread").start();
     }
 
@@ -193,9 +185,9 @@ public class App extends AppCompatActivity {
 
             new Thread(() -> {
                 if (old != null)
-                    Threaded.sleep(250);
+                    Platform.sleep(250);
                 while (page.get() == null) {
-                    Threaded.sleep(10);
+                    Platform.sleep(10);
                 }
                 Platform.runLater(() -> {
                     page.get().setAlpha(1);
@@ -385,7 +377,6 @@ public class App extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
         applyTheme();
     }
 
@@ -408,29 +399,6 @@ public class App extends AppCompatActivity {
 
     public void setLocale(Locale locale) {
         this.locale.set(locale);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Runnable handler = onPermission.get(requestCode);
-        if (handler != null && isGranted(permissions)) {
-            handler.run();
-            onPermission.remove(requestCode);
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private boolean isGranted(String[] permissions) {
-        for (String permission : permissions) {
-            if (!isGranted(permission)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isGranted(String permission) {
-        return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     @SuppressWarnings("unchecked")

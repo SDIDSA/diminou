@@ -10,7 +10,7 @@ import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.easing.Linear;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 
 import java.util.ArrayList;
@@ -55,8 +55,8 @@ public abstract class Animation {
 
     @SuppressWarnings("unchecked")
     public <T extends Animation> T start(long after) {
-        Threaded.runBack(() -> {
-            Threaded.sleep(after);
+        Platform.runBack(() -> {
+            Platform.sleep(after);
             stop();
             init();
             start(1);
@@ -98,7 +98,7 @@ public abstract class Animation {
                         }
                         lastUpdate = now;
                     }else {
-                        Threaded.sleep(1);
+                        Platform.sleep(1);
                     }
                 }
             }

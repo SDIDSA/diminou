@@ -28,7 +28,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.app.pages.settings.Timer;
@@ -352,7 +352,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         pieces.addAll(rToAdd);
         resizePieces();
 
-        Threaded.runBack(() -> {
+        Platform.runBack(() -> {
             for (Piece p : rToAdd) {
                 ColorIcon piece = (mine ? p : Piece.HIDDEN).getImage(owner, size, side.getOrientation().other());
                 if (side.isHorizontal())
@@ -416,7 +416,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                         .setInterpolator(Interpolator.EASE_OUT)
                         .start();
 
-                Threaded.sleep(100);
+                Platform.sleep(100);
             }
         });
         return true;
@@ -620,7 +620,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
             if(enabled) {
                 timer.setFill(owner.getStyle().get().getTextPositive());
                 int time = Objects.requireNonNull(Timer.byText(owner.getString("timer"))).getDuration();
-                Threaded.runBack(() -> {
+                Platform.runBack(() -> {
                     long start = System.currentTimeMillis();
                     boolean yellow = false;
                     boolean red = false;
@@ -656,7 +656,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                                 //IGNORE
                             }
                         });
-                        Threaded.sleep(20);
+                        Platform.sleep(20);
                     }
                     Platform.runLater(() -> {
                         try {

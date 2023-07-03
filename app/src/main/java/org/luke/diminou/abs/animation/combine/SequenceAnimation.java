@@ -2,7 +2,7 @@ package org.luke.diminou.abs.animation.combine;
 
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 
 import java.util.ArrayList;
 
@@ -49,7 +49,7 @@ public class SequenceAnimation extends Animation {
                 Animation next = animations.get(i + 1);
                 current.start();
                 running = current;
-                Threaded.sleep((long) ((getDuration() + delay) * timeScale));
+                Platform.sleep((long) ((getDuration() + delay) * timeScale));
                 next.start();
                 running = next;
             }

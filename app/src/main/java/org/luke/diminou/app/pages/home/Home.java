@@ -26,7 +26,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.avatar.AvatarSelect;
@@ -145,7 +145,7 @@ public class Home extends Page {
         floating.forEach(p -> removeView(p.getImg()));
         floating.clear();
 
-        Threaded.waitWhile(() -> settingUp, () -> {
+        Platform.waitWhile(() -> settingUp, () -> {
             effects.removeAllViews();
             SequenceAnimation show = new SequenceAnimation(400)
                     .addAnimation(show(profile))
@@ -280,10 +280,10 @@ public class Home extends Page {
         floatingThread = new Thread(() -> {
             for(int i = 0; i < 6; i++) {
                 createPiece();
-                Threaded.sleep(100);
+                Platform.sleep(100);
             }
             while(!destroyed && !Thread.currentThread().isInterrupted()) {
-                Threaded.sleep(4000);
+                Platform.sleep(4000);
                 if(destroyed || Thread.currentThread().isInterrupted()) return;
                 try {
                     replacePiece(floating.get(0));

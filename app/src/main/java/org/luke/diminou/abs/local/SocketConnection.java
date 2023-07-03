@@ -5,7 +5,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.luke.diminou.abs.utils.ErrorHandler;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.functional.StringConsumer;
 
 import java.io.DataInputStream;
@@ -69,7 +69,7 @@ public class SocketConnection {
 
     public boolean isRunning() {
         emit("test", "");
-        Threaded.sleep(100);
+        Platform.sleep(100);
         return !socket.isClosed();
     }
 
@@ -93,7 +93,7 @@ public class SocketConnection {
 
     private final Semaphore emitMutex = new Semaphore(1);
     public synchronized void emit(String action, String data) {
-        Threaded.runBack(() -> {
+        Platform.runBack(() -> {
             emitMutex.acquireUninterruptibly();
             JSONObject obj = new JSONObject();
             try {

@@ -16,21 +16,11 @@ public class Diminou extends App {
         postCreate();
     }
 
-    @Override
-    protected void postInit() {
-        super.postInit();
-    }
-
     protected void postCreate() {
         new Thread(() -> {
             Page.clearCache();
-
             Piece.initAll(this);
-
-            Runnable loadLogin = () -> loadPage(Home.class);
-
-            Platform.runAfter(loadLogin, 2000);
-
+            Platform.runAfter(() -> loadPage(Home.class), 2000);
         }, "post_create_thread").start();
     }
 }

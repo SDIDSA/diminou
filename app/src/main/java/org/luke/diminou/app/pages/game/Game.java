@@ -30,7 +30,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.game.score.ScoreBoard;
 import org.luke.diminou.app.pages.home.Home;
@@ -553,7 +553,7 @@ public class Game extends Page {
                     assert holder != null;
                     assert player != null;
 
-                    while (holder.getPieces().isEmpty()) Threaded.sleep(50);
+                    while (holder.getPieces().isEmpty()) Platform.sleep(50);
 
                     holder.getPieces().forEach(p -> arr.put(p.name()));
                     JSONObject obj = new JSONObject();
@@ -655,7 +655,7 @@ public class Game extends Page {
             }));
         }
 
-        Threaded.runBack(() -> {
+        Platform.runBack(() -> {
             boolean empty = true;
             while (empty) {
                 empty = false;
@@ -665,7 +665,7 @@ public class Game extends Page {
                         break;
                     }
                 }
-                Threaded.sleep(50);
+                Platform.sleep(50);
             }
 
             Platform.runAfter(() -> {

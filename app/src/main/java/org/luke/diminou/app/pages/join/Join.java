@@ -27,7 +27,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.abs.utils.Threaded;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.cards.DisplayCards;
@@ -341,7 +341,7 @@ public class Join extends Titled {
                                         JSONObject client = new JSONObject();
                                         client.put("username", Store.getUsername());
                                         client.put("avatar", Store.getAvatar());
-                                        Threaded.runBack(()-> server.emit("join", client));
+                                        Platform.runBack(()-> server.emit("join", client));
                                     }catch(JSONException x) {
                                         ErrorHandler.handle(x, "joining party");
                                     }
