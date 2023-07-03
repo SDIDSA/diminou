@@ -35,6 +35,7 @@ import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.components.layout.overlay.Overlay;
+import org.luke.diminou.abs.local.SocketConnection;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.Platform;
@@ -43,10 +44,13 @@ import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.PlaySound;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class App extends AppCompatActivity {
@@ -402,7 +406,7 @@ public class App extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getTypedData(String key) {
+    private <T> T getTypedData(String key) {
         return (T) data.get(key);
     }
 
@@ -420,5 +424,38 @@ public class App extends AppCompatActivity {
 
     public String getString(String key) {
         return getTypedData(key);
+    }
+
+    public FourMode getFourMode() {
+        return FourMode.byText(getString("mode"));
+    }
+
+    public List<Player> getPlayers() {
+        return getTypedData("players");
+    }
+
+    public HashMap<Player, Integer> getScore() {
+        HashMap<Player, Integer> score = getTypedData("score");
+        if(score == null) {
+            score = new HashMap<>();
+            putData("score", score);
+        }
+        return score;
+    }
+
+    public List<SocketConnection> getSockets() {
+        return getTypedData("sockets");
+    }
+
+    public SocketConnection getSocket() {
+        return getTypedData("socket");
+    }
+
+    public Player getWinner() {
+        return getTypedData("winner");
+    }
+
+    public boolean isHost() {
+        return getTypedData("host");
     }
 }

@@ -99,7 +99,7 @@ public class ScoreBoard extends Overlay implements Styleable {
     private void loadScores() {
         root.removeAllViews();
         boolean gameEnd = false;
-        ArrayList<Player> players = new ArrayList<>(owner.getTypedData("players"));
+        ArrayList<Player> players = new ArrayList<>(owner.getPlayers());
 
         Game game = (Game) Page.getInstance(owner, Game.class);
         assert game != null;
@@ -156,7 +156,7 @@ public class ScoreBoard extends Overlay implements Styleable {
             skip.setOnClick(() -> {
                 hide();
                 owner.getLoaded().setup();
-                game.broadCast().forEach(s -> s.emit("skip", ""));
+                owner.getSockets().forEach(s -> s.emit("skip", ""));
             });
             root.addView(skip);
         }else {
@@ -167,7 +167,7 @@ public class ScoreBoard extends Overlay implements Styleable {
     }
 
     private HashMap<Player, Integer> getScore() {
-        HashMap<Player, Integer> score = owner.getTypedData("score");
+        HashMap<Player, Integer> score = owner.getScore();
         if(score == null) {
             score = new HashMap<>();
             owner.putData("score", score);

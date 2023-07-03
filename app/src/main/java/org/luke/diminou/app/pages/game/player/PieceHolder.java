@@ -23,7 +23,6 @@ import org.luke.diminou.abs.components.controls.image.ColorIcon;
 import org.luke.diminou.abs.components.controls.shape.Rectangle;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.layout.linear.LinearBox;
-import org.luke.diminou.abs.local.SocketConnection;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
@@ -225,20 +224,12 @@ public class PieceHolder extends FrameLayout implements Styleable {
 
             hide.setOnFinished(() -> removeView(icon));
 
-            icon.setOnFinished(() -> {
-                Platform.runAfter(hide::start, 300);
-            });
+            icon.setOnFinished(() -> Platform.runAfter(hide::start, 300));
             switch (side) {
-                case TOP -> {
-                    show.addAnimation(new TranslateYAnimation(icon, icon.height() + add));
-                }
+                case TOP -> show.addAnimation(new TranslateYAnimation(icon, icon.height() + add));
                 case BOTTOM -> show.addAnimation(new TranslateYAnimation(icon, - icon.height() - add));
-                case LEFT -> {
-                    show.addAnimation(new TranslateXAnimation(icon, icon.width() + add));
-                }
-                case RIGHT -> {
-                    show.addAnimation(new TranslateXAnimation(icon, - icon.width() - add));
-                }
+                case LEFT -> show.addAnimation(new TranslateXAnimation(icon, icon.width() + add));
+                case RIGHT -> show.addAnimation(new TranslateXAnimation(icon, - icon.width() - add));
             }
 
             show.start();
@@ -307,11 +298,9 @@ public class PieceHolder extends FrameLayout implements Styleable {
             obj.put("move", m.serialize());
 
             if (game.isHost()) {
-                List<SocketConnection> sockets = owner.getTypedData("sockets");
-                sockets.forEach(socket -> socket.emit("move", obj));
+                owner.getSockets().forEach(socket -> socket.emit("move", obj));
             } else {
-                SocketConnection socket = owner.getTypedData("socket");
-                socket.emit("move", obj);
+                owner.getSocket().emit("move", obj);
             }
         } catch (Exception x) {
             ErrorHandler.handle(x, "sending move");
@@ -375,7 +364,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     piece.setOnDoubleClick(() -> {
                         deselect();
                         if (isEnabled() && gameTable.isPlaying() == null) {
-                            Player winner = owner.getTypedData("winner");
+                            Player winner = owner.getWinner();
                             if ((winner != null && winner.equals(player)) ||
                                     gameTable.getPossiblePlays(pieces).contains(p)) {
                                 List<Move> moves = gameTable.getPossiblePlays(p, null);
@@ -387,7 +376,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     });
                     piece.setOnClick(() -> {
                         if (isEnabled()) {
-                            Player winner = owner.getTypedData("winner");
+                            Player winner = owner.getWinner();
                             if ((winner != null && winner.equals(player)) ||
                                     gameTable.getPossiblePlays(pieces).contains(p)) {
                                 select(p);
@@ -567,8 +556,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                         if (game.isHost()) {
                             add(game.deal().toArray(new Piece[0]));
                         } else {
-                            SocketConnection socket = owner.getTypedData("socket");
-                            socket.emit("deal", player.serialize());
+                            owner.getSocket().emit("deal", player.serialize());
                         }
                     });
                 });

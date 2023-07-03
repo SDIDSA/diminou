@@ -296,7 +296,6 @@ public class Table extends FrameLayout {
     public void play(Move move, ColorIcon source, Player player) {
         playing = player;
         owner.putData("winner", null);
-        owner.putData("last_player", player);
         ColorIcon target = getPlayPosition(move);
         target.setAlpha(0f);
 
