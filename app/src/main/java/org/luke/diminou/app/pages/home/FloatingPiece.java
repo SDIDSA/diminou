@@ -9,7 +9,7 @@ import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.RotateAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
-import org.luke.diminou.app.pages.game.Piece;
+import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
 
 import java.util.Random;

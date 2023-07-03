@@ -26,8 +26,8 @@ import org.luke.diminou.app.cards.MirorredCards;
 import org.luke.diminou.app.cards.PlayerCard;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.Player;
-import org.luke.diminou.app.pages.game.PlayerType;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.player.PlayerType;
 import org.luke.diminou.app.pages.home.Home;
 import org.luke.diminou.app.pages.settings.FourMode;
 

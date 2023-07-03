@@ -24,7 +24,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.Player;
+import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 

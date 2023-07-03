@@ -1,6 +1,4 @@
-package org.luke.diminou.app.pages.game;
-
-import android.util.Log;
+package org.luke.diminou.app.pages.game.player;
 
 import androidx.annotation.NonNull;
 

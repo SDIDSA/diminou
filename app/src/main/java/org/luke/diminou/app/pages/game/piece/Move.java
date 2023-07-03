@@ -1,8 +1,9 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.piece;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.luke.diminou.abs.utils.ErrorHandler;
+import org.luke.diminou.app.pages.game.player.Side;
 
 public class Move {
     private static final String PLAYED = "played";

@@ -15,7 +15,6 @@ import org.luke.diminou.abs.animation.base.ColorAnimation;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
-import org.luke.diminou.abs.animation.view.corner_radii.CornerRadiiAnimation;
 import org.luke.diminou.abs.animation.view.padding.PaddingAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
@@ -30,9 +29,15 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.app.pages.game.piece.Move;
+import org.luke.diminou.app.pages.game.piece.Piece;
+import org.luke.diminou.app.pages.game.player.PieceHolder;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.player.PlayerType;
+import org.luke.diminou.app.pages.game.player.Side;
 import org.luke.diminou.app.pages.game.score.ScoreBoard;
+import org.luke.diminou.app.pages.game.table.Table;
 import org.luke.diminou.app.pages.home.Home;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
@@ -282,7 +287,7 @@ public class Game extends Page {
         return score;
     }
 
-    int getScoreOf(Player player) {
+    public int getScoreOf(Player player) {
         HashMap<Player, Integer> score = getScore();
 
         Integer i = score.get(player);

@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.player;
 
 import android.annotation.SuppressLint;
 import android.view.Gravity;

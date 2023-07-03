@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.player;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
@@ -28,9 +28,13 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.pages.game.Game;
+import org.luke.diminou.app.pages.game.PlaySound;
+import org.luke.diminou.app.pages.game.piece.Move;
+import org.luke.diminou.app.pages.game.piece.Piece;
+import org.luke.diminou.app.pages.game.table.Table;
 import org.luke.diminou.app.pages.settings.Timer;
 import org.luke.diminou.data.property.Property;
 
@@ -396,7 +400,6 @@ public class PieceHolder extends FrameLayout implements Styleable {
                 piecesDisplay.put(p, piece);
                 game.updateStock();
 
-                //if(side == Side.BOTTOM)
                 owner.playSound(PlaySound.SOUND_16.getRes());
                 new ParallelAnimation(300)
                         .addAnimation(new ValueAnimation(0, calcPieceSize()) {

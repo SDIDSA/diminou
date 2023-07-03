@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.table;
 
 import android.graphics.Rect;
 import android.view.Gravity;
@@ -20,6 +20,15 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.pages.game.Game;
+import org.luke.diminou.app.pages.game.piece.Move;
+import org.luke.diminou.app.pages.game.piece.Piece;
+import org.luke.diminou.app.pages.game.player.PieceHolder;
+import org.luke.diminou.app.pages.game.piece.PieceRotation;
+import org.luke.diminou.app.pages.game.PlaySound;
+import org.luke.diminou.app.pages.game.piece.PlayedPiece;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.player.Side;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,5 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.piece;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.DrawableRes;
