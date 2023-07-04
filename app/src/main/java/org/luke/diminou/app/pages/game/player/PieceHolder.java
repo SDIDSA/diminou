@@ -35,6 +35,7 @@ import org.luke.diminou.app.pages.game.PlaySound;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.game.table.Table;
+import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
@@ -58,17 +59,14 @@ public class PieceHolder extends FrameLayout implements Styleable {
     private final Player player;
     private final Label name;
     private final Label score;
+    private final Rectangle timer;
+    private final Rect timerClip;
     private ColorIcon removing = null;
     private Piece selected = null;
     private ParallelAnimation resizing;
-
-    private final Rectangle timer;
-
     private ObjectConsumer<Float> setTimer = null;
-
     private Animation yellow, red;
 
-    private final Rect timerClip;
     @SuppressLint("RtlHardcoded")
     public PieceHolder(App owner, Game game, Player player, Side side, boolean mine) {
         super(owner);
@@ -89,12 +87,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         root.setZ(5);
         setClipChildren(false);
 
-        ViewUtils.setPadding(root,
-                side == Side.LEFT ? 0 : padding,
-                side == Side.TOP ? 0 : padding,
-                side == Side.RIGHT ? 0 : padding,
-                side == Side.BOTTOM ? 0 : padding,
-                owner);
+        ViewUtils.setPadding(root, side == Side.LEFT ? 0 : padding, side == Side.TOP ? 0 : padding, side == Side.RIGHT ? 0 : padding, side == Side.BOTTOM ? 0 : padding, owner);
         switch (side) {
             case TOP -> root.setCornerRadiusBottom(radius);
             case BOTTOM -> root.setCornerRadiusTop(radius);
@@ -184,7 +177,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         addView(name);
         addView(score);
 
-        if(side.isVertical()) {
+        if (side.isVertical()) {
             ViewUtils.setMarginTop(this, owner, 30);
         }
 
@@ -212,23 +205,18 @@ public class PieceHolder extends FrameLayout implements Styleable {
 
             ViewUtils.alignInFrame(icon, side.getScoreGravity());
             int add = ViewUtils.dipToPx(7, owner);
-            ParallelAnimation show = new ParallelAnimation(300)
-                    .addAnimation(new AlphaAnimation(icon, 1))
-                    .setInterpolator(Interpolator.EASE_OUT);
-            Animation hide = new ParallelAnimation(300)
-                    .addAnimation(new TranslateYAnimation(icon, 0))
-                    .addAnimation(new TranslateXAnimation(icon, 0))
-                    .addAnimation(new AlphaAnimation(icon, 0))
-                    .setInterpolator(Interpolator.EASE_OUT);
+            ParallelAnimation show = new ParallelAnimation(300).addAnimation(new AlphaAnimation(icon, 1)).setInterpolator(Interpolator.EASE_OUT);
+            Animation hide = new ParallelAnimation(300).addAnimation(new TranslateYAnimation(icon, 0)).addAnimation(new TranslateXAnimation(icon, 0)).addAnimation(new AlphaAnimation(icon, 0)).setInterpolator(Interpolator.EASE_OUT);
 
             hide.setOnFinished(() -> removeView(icon));
 
             icon.setOnFinished(() -> Platform.runAfter(hide::start, 300));
             switch (side) {
                 case TOP -> show.addAnimation(new TranslateYAnimation(icon, icon.height() + add));
-                case BOTTOM -> show.addAnimation(new TranslateYAnimation(icon, - icon.height() - add));
+                case BOTTOM ->
+                        show.addAnimation(new TranslateYAnimation(icon, -icon.height() - add));
                 case LEFT -> show.addAnimation(new TranslateXAnimation(icon, icon.width() + add));
-                case RIGHT -> show.addAnimation(new TranslateXAnimation(icon, - icon.width() - add));
+                case RIGHT -> show.addAnimation(new TranslateXAnimation(icon, -icon.width() - add));
             }
 
             show.start();
@@ -240,7 +228,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
     }
 
     public void select(Piece p) {
-        if(gameTable.isPlaying() != null) return;
+        if (gameTable.isPlaying() != null) return;
         if (selected == p) {
             deselect(p);
             selected = null;
@@ -253,10 +241,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         gameTable.getPossiblePlays(p, this::applyMove);
 
         if (piece != null) {
-            ParallelAnimation sa = new ParallelAnimation(200)
-                    .addAnimation(new AlphaAnimation(piece, 1))
-                    .addAnimation(new ScaleXYAnimation(piece, Math.max(1, (float) ViewUtils.dipToPx(size, owner) / (side.isHorizontal() ? piece.getWidth() : piece.getHeight()))))
-                    .setInterpolator(Interpolator.EASE_OUT);
+            ParallelAnimation sa = new ParallelAnimation(200).addAnimation(new AlphaAnimation(piece, 1)).addAnimation(new ScaleXYAnimation(piece, Math.max(1, (float) ViewUtils.dipToPx(size, owner) / (side.isHorizontal() ? piece.getWidth() : piece.getHeight())))).setInterpolator(Interpolator.EASE_OUT);
 
             sa.addAnimation(new TranslateYAnimation(piece, ViewUtils.dipToPx(-size / 3, owner)));
             sa.addAnimation(new BottomPaddingAnimation(piece, ViewUtils.dipToPx(size, owner)));
@@ -277,6 +262,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
     }
 
     private void applyMove(Move m) {
+        game.getPassInit().hide();
         play(m);
         Platform.runAfter(() -> {
             if (pieces.isEmpty()) {
@@ -310,9 +296,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         gameTable.removePossiblePlays();
         ColorIcon piece = piecesDisplay.get(p);
         if (piece != null) {
-            ParallelAnimation sa = new ParallelAnimation(200)
-                    .addAnimation(new ScaleXYAnimation(piece, 1))
-                    .setInterpolator(Interpolator.EASE_OUT);
+            ParallelAnimation sa = new ParallelAnimation(200).addAnimation(new ScaleXYAnimation(piece, 1)).setInterpolator(Interpolator.EASE_OUT);
 
 
             sa.addAnimation(new BottomPaddingAnimation(piece, 0));
@@ -344,10 +328,8 @@ public class PieceHolder extends FrameLayout implements Styleable {
         Platform.runBack(() -> {
             for (Piece p : rToAdd) {
                 ColorIcon piece = (mine ? p : Piece.HIDDEN).getImage(owner, size, side.getOrientation().other());
-                if (side.isHorizontal())
-                    piece.setWidth(0);
-                else
-                    piece.setHeight(0);
+                if (side.isHorizontal()) piece.setWidth(0);
+                else piece.setHeight(0);
                 piece.setAlpha(0f);
                 switch (side) {
                     case TOP -> piece.setTranslationY(-ViewUtils.dipToPx(size, owner));
@@ -360,9 +342,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     piece.setOnDoubleClick(() -> {
                         deselect();
                         if (isEnabled() && gameTable.isPlaying() == null) {
-                            Player winner = owner.getWinner();
-                            if ((winner != null && winner.equals(player)) ||
-                                    gameTable.getPossiblePlays(pieces).contains(p)) {
+                            if (player.isWinner(owner) || gameTable.getPossiblePlays(pieces).contains(p)) {
                                 List<Move> moves = gameTable.getPossiblePlays(p, null);
                                 if (moves.size() == 1 || p.isDouble() || pieces.size() == 1 || gameTable.isMirror()) {
                                     applyMove(moves.get(0));
@@ -372,9 +352,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     });
                     piece.setOnClick(() -> {
                         if (isEnabled()) {
-                            Player winner = owner.getWinner();
-                            if ((winner != null && winner.equals(player)) ||
-                                    gameTable.getPossiblePlays(pieces).contains(p)) {
+                            if (player.isWinner(owner) || gameTable.getPossiblePlays(pieces).contains(p)) {
                                 select(p);
                             }
                         }
@@ -386,19 +364,12 @@ public class PieceHolder extends FrameLayout implements Styleable {
                 game.updateStock();
 
                 owner.playSound(PlaySound.SOUND_16.getRes());
-                new ParallelAnimation(300)
-                        .addAnimation(new ValueAnimation(0, calcPieceSize()) {
-                            @Override
-                            public void updateValue(float v) {
-                                applySize(piece, v);
-                            }
-                        })
-                        .addAnimation(new TranslateYAnimation(piece, 0))
-                        .addAnimation(new TranslateXAnimation(piece, 0))
-                        .addAnimation(new AlphaAnimation(piece, 1))
-                        .setOnFinished(() -> adding.remove(piece))
-                        .setInterpolator(Interpolator.EASE_OUT)
-                        .start();
+                new ParallelAnimation(300).addAnimation(new ValueAnimation(0, calcPieceSize()) {
+                    @Override
+                    public void updateValue(float v) {
+                        applySize(piece, v);
+                    }
+                }).addAnimation(new TranslateYAnimation(piece, 0)).addAnimation(new TranslateXAnimation(piece, 0)).addAnimation(new AlphaAnimation(piece, 1)).setOnFinished(() -> adding.remove(piece)).setInterpolator(Interpolator.EASE_OUT).start();
 
                 Platform.sleep(100);
             }
@@ -415,21 +386,17 @@ public class PieceHolder extends FrameLayout implements Styleable {
 
         resizePieces();
 
-        new ParallelAnimation(300)
-                .addAnimation(new ValueAnimation(ViewUtils.pxToDip(side.isHorizontal() ? disp.getWidth() : disp.getHeight(), owner), 0) {
-                    @Override
-                    public void updateValue(float v) {
-                        if (side.isHorizontal()) disp.setWidth(v);
-                        else disp.setHeight(v);
-                    }
-                })
-                .addAnimation(new AlphaAnimation(disp, 0))
-                .setInterpolator(Interpolator.EASE_OUT)
-                .setOnFinished(() -> {
-                    removing = null;
-                    piecesDisplay.remove(piece);
-                    root.removeView(disp);
-                }).start();
+        new ParallelAnimation(300).addAnimation(new ValueAnimation(ViewUtils.pxToDip(side.isHorizontal() ? disp.getWidth() : disp.getHeight(), owner), 0) {
+            @Override
+            public void updateValue(float v) {
+                if (side.isHorizontal()) disp.setWidth(v);
+                else disp.setHeight(v);
+            }
+        }).addAnimation(new AlphaAnimation(disp, 0)).setInterpolator(Interpolator.EASE_OUT).setOnFinished(() -> {
+            removing = null;
+            piecesDisplay.remove(piece);
+            root.removeView(disp);
+        }).start();
     }
 
     public void resizePieces() {
@@ -449,33 +416,29 @@ public class PieceHolder extends FrameLayout implements Styleable {
         if (ref == null) return;
 
         if (resizing != null) resizing.stop();
-        resizing = new ParallelAnimation(300)
-                .addAnimation(new ValueAnimation(ViewUtils.pxToDip(side.isHorizontal() ? ref.getWidth() : ref.getHeight(), owner), pieceSize) {
-                    @Override
-                    public void updateValue(float v) {
-                        try {
-                            piecesDisplay.values().forEach(p -> {
-                                if (p != removing && !adding.contains(p))
-                                    applySize(p, v);
-                            });
-                        } catch (ConcurrentModificationException x) {
-                            ErrorHandler.handle(x, "resizing pieces");
-                        }
-                    }
-                })
-                .addAnimation(new ValueAnimation(ref.getAlpha(), 1) {
-                    @Override
-                    public void updateValue(float v) {
-                        try {
-                            piecesDisplay.values().forEach(p -> {
-                                if (p != removing && !adding.contains(p)) p.setAlpha(v);
-                            });
-                        } catch (ConcurrentModificationException x) {
-                            ErrorHandler.handle(x, "resizing pieces");
-                        }
-                    }
-                })
-                .setInterpolator(Interpolator.EASE_OUT);
+        resizing = new ParallelAnimation(300).addAnimation(new ValueAnimation(ViewUtils.pxToDip(side.isHorizontal() ? ref.getWidth() : ref.getHeight(), owner), pieceSize) {
+            @Override
+            public void updateValue(float v) {
+                try {
+                    piecesDisplay.values().forEach(p -> {
+                        if (p != removing && !adding.contains(p)) applySize(p, v);
+                    });
+                } catch (ConcurrentModificationException x) {
+                    ErrorHandler.handle(x, "resizing pieces");
+                }
+            }
+        }).addAnimation(new ValueAnimation(ref.getAlpha(), 1) {
+            @Override
+            public void updateValue(float v) {
+                try {
+                    piecesDisplay.values().forEach(p -> {
+                        if (p != removing && !adding.contains(p)) p.setAlpha(v);
+                    });
+                } catch (ConcurrentModificationException x) {
+                    ErrorHandler.handle(x, "resizing pieces");
+                }
+            }
+        }).setInterpolator(Interpolator.EASE_OUT);
         resizing.start();
     }
 
@@ -484,8 +447,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         if (side.isHorizontal()) {
             p.setWidth(v);
             p.setPadding(pad, 0, pad, 0);
-        }
-        else {
+        } else {
             p.setHeight(v);
             p.setPadding(0, pad, 0, pad);
         }
@@ -538,29 +500,22 @@ public class PieceHolder extends FrameLayout implements Styleable {
 
 
         res.addAnimation(new ColorAnimation(owner.getStyle().get().getBackgroundTertiary(), owner.getStyle().get().getTextMuted()) {
-                    @Override
-                    public void updateValue(int color) {
-                        root.setBorderColor(color);
-                    }
-                })
-                .setOnFinished(() -> {
-                    side.namePos(name);
-                    side.scorePos(score);
-                    new ParallelAnimation(400)
-                            .addAnimation(new AlphaAnimation(name, 0, 1))
-                            .addAnimation(new ScaleXYAnimation(name, 0.5f, 1))
-                            .addAnimation(new AlphaAnimation(score, 0, 1))
-                            .addAnimation(new ScaleXYAnimation(score, 0.5f, 1))
-                            .setInterpolator(Interpolator.EASE_OUT)
-                            .start();
-                    Platform.runLater(() -> {
-                        if (game.isHost()) {
-                            add(game.deal().toArray(new Piece[0]));
-                        } else {
-                            owner.getSocket().emit("deal", player.serialize());
-                        }
-                    });
-                });
+            @Override
+            public void updateValue(int color) {
+                root.setBorderColor(color);
+            }
+        }).setOnFinished(() -> {
+            side.namePos(name);
+            side.scorePos(score);
+            new ParallelAnimation(400).addAnimation(new AlphaAnimation(name, 0, 1)).addAnimation(new ScaleXYAnimation(name, 0.5f, 1)).addAnimation(new AlphaAnimation(score, 0, 1)).addAnimation(new ScaleXYAnimation(score, 0.5f, 1)).setInterpolator(Interpolator.EASE_OUT).start();
+            Platform.runLater(() -> {
+                if (game.isHost()) {
+                    add(game.deal().toArray(new Piece[0]));
+                } else {
+                    owner.getSocket().emit("deal", player.serialize());
+                }
+            });
+        });
 
         return res;
     }
@@ -598,6 +553,19 @@ public class PieceHolder extends FrameLayout implements Styleable {
     public void setEnabled(boolean enabled) {
         Platform.runLater(() -> {
             super.setEnabled(enabled);
+
+            if (side == Side.BOTTOM) {
+                if (enabled && owner.getFourMode() == FourMode.TEAM_MODE && player.isWinner(owner)) {
+                    game.getPassInit().show(() -> {
+                        game.getPassInit().hide();
+                        Player mate = game.otherPlayer(player);
+                        game.turn(mate);
+                        if(!game.isHost()) {
+                            owner.getSocket().emit("turn", mate.serialize());
+                        }
+                    });
+                }
+            }
             name.setFill(App.adjustAlpha(owner.getStyle().get().getTextNormal(), enabled ? 1 : .5f));
             score.setFill(App.adjustAlpha(owner.getStyle().get().getTextNormal(), enabled ? 1 : .5f));
 
@@ -606,23 +574,22 @@ public class PieceHolder extends FrameLayout implements Styleable {
                 public void updateValue(int color) {
                     root.setForeground(color);
                 }
-            }.setOnFinished(this::deselect).setInterpolator(Interpolator.EASE_OUT)
-                    .start();
+            }.setOnFinished(this::deselect).setInterpolator(Interpolator.EASE_OUT).start();
 
-            if(enabled) {
+            if (enabled) {
                 timer.setFill(owner.getStyle().get().getTextPositive());
                 int time = owner.getTimer().getDuration();
                 Platform.runBack(() -> {
                     long start = System.currentTimeMillis();
                     boolean yellow = false;
                     boolean red = false;
-                    while(isEnabled() && isAttachedToWindow()) {
+                    while (isEnabled() && isAttachedToWindow()) {
                         long passed = System.currentTimeMillis() - start;
                         float factor = Math.max(0, 1 - passed / (time * 1000f));
 
-                        if(factor == 0 && player.isSelf(game.isHost())) {
+                        if (factor == 0 && player.isSelf(game.isHost())) {
                             Platform.runLater(() -> {
-                                if(gameTable.isPlaying() != null) return;
+                                if (gameTable.isPlaying() != null) return;
                                 Piece p = gameTable.getPossiblePlays(pieces).get(0);
                                 Move m = gameTable.getPossiblePlays(p, null).get(0);
                                 applyMove(m);
@@ -630,12 +597,12 @@ public class PieceHolder extends FrameLayout implements Styleable {
                             break;
                         }
 
-                        if(factor < .5 && !yellow) {
+                        if (factor < .5 && !yellow) {
                             yellow = true;
                             this.yellow.start();
                         }
 
-                        if(factor < .25 && !red) {
+                        if (factor < .25 && !red) {
                             red = true;
                             this.red.start();
                         }

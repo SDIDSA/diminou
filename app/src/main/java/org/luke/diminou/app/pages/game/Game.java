@@ -57,6 +57,7 @@ public class Game extends Page {
 
     private final HBox center;
     private final HBox cherat;
+    private final PassInit passInit;
     private final Semaphore stockMutex = new Semaphore(1);
     private ArrayList<Piece> stock;
 
@@ -85,6 +86,7 @@ public class Game extends Page {
         center.setClipChildren(false);
 
         cherat = new HBox(owner);
+        cherat.setGravity(Gravity.BOTTOM);
         cherat.setPadding(7);
 
         ColoredIcon khabt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.khabet_static);
@@ -111,7 +113,11 @@ public class Game extends Page {
             }
         });
 
+        passInit = new PassInit(owner);
+
         cherat.addView(sakt);
+        cherat.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
+        cherat.addView(passInit);
         cherat.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         cherat.addView(khabt);
 
@@ -141,6 +147,10 @@ public class Game extends Page {
         ViewUtils.alignInFrame(leftInStock, Gravity.TOP | Gravity.END);
 
         applyStyle(owner.getStyle());
+    }
+
+    public PassInit getPassInit() {
+        return passInit;
     }
 
     public PieceHolder getForPlayer(Player player) {
@@ -194,7 +204,7 @@ public class Game extends Page {
             }
             if(p.getType() == PlayerType.BOT && !lostTurn && checkForWinner() == null) {
                 Platform.runAfter(() -> {
-                    if(owner.getLoaded() != this) return;
+                    if(owner.getLoaded() != this || scoreBoard.isShown()) return;
                     List<Piece> possible = table.getPossiblePlays(holder.getPieces());
                     if(!possible.isEmpty()) {
                         Piece piece = possible.get(0);
@@ -528,8 +538,6 @@ public class Game extends Page {
             root.removeView(cherat);
         }
         show.start();
-
-
 
         if (host) {
             owner.getSockets().forEach(socket -> {

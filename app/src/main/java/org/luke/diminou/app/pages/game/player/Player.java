@@ -4,8 +4,11 @@ import androidx.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.luke.diminou.abs.App;
+import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.local.Local;
 import org.luke.diminou.abs.utils.ErrorHandler;
+import org.luke.diminou.app.pages.game.Game;
 
 import java.util.Objects;
 
@@ -36,12 +39,17 @@ public class Player {
         return avatar;
     }
 
-    public String getIp() {
-        return ip;
-    }
-
     public boolean isSelf(boolean host) {
         return host ? (ip.isBlank() && type != PlayerType.BOT) : Local.getMyIp().contains(ip);
+    }
+
+    public boolean isWinner(App owner) {
+        Game game = (Game) Page.getInstance(owner, Game.class);
+
+        Player winner = owner.getWinner();
+        if (equals(winner)) return true;
+        assert game != null;
+        return game.otherPlayer(this).equals(winner);
     }
 
     public JSONObject serialize() {

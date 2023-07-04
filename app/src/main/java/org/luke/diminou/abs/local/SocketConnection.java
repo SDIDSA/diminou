@@ -42,6 +42,7 @@ public class SocketConnection {
             try {
                 String line;
                 while (!Thread.currentThread().isInterrupted() && (line = din.readUTF()) != null ) {
+                    Log.i("received", line);
                     readMutex.acquireUninterruptibly();
                     JSONObject obj = new JSONObject(line);
                     String action = obj.getString("action");
@@ -104,6 +105,7 @@ public class SocketConnection {
                 dout.writeUTF(toSend);
                 dout.flush();
                 emitMutex.release();
+                Log.i("sent", toSend);
             }catch(JSONException | IOException x) {
                 ErrorHandler.handle(x, "emitting action " + action);
                 if(onError != null) onError.run();

@@ -59,5 +59,7 @@
   "play_timer_very_short" : "20 seconds",
   "play_timer_short" : "30 seconds",
   "play_timer_default" : "40 seconds",
-  "play_timer_long" : "50 seconds"
+  "play_timer_long" : "50 seconds",
+
+  "pass_init" : "Let your mate start"
 }
