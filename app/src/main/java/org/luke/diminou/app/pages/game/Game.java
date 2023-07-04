@@ -518,10 +518,14 @@ public class Game extends Page {
                     leftInStock.setTranslationX(-preRoot.getPaddingRight());
                     leftInStock.setAlpha(v);
                 })
+                .setOnFinished(table::adjustBoard)
                 .setInterpolator(Interpolator.EASE_OUT);
+
         if(owner.getFourMode() == FourMode.TEAM_MODE) {
             show.addAnimation(new AlphaAnimation(cherat, 1))
                     .addAnimation(new TranslateYAnimation(cherat, 0));
+        }else {
+            root.removeView(cherat);
         }
         show.start();
 
