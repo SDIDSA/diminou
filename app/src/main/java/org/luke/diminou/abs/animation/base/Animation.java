@@ -8,17 +8,12 @@ import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.combine.SequenceAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.easing.Linear;
-import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.functional.ObjectConsumer;
-
-import java.util.ArrayList;
 
 public abstract class Animation {
     public static final int INDEFINITE = -1;
 
-    public static float timeScale = 1f;
+    public static final float timeScale = 1f;
 
     private float fps = 60f;
     private Interpolator interpolator = new Linear();
@@ -32,48 +27,36 @@ public abstract class Animation {
     private boolean autoReverse = false;
     private int cycleCount = 1;
 
-    private ArrayList<ObjectConsumer<Float>> onUpdate;
-
     private ParallelAnimation parent;
 
     protected Animation(long duration) {
         this.duration = (long) (duration * timeScale);
-        onUpdate = new ArrayList<>();
     }
 
     protected Animation() {
         this(0);
     }
 
-    public void addOnUpdate(ObjectConsumer<Float> onUpdate) {
-        this.onUpdate.add(onUpdate);
-    }
-
     public void init() {
 
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Animation> T start(long after) {
+    public void start(long after) {
         Platform.runBack(() -> {
             Platform.sleep(after);
             stop();
             init();
             start(1);
         });
-        return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Animation> T start() {
+    public void start() {
         stop();
         init();
         start(1);
-        return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
-    protected <T extends Animation> T start(int rep) {
+    protected void start(int rep) {
         th = new Thread("animation_thread_" + getClass().getSimpleName()) {
             public void run() {
                 final long start = System.nanoTime();
@@ -104,7 +87,6 @@ public abstract class Animation {
             }
         };
         th.start();
-        return (T) this;
     }
 
     private boolean stopped = false;
@@ -165,10 +147,6 @@ public abstract class Animation {
         return (T) this;
     }
 
-    public int getCycleCount() {
-        return cycleCount;
-    }
-
     @SuppressWarnings("unchecked")
     public <T extends Animation> T setAutoReverse(boolean autoReverse) {
         this.autoReverse = autoReverse;
@@ -183,13 +161,6 @@ public abstract class Animation {
 
     private void preUpdate(float v) {
         update(v);
-        for(ObjectConsumer<Float> updater : onUpdate) {
-            try {
-                updater.accept(v);
-            } catch (Exception e) {
-                ErrorHandler.handle(e, "animating");
-            }
-        }
     }
 
     public abstract void update(float v);
@@ -203,8 +174,7 @@ public abstract class Animation {
         }
         sb.append(getClass().getSimpleName());
 
-        if (this instanceof ParallelAnimation) {
-            ParallelAnimation pa = (ParallelAnimation) this;
+        if (this instanceof ParallelAnimation pa) {
             View target = null;
 
             for (Animation sa : pa.getAnimations()) {
@@ -222,8 +192,7 @@ public abstract class Animation {
             }
         }
 
-        if (this instanceof SequenceAnimation) {
-            SequenceAnimation pa = (SequenceAnimation) this;
+        if (this instanceof SequenceAnimation pa) {
             for (Animation sa : pa.getAnimations()) {
                 sb.append(sa.toString(indent + 1));
             }

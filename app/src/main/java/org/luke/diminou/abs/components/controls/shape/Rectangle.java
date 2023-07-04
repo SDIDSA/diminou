@@ -12,34 +12,33 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.abs.ColoredView;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.observable.ChangeListener;
-import org.luke.diminou.data.property.DoubleProperty;
-import org.luke.diminou.data.property.IntegerProperty;
+import org.luke.diminou.data.property.Property;
 
 public class Rectangle extends View implements ColoredView {
     private final GradientDrawable background;
 
-    private final DoubleProperty width;
-    private final DoubleProperty height;
-    private final DoubleProperty radius;
-    private final IntegerProperty strokeWidth;
+    private final Property<Float> width;
+    private final Property<Float> height;
+    private final Property<Float> radius;
+    private final Property<Integer> strokeWidth;
 
-    private final IntegerProperty fill;
-    private final IntegerProperty stroke;
+    private final Property<Integer> fill;
+    private final Property<Integer> stroke;
 
     public Rectangle(App owner) {
         super(owner);
         background = new GradientDrawable();
         setBackground(background);
 
-        width = new DoubleProperty(0.0);
-        height = new DoubleProperty(0.0);
-        radius = new DoubleProperty(0.0);
-        strokeWidth = new IntegerProperty(0);
+        width = new Property<>(0f);
+        height = new Property<>(0f);
+        radius = new Property<>(0f);
+        strokeWidth = new Property<>(0);
 
-        fill = new IntegerProperty(Color.TRANSPARENT);
-        stroke = new IntegerProperty(Color.TRANSPARENT);
+        fill = new Property<>(Color.TRANSPARENT);
+        stroke = new Property<>(Color.TRANSPARENT);
 
-        ChangeListener<Double> sizeListener = (obs, ov, nv) -> {
+        ChangeListener<Float> sizeListener = (obs, ov, nv) -> {
             if (getParent() instanceof FrameLayout) {
                 setLayoutParams(new FrameLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
             } else {
@@ -57,26 +56,26 @@ public class Rectangle extends View implements ColoredView {
         stroke.addListener((strokeListener));
     }
 
-    public Rectangle(App owner, double width, double height) {
+    public Rectangle(App owner, float width, float height) {
         this(owner);
 
         setSize(width, height);
     }
 
-    public void setSize(double width, double height) {
+    public void setSize(float width, float height) {
         setWidth(width);
         setHeight(height);
     }
 
-    public void setWidth(double width) {
+    public void setWidth(float width) {
         this.width.set(width);
     }
 
-    public void setHeight(double height) {
+    public void setHeight(float height) {
         this.height.set(height);
     }
 
-    public void setRadius(double radius) {
+    public void setRadius(float radius) {
         this.radius.set(radius);
     }
 
@@ -92,33 +91,5 @@ public class Rectangle extends View implements ColoredView {
     @Override
     public void setFill(@ColorInt int fill) {
         this.fill.set(fill);
-    }
-
-    public void setStroke(@ColorInt int stroke) {
-        this.stroke.set(stroke);
-    }
-
-    public DoubleProperty widthProperty() {
-        return width;
-    }
-
-    public DoubleProperty heightProperty() {
-        return height;
-    }
-
-    public DoubleProperty radiusProperty() {
-        return radius;
-    }
-
-    public IntegerProperty strokeWidthProperty() {
-        return strokeWidth;
-    }
-
-    public IntegerProperty fillProperty() {
-        return fill;
-    }
-
-    public IntegerProperty strokeProperty() {
-        return stroke;
     }
 }

@@ -1,23 +1,10 @@
 package org.luke.diminou.app.pages.host;
 
-import android.view.Gravity;
-
-import androidx.core.graphics.Insets;
-
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
-import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.input.checkBox.LabeledCheckBox;
-import org.luke.diminou.abs.components.controls.text.Label;
-import org.luke.diminou.abs.components.controls.text.font.Font;
-import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.components.layout.overlay.MultipleOptionOverlay;
-import org.luke.diminou.abs.components.layout.overlay.PartialSlideOverlay;
-import org.luke.diminou.abs.style.Style;
-import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.abs.utils.ViewUtils;
-import org.luke.diminou.abs.utils.functional.BooleanConsumer;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Settings;
 

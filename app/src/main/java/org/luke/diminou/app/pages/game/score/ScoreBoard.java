@@ -104,8 +104,7 @@ public class ScoreBoard extends Overlay implements Styleable {
         Game game = (Game) Page.getInstance(owner, Game.class);
         assert game != null;
 
-        FourMode mode = FourMode.byText(owner.getString("mode"));
-        if(mode == FourMode.NORMAL_MODE) {
+        if(owner.getFourMode() == FourMode.NORMAL_MODE) {
             root.setPadding(15);
             players.sort((p1, p2) -> Integer.compare(getScoreOf(p2), getScoreOf(p1)));
 
@@ -193,7 +192,7 @@ public class ScoreBoard extends Overlay implements Styleable {
 
     @Override
     public void applyStyle(Style style) {
-        FourMode mode = FourMode.byText(owner.getString("mode"));
+        FourMode mode = owner.getFourMode();
         root.setBackground(mode == FourMode.NORMAL_MODE ? style.getBackgroundTertiary() : Color.TRANSPARENT);
         waiting.setFill(style.getTextMuted());
         skip.setFill(mode == FourMode.NORMAL_MODE ? App.adjustAlpha(style.getSecondaryButtonBack(), .3f) : style.getBackgroundPrimary());

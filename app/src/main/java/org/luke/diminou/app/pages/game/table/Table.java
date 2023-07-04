@@ -1,6 +1,7 @@
 package org.luke.diminou.app.pages.game.table;
 
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -36,7 +37,6 @@ import java.util.stream.Collectors;
 
 public class Table extends FrameLayout {
     private static final int SPACING = 2;
-    private static final int offsetY = 25;
     private static final int CENTER_SIZE = 9;
     private final App owner;
     private final ArrayList<PlayedPiece> onTable = new ArrayList<>();
@@ -52,8 +52,6 @@ public class Table extends FrameLayout {
 
         setLayoutParams(new LayoutParams(owner.getScreenWidth() * 3, owner.getScreenHeight() * 3));
         ViewUtils.alignInFrame(this, Gravity.CENTER);
-
-        setTranslationY(-ViewUtils.dipToPx(offsetY, owner));
 
         setOnTouchListener((v, e) -> {
             float rawX = e.getRawX();
@@ -75,7 +73,8 @@ public class Table extends FrameLayout {
 
                 float dx = px - x;
                 float dy = py - y;
-                double distance = Math.sqrt(dx * dx + dy * dy) / getScaleY();
+                double unscaled = Math.sqrt(dx * dx + dy * dy);
+                double distance = unscaled * getScaleY();
 
                 if(distance < minDistance) {
                     closest = possible;
@@ -343,8 +342,7 @@ public class Table extends FrameLayout {
                     .addAnimation(new TranslateYAnimation(target, oldY))
                     .addAnimation(new AlphaAnimation(target, 1))
                     .setInterpolator(Interpolator.EASE_OUT)
-                    .setOnFinished(this::adjustBoard)
-                    .start();
+                    .setOnFinished(this::adjustBoard);
             anim.start();
         }, 50);
     }
@@ -675,7 +673,6 @@ public class Table extends FrameLayout {
         removeAllViews();
         setScaleX(1);
         setScaleY(1);
-        setTranslationY(-ViewUtils.dipToPx(offsetY, owner));
         setTranslationX(0);
         setAlpha(1);
         onTable.clear();

@@ -6,7 +6,7 @@ import android.widget.EditText;
 
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.functional.StringConsumer;
-import org.luke.diminou.data.property.StringProperty;
+import org.luke.diminou.data.property.Property;
 
 public class InputUtils {
     public static void setChangeListener(EditText input, StringConsumer onChange) {
@@ -26,7 +26,7 @@ public class InputUtils {
         });
     }
 
-    public static void bindToProperty(EditText input, StringProperty property) {
+    public static void bindToProperty(EditText input, Property<String> property) {
         setChangeListener(input, property::set);
     }
 }

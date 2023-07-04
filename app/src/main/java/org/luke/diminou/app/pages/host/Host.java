@@ -89,8 +89,8 @@ public class Host extends Titled {
                 try {
                     JSONObject game = new JSONObject();
                     game.put("players", arr);
-                    game.put("mode", owner.getString("mode"));
-                    game.put("timer", owner.getString("timer"));
+                    game.put("mode", owner.getFourMode().getText());
+                    game.put("timer", owner.getTimer().getText());
                     socket.emit("begin", game);
                 } catch (Exception x) {
                     ErrorHandler.handle(x, "starting game");

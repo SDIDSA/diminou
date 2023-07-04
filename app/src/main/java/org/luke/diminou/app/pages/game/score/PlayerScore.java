@@ -72,8 +72,7 @@ public class PlayerScore extends HBox implements Styleable {
     public void applyStyle(Style style) {
         name.setFill(style.getTextNormal());
         score.setFill(style.getTextNormal());
-        FourMode mode = FourMode.byText(getOwner().getString("mode"));
-        if(scoreVal >= 100 && mode == FourMode.NORMAL_MODE) {
+        if(scoreVal >= 100 && getOwner().getFourMode() == FourMode.NORMAL_MODE) {
             setPadding(15);
             setBackground(App.adjustAlpha(style.getTextPositive(), .4f));
         }

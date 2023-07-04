@@ -14,7 +14,8 @@ import org.luke.diminou.abs.animation.base.ValueAnimation;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
-import org.luke.diminou.abs.animation.view.padding.UnifiedPaddingAnimation;
+import org.luke.diminou.abs.animation.view.LinearHeightAnimation;
+import org.luke.diminou.abs.animation.view.padding.BottomPaddingAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateXAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
@@ -34,7 +35,6 @@ import org.luke.diminou.app.pages.game.PlaySound;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.game.table.Table;
-import org.luke.diminou.app.pages.settings.Timer;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
@@ -42,7 +42,6 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class PieceHolder extends FrameLayout implements Styleable {
     private final App owner;
@@ -259,22 +258,16 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     .addAnimation(new ScaleXYAnimation(piece, Math.max(1, (float) ViewUtils.dipToPx(size, owner) / (side.isHorizontal() ? piece.getWidth() : piece.getHeight()))))
                     .setInterpolator(Interpolator.EASE_OUT);
 
-            switch (side) {
-                case TOP ->
-                        sa.addAnimation(new TranslateYAnimation(piece, ViewUtils.dipToPx(size / 2, owner)));
-                case BOTTOM ->
-                        sa.addAnimation(new TranslateYAnimation(piece, -ViewUtils.dipToPx(size / 2, owner)));
-                case RIGHT ->
-                        sa.addAnimation(new TranslateXAnimation(piece, -ViewUtils.dipToPx(size / 2, owner)));
-                case LEFT ->
-                        sa.addAnimation(new TranslateXAnimation(piece, ViewUtils.dipToPx(size / 2, owner)));
-            }
+            sa.addAnimation(new TranslateYAnimation(piece, ViewUtils.dipToPx(-size / 3, owner)));
+            sa.addAnimation(new BottomPaddingAnimation(piece, ViewUtils.dipToPx(size, owner)));
+            sa.addAnimation(new LinearHeightAnimation(piece, ViewUtils.dipToPx(size * 4, owner)));
 
             for (ColorIcon other : piecesDisplay.values()) {
                 if (other != piece) {
                     sa.addAnimation(new AlphaAnimation(other, .5f));
-                    sa.addAnimation(new TranslateYAnimation(other, 0f));
-                    sa.addAnimation(new TranslateXAnimation(other, 0f));
+                    sa.addAnimation(new BottomPaddingAnimation(other, 0));
+                    sa.addAnimation(new LinearHeightAnimation(other, ViewUtils.dipToPx(size * 2, owner)));
+                    sa.addAnimation(new TranslateYAnimation(other, ViewUtils.dipToPx(0, owner)));
                     sa.addAnimation(new ScaleXYAnimation(other, 1));
                 }
             }
@@ -318,10 +311,13 @@ public class PieceHolder extends FrameLayout implements Styleable {
         ColorIcon piece = piecesDisplay.get(p);
         if (piece != null) {
             ParallelAnimation sa = new ParallelAnimation(200)
-                    .addAnimation(new TranslateYAnimation(piece, 0))
-                    .addAnimation(new TranslateXAnimation(piece, 0))
                     .addAnimation(new ScaleXYAnimation(piece, 1))
                     .setInterpolator(Interpolator.EASE_OUT);
+
+
+            sa.addAnimation(new BottomPaddingAnimation(piece, 0));
+            sa.addAnimation(new LinearHeightAnimation(piece, ViewUtils.dipToPx(size * 2, owner)));
+            sa.addAnimation(new TranslateYAnimation(piece, ViewUtils.dipToPx(0, owner)));
 
             for (ColorIcon other : piecesDisplay.values()) {
                 if (other != piece) {
@@ -337,11 +333,11 @@ public class PieceHolder extends FrameLayout implements Styleable {
         selected = null;
     }
 
-    public boolean add(Piece... toAdd) {
-        if (!adding.isEmpty()) return false;
+    public void add(Piece... toAdd) {
+        if (!adding.isEmpty()) return;
         ArrayList<Piece> rToAdd = new ArrayList<>(Arrays.asList(toAdd));
         rToAdd.removeIf(p -> pieces.contains(p) || p == Piece.HIDDEN || gameTable.contains(p));
-        if (rToAdd.isEmpty()) return false;
+        if (rToAdd.isEmpty()) return;
         pieces.addAll(rToAdd);
         resizePieces();
 
@@ -394,16 +390,12 @@ public class PieceHolder extends FrameLayout implements Styleable {
                         .addAnimation(new ValueAnimation(0, calcPieceSize()) {
                             @Override
                             public void updateValue(float v) {
-                                if (side.isHorizontal())
-                                    piece.setWidth(v);
-                                else
-                                    piece.setHeight(v);
+                                applySize(piece, v);
                             }
                         })
                         .addAnimation(new TranslateYAnimation(piece, 0))
                         .addAnimation(new TranslateXAnimation(piece, 0))
                         .addAnimation(new AlphaAnimation(piece, 1))
-                        .addAnimation(new UnifiedPaddingAnimation(piece, ViewUtils.dipToPx(1.5f, owner)))
                         .setOnFinished(() -> adding.remove(piece))
                         .setInterpolator(Interpolator.EASE_OUT)
                         .start();
@@ -411,7 +403,6 @@ public class PieceHolder extends FrameLayout implements Styleable {
                 Platform.sleep(100);
             }
         });
-        return true;
     }
 
     public void remove(Piece piece) {
@@ -433,7 +424,6 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     }
                 })
                 .addAnimation(new AlphaAnimation(disp, 0))
-                .addAnimation(new UnifiedPaddingAnimation(disp, 0))
                 .setInterpolator(Interpolator.EASE_OUT)
                 .setOnFinished(() -> {
                     removing = null;
@@ -466,8 +456,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                         try {
                             piecesDisplay.values().forEach(p -> {
                                 if (p != removing && !adding.contains(p))
-                                    if (side.isHorizontal()) p.setWidth(v);
-                                    else p.setHeight(v);
+                                    applySize(p, v);
                             });
                         } catch (ConcurrentModificationException x) {
                             ErrorHandler.handle(x, "resizing pieces");
@@ -486,8 +475,20 @@ public class PieceHolder extends FrameLayout implements Styleable {
                         }
                     }
                 })
-                .setInterpolator(Interpolator.EASE_OUT)
-                .start();
+                .setInterpolator(Interpolator.EASE_OUT);
+        resizing.start();
+    }
+
+    private void applySize(ColorIcon p, float v) {
+        int pad = v > size ? Math.max(ViewUtils.dipToPx((v - size) / 2, owner), 4) : 4;
+        if (side.isHorizontal()) {
+            p.setWidth(v);
+            p.setPadding(pad, 0, pad, 0);
+        }
+        else {
+            p.setHeight(v);
+            p.setPadding(0, pad, 0, pad);
+        }
     }
 
     public int sum() {
@@ -498,7 +499,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         int size = (side.isHorizontal() ? root.getWidth() : root.getHeight()) - (side == Side.RIGHT ? root.getPaddingLeft() : root.getPaddingRight()) * 2;
         float sizeDp = ViewUtils.pxToDip(size, owner);
 
-        return sizeDp / pieces.size();
+        return Math.min(sizeDp / pieces.size(), this.size * 2);
     }
 
     public Animation setup() {
@@ -610,7 +611,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
 
             if(enabled) {
                 timer.setFill(owner.getStyle().get().getTextPositive());
-                int time = Objects.requireNonNull(Timer.byText(owner.getString("timer"))).getDuration();
+                int time = owner.getTimer().getDuration();
                 Platform.runBack(() -> {
                     long start = System.currentTimeMillis();
                     boolean yellow = false;

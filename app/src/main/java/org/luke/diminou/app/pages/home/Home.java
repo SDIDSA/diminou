@@ -85,7 +85,6 @@ public class Home extends Page {
         username.setFont(new Font(18));
         username.setValue(Store.getUsername());
         username.valueProperty().addListener((obs, ov, nv) -> Store.setUsername(nv, null));
-        username.removeClear();
         ViewUtils.spacer(username);
 
 

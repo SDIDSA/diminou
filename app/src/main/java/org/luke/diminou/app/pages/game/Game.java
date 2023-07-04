@@ -258,9 +258,8 @@ public class Game extends Page {
                     }
                 }
 
-                FourMode mode = FourMode.byText(owner.getString("mode"));
                 if(winner.size() == 1 ||
-                        (mode == FourMode.TEAM_MODE &&
+                        (owner.getFourMode() == FourMode.TEAM_MODE &&
                                 winner.size() == 2 &&
                                 index(winner.get(0)) % 2 == index(winner.get(1)) % 2)) {
                     emitWin(winner.get(0));
@@ -317,12 +316,11 @@ public class Game extends Page {
 
     private int scoreToAdd(Player winner) {
         int sum = 0;
-        FourMode mode = FourMode.byText(owner.getString("mode"));
 
         ArrayList<Player> winners = new ArrayList<>();
         winners.add(winner);
 
-        if(mode == FourMode.TEAM_MODE) {
+        if(owner.getFourMode() == FourMode.TEAM_MODE) {
             winners.add(otherPlayer(winner));
         }
 
@@ -374,12 +372,10 @@ public class Game extends Page {
 
     public void emitWin(Player winner) {
         if(host) {
-            FourMode mode = FourMode.byText(owner.getString("mode"));
-
             int scoreToAdd = scoreToAdd(winner);
 
             addScoreOf(winner, scoreToAdd);
-            if(mode == FourMode.TEAM_MODE) {
+            if(owner.getFourMode() == FourMode.TEAM_MODE) {
                 addScoreOf(otherPlayer(winner), scoreToAdd);
             }
 
@@ -523,8 +519,7 @@ public class Game extends Page {
                     leftInStock.setAlpha(v);
                 })
                 .setInterpolator(Interpolator.EASE_OUT);
-        FourMode mode = FourMode.byText(owner.getString("mode"));
-        if(mode == FourMode.TEAM_MODE) {
+        if(owner.getFourMode() == FourMode.TEAM_MODE) {
             show.addAnimation(new AlphaAnimation(cherat, 1))
                     .addAnimation(new TranslateYAnimation(cherat, 0));
         }

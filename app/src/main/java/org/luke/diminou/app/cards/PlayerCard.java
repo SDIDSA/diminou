@@ -4,10 +4,7 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.text.LineBreaker;
-import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
@@ -36,9 +33,7 @@ import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.pages.host.ConfirmKick;
 import org.luke.diminou.app.pages.host.Host;
 import org.luke.diminou.data.observable.Observable;
-import org.luke.diminou.data.observable.StringObservable;
 import org.luke.diminou.data.property.Property;
-import org.luke.diminou.data.property.StringProperty;
 
 import java.util.HashMap;
 
@@ -49,8 +44,8 @@ public class PlayerCard extends VBox implements Styleable {
     private final FrameLayout preAvatar;
     private final AvatarDisplay avatarDisplay;
     private final Label name;
-    private final StringProperty username = new StringProperty(null);
-    private final StringProperty avatar = new StringProperty(null);
+    private final Property<String> username = new Property<>(null);
+    private final Property<String> avatar = new Property<>(null);
     private final Property<SocketConnection> connection = new Property<>(null);
     private final Property<Type> type = new Property<>(Type.EMPTY);
     private final ColorIcon remove;
@@ -296,8 +291,8 @@ public class PlayerCard extends VBox implements Styleable {
         ParallelAnimation anim = new ParallelAnimation(duration)
                 .addAnimation(new TranslateXAnimation(this, otherX - thisX))
                 .addAnimation(new TranslateXAnimation(other, thisX - otherX))
-                .setInterpolator(Interpolator.EASE_OUT)
-                .start();
+                .setInterpolator(Interpolator.EASE_OUT);
+        anim.start();
 
         if(boundTo != null) {
             PlayerCard boundToThis = boundTo;
@@ -360,11 +355,11 @@ public class PlayerCard extends VBox implements Styleable {
         return offsetViewBounds.top;
     }
 
-    public StringObservable usernameProperty() {
+    public Observable<String> usernameProperty() {
         return username;
     }
 
-    public StringObservable avatarProperty() {
+    public Observable<String> avatarProperty() {
         return avatar;
     }
 

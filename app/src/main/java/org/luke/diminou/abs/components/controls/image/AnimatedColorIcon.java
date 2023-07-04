@@ -8,7 +8,7 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.Platform;
 
 public class AnimatedColorIcon extends ColorIcon {
-    private int audio;
+    private final int audio;
     public AnimatedColorIcon(App owner, int id, int audio) {
         super(owner, id);
         this.audio = audio;

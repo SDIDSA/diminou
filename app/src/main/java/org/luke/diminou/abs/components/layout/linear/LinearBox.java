@@ -9,10 +9,10 @@ import androidx.core.content.res.ResourcesCompat;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.ViewUtils;
-import org.luke.diminou.data.property.DoubleProperty;
+import org.luke.diminou.data.property.Property;
 
 public class LinearBox extends LinearLayout {
-    private final DoubleProperty spacing;
+    private final Property<Float> spacing;
     private final App owner;
 
     private final GradientDrawable background;
@@ -28,7 +28,7 @@ public class LinearBox extends LinearLayout {
         setBackground(background);
         setForeground(foreground);
 
-        spacing = new DoubleProperty(0.0);
+        spacing = new Property<>(0f);
         spacing.addListener((obs, ov, nv) -> applySpacing(nv));
     }
 
@@ -48,12 +48,8 @@ public class LinearBox extends LinearLayout {
         setShowDividers(SHOW_DIVIDER_MIDDLE);
     }
 
-    public void setSpacing(double spacing) {
+    public void setSpacing(float spacing) {
         this.spacing.set(spacing);
-    }
-
-    public DoubleProperty spacingProperty() {
-        return spacing;
     }
 
     public App getOwner() {
@@ -151,13 +147,7 @@ public class LinearBox extends LinearLayout {
         });
     }
 
-    private int border = Color.TRANSPARENT;
     public void setBorderColor(int color) {
-        border = color;
         background.setStroke(ViewUtils.dipToPx(1, owner), color);
-    }
-
-    public int getBorderColor() {
-        return border;
     }
 }

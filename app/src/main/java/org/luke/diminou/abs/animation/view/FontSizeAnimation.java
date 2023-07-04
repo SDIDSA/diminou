@@ -11,7 +11,7 @@ import org.luke.diminou.abs.utils.ViewUtils;
 
 public class FontSizeAnimation extends ViewAnimation {
 
-    private TextView view;
+    private final TextView view;
 
     public FontSizeAnimation(long duration, TextView view, float to) {
         super(duration, view, to);
