@@ -2,6 +2,7 @@ package org.luke.diminou.abs.animation.base;
 
 import android.view.View;
 
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Platform;
 
@@ -19,12 +20,16 @@ public abstract class ViewAnimation extends ValueAnimation {
         Platform.sleep(10000);
         running.values().forEach(val -> {
             ArrayList<View> toClear = new ArrayList<>();
-            val.keySet().forEach(view -> {
-                if(!view.isAttachedToWindow()) {
-                    toClear.add(view);
-                }
-            });
-            toClear.forEach(val::remove);
+            try {
+                val.keySet().forEach(view -> {
+                    if(!view.isAttachedToWindow()) {
+                        toClear.add(view);
+                    }
+                });
+                toClear.forEach(val::remove);
+            }catch(Exception x) {
+                ErrorHandler.handle(x, "clearing view animation cache");
+            }
         });
         clear();
     }

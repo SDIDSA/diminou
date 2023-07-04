@@ -1,7 +1,9 @@
 package org.luke.diminou.app.pages.home;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -186,10 +188,11 @@ public class Home extends Page {
     }
     private void setEffects() {
         VBox all = new VBox(owner);
+        all.setLayoutParams(new ViewGroup.LayoutParams(owner.getScreenWidth() * 10, owner.getScreenWidth() * 10));
+        all.setClipChildren(false);
         effects.addView(all);
         all.setPivotX(0);
         all.setPivotY(0);
-        all.setSpacing(15);
         all.setAlpha(.4f);
 
         ArrayList<HBox> top = new ArrayList<>();
@@ -198,10 +201,11 @@ public class Home extends Page {
         ArrayList<ColorIcon> left = new ArrayList<>();
         ArrayList<ColorIcon> right = new ArrayList<>();
 
-        ArrayList<ColorIcon> center = new ArrayList<>();
+        int rows = owner.getScreenHeight() / ViewUtils.dipToPx(80, owner) + 1;
+        int cols = owner.getScreenWidth() / ViewUtils.dipToPx(80, owner) + 1;
 
-        int rows = owner.getScreenHeight() / ViewUtils.dipToPx(60, owner);
-        int cols = owner.getScreenWidth() / ViewUtils.dipToPx(55, owner);
+        rows = rows + rows % 2;
+        cols = cols + cols % 2;
 
         for (int i = 0; i < rows; i++) {
             HBox row = new HBox(owner);
@@ -210,12 +214,14 @@ public class Home extends Page {
             }else {
                 bottom.add(row);
             }
-            row.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewUtils.dipToPx(110, owner)));
-            row.setTranslationY(-i * ViewUtils.dipToPx(46, owner) + ViewUtils.dipToPx(-90, owner));
+            row.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, ViewUtils.dipToPx(65, owner)));
+            ViewUtils.setMarginBottom(row, owner, 15);
             for (int j = 0; j < cols; j++) {
                 ColorIcon img = Piece.random().getImage(owner, 50);
+                ViewUtils.setMarginRight(img, owner, 30);
+                img.setPivotY(ViewUtils.dipToPx(100, owner));
+                img.setPivotX(ViewUtils.dipToPx(50, owner));
                 img.setRotation(45);
-                img.setTranslationX(ViewUtils.dipToPx(30 + j * 29 - 69, owner));
                 img.setTranslationY(ViewUtils.dipToPx(4f, owner));
                 row.addView(img);
 
@@ -223,8 +229,6 @@ public class Home extends Page {
                     left.add(img);
                 }else if(j * 2 >= cols){
                     right.add(img);
-                }else {
-                    center.add(img);
                 }
             }
             all.addView(row);
@@ -258,16 +262,20 @@ public class Home extends Page {
             hide.addAnimation(new TranslateXAnimation(icon, old + owner.getScreenWidth() / 1.5f));
         }
 
-        if(!center.isEmpty()) {
-            for(ColorIcon icon : center) {
-                hide.addAnimation(new AlphaAnimation(icon, 0)).addAnimation(new ScaleXYAnimation(icon, .7f));
-            }
-        }
-
         hide.setOnFinished(() -> {removeView(all); settingUp = false;});
 
         show.setOnFinished(() -> Platform.runAfter(hide::start, 1000));
-        Platform.runAfter(show::start, 500);
+
+        int width = cols * ViewUtils.dipToPx(80, owner);
+        int height = rows * ViewUtils.dipToPx(80, owner);
+        int dw = (width - owner.getScreenWidth()) / 2 + ViewUtils.dipToPx(50/ 2, owner);
+        int dh = (height - owner.getScreenHeight()) / 2 + ViewUtils.dipToPx(50 / 5, owner);
+        Platform.runAfter(() -> {
+
+            all.setTranslationX(-dw);
+            all.setTranslationY(-dh);
+            show.start();
+        }, 500);
     }
 
     private final ArrayList<FloatingPiece> floating = new ArrayList<>();

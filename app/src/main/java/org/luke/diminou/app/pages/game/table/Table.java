@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 public class Table extends FrameLayout {
     private static final int SPACING = 2;
-    private static final int CENTER_SIZE = 9;
+    private static final int CENTER_SIZE = 8;
     private final App owner;
     private final ArrayList<PlayedPiece> onTable = new ArrayList<>();
     private final ArrayList<PlayedPiece> center = new ArrayList<>();

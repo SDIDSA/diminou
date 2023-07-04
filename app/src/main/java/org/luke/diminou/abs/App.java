@@ -152,15 +152,23 @@ public class App extends AppCompatActivity {
         }, "app_init_thread").start();
     }
 
-    private void loadSound(@RawRes int res) {
-        sounds.put(res, MediaPlayer.create(this, res));
+    private MediaPlayer loadSound(@RawRes int res) {
+        MediaPlayer mp = MediaPlayer.create(this, res);
+        sounds.put(res, mp);
+        assert mp != null;
+        mp.setVolume(1, 1);
+        return mp;
     }
 
     public synchronized void playSound(@RawRes int res) {
         MediaPlayer mp = sounds.get(res);
-        assert mp != null;
-        mp.seekTo(0);
-        mp.start();
+        if(mp == null) return;
+        try {
+            mp.seekTo(0);
+            mp.start();
+        }catch(Exception x) {
+            loadSound(res).start();
+        }
     }
 
     public void reloadPage() {
