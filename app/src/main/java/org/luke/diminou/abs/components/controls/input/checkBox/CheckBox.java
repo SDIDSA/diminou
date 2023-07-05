@@ -8,7 +8,6 @@ import android.widget.FrameLayout;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
-import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;

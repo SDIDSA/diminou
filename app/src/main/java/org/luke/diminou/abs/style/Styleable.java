@@ -1,7 +1,5 @@
 package org.luke.diminou.abs.style;
 
-import android.util.Log;
-
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;

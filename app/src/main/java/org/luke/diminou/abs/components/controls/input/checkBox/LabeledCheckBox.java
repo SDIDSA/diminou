@@ -29,9 +29,7 @@ public class LabeledCheckBox extends HBox implements Styleable {
         addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         addView(checkBox);
 
-        setOnClickListener(e -> {
-            setChecked(!isChecked());
-        });
+        setOnClickListener(e -> setChecked(!isChecked()));
 
         applyStyle(owner.getStyle());
     }

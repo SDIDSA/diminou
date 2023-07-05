@@ -288,8 +288,8 @@ public class PieceHolder extends FrameLayout implements Styleable {
     }
 
     public void play(Move move) {
-        gameTable.play(move, piecesDisplay.get(move.getPlayed().getPiece()), player);
-        remove(move.getPlayed().getPiece());
+        gameTable.play(move, piecesDisplay.get(move.played().getPiece()), player);
+        remove(move.played().getPiece());
         gameTable.removePossiblePlays();
         if(player.isSelf(game.isHost()) && owner.getFourMode() == FourMode.TEAM_MODE && (pieces.size() <= 1 || game.getForPlayer(game.otherPlayer(player)).pieces.size() <= 1)) {
             game.getCherrat().hide().start();

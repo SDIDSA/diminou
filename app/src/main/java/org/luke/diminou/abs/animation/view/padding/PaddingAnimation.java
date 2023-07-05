@@ -1,6 +1,5 @@
 package org.luke.diminou.abs.animation.view.padding;
 
-import android.util.Log;
 import android.view.View;
 
 import org.luke.diminou.abs.animation.base.ViewAnimation;

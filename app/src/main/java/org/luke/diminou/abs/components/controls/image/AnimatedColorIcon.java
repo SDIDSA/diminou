@@ -37,13 +37,12 @@ public class AnimatedColorIcon extends ColorIcon {
     }
 
     public void setOnFinished(Runnable post) {
-        Platform.runLater(() -> {
-            ((AnimatedVectorDrawable)getDrawable()).registerAnimationCallback(new Animatable2.AnimationCallback() {
-                @Override
-                public void onAnimationEnd(Drawable drawable) {
-                    post.run();
-                }
-            });
-        });
+        Platform.runLater(() ->
+                ((AnimatedVectorDrawable)getDrawable()).registerAnimationCallback(new Animatable2.AnimationCallback() {
+                    @Override
+                    public void onAnimationEnd(Drawable drawable) {
+                        post.run();
+                    }
+                }));
     }
 }

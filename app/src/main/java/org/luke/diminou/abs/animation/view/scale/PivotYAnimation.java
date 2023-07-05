@@ -5,9 +5,6 @@ import android.view.View;
 import org.luke.diminou.abs.animation.base.ViewAnimation;
 
 public class PivotYAnimation extends ViewAnimation {
-    public PivotYAnimation(long duration, View view, float to) {
-        super(duration, view, to);
-    }
 
     public PivotYAnimation(View view, float to) {
         super(view, to);

@@ -20,17 +20,8 @@ public abstract class ValueAnimation extends Animation {
         this.to = to;
     }
 
-    public ValueAnimation() {
-        super();
-    }
-
     public ValueAnimation setLateTo(ObjectSupplier<Float> lateTo) {
         this.lateTo = lateTo;
-        return this;
-    }
-
-    public ValueAnimation setLateToInt(ObjectSupplier<Integer> lateTo) {
-        this.lateTo = () -> (float) lateTo.get();
         return this;
     }
 

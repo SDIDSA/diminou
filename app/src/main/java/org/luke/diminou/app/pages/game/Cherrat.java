@@ -16,7 +16,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.ViewUtils;
 
 public class Cherrat extends HBox {
-    private PassInit passInit;
+    private final PassInit passInit;
 
     public Cherrat(App owner) {
         super(owner);
@@ -29,13 +29,9 @@ public class Cherrat extends HBox {
         ColoredIcon sakt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.saket_static);
         sakt.setSize(38);
 
-        khabt.setOnClick(() -> {
-            cherra("khabet", R.drawable.khabet, R.raw.khabet);
-        });
+        khabt.setOnClick(() -> cherra("khabet", R.drawable.khabet, R.raw.khabet));
 
-        sakt.setOnClick(() -> {
-            cherra("saket", R.drawable.saket, R.raw.saket);
-        });
+        sakt.setOnClick(() -> cherra("saket", R.drawable.saket, R.raw.saket));
 
         passInit = new PassInit(owner);
 

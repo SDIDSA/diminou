@@ -3,28 +3,30 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    namespace 'org.luke.diminou'
+    compileSdk 34
 
     defaultConfig {
         applicationId "org.luke.diminou"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        proguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-
         debug {
             minifyEnabled true
             shrinkResources true
+            jniDebuggable true
+            renderscriptDebuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
@@ -36,30 +38,10 @@ android {
             }
         }
     }
-    packagingOptions {
-        resources {
-            merges += ['META-INF/DEPENDENCIES']
-        }
-    }
-    namespace 'org.luke.diminou'
-    dependenciesInfo {
-        includeInApk true
-        includeInBundle true
-    }
-    buildToolsVersion '33.0.0'
 }
 
 dependencies {
-    implementation "androidx.datastore:datastore-preferences-rxjava3:1.0.0"
-
     implementation 'androidx.appcompat:appcompat:1.6.1'
-
-    constraints {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
-            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
-        }
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
-            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-        }
-    }
+    implementation "androidx.datastore:datastore-preferences-rxjava3:1.0.0"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }

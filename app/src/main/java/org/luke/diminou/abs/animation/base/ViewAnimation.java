@@ -4,7 +4,6 @@ import android.view.View;
 
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Platform;
 
 import java.util.ArrayList;
 import java.util.HashMap;

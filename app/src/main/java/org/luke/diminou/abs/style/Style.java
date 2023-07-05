@@ -69,10 +69,8 @@ public class Style {
     public boolean isLight() {
         return !dark;
     }
-
-    @Override
     @NonNull
-    public Style clone() {
+    public Style copy() {
         return new Style(colors, dark);
     }
 

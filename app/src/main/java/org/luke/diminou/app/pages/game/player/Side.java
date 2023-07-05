@@ -2,7 +2,6 @@ package org.luke.diminou.app.pages.game.player;
 
 import android.annotation.SuppressLint;
 import android.view.Gravity;
-import android.view.View;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;

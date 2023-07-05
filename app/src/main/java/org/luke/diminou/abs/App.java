@@ -91,8 +91,8 @@ public class App extends AppCompatActivity {
         dark = new Style(this, "dark", true);
         light = new Style(this, "light", false);
 
-        dark_auto = dark.clone();
-        light_auto = light.clone();
+        dark_auto = dark.copy();
+        light_auto = light.copy();
 
         style = new Property<>();
         applyTheme();

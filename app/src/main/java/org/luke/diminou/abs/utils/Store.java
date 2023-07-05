@@ -1,6 +1,5 @@
 package org.luke.diminou.abs.utils;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.datastore.preferences.core.MutablePreferences;
@@ -11,6 +10,7 @@ import androidx.datastore.rxjava3.RxDataStore;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.style.Style;
+import org.luke.diminou.abs.utils.functional.StringConsumer;
 import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Timer;
@@ -46,26 +46,25 @@ public class Store {
         }
     }
 
-    @SuppressWarnings("CheckResult")
-    private static void setSetting(Preferences.Key<String> key, String value, Runnable onSuccess) {
+    private static void setSetting(Preferences.Key<String> key, String value, StringConsumer onSuccess) {
         boolean success = false;
         while(!success) {
             try {
-                settings.updateDataAsync(prefsIn -> {
+                String res = settings.updateDataAsync(prefsIn -> {
                     MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
                     mutablePreferences.set(key, value);
                     return Single.just(mutablePreferences);
-                }).blockingGet();
+                }).blockingGet().get(key);
+                if(onSuccess != null)
+                    onSuccess.accept(res);
                 success = true;
             }catch (Exception x) {
                 ErrorHandler.handle(new RuntimeException("failed to store"), "storing data at " + key.getName() + ", retrying...");
             }
         }
-        if(onSuccess != null)
-            onSuccess.run();
     }
 
-    public static void setTheme(String value, Runnable onSuccess) {
+    public static void setTheme(String value, StringConsumer onSuccess) {
         setSetting(THEME, value, onSuccess);
     }
 
@@ -73,7 +72,7 @@ public class Store {
         return getSetting(THEME, Style.THEME_SYSTEM).toLowerCase();
     }
 
-    public static void setScale(String value, Runnable onSuccess) {
+    public static void setScale(String value, StringConsumer onSuccess) {
         setSetting(SCALE, value, onSuccess);
     }
 
@@ -81,7 +80,7 @@ public class Store {
         return getSetting(SCALE, "1.0");
     }
 
-    public static void setUsername(String value, Runnable onSuccess) {
+    public static void setUsername(String value, StringConsumer onSuccess) {
         setSetting(USERNAME, value, onSuccess);
     }
 
@@ -91,7 +90,7 @@ public class Store {
         return saved.isBlank() ? device : saved;
     }
 
-    public static void setAvatar(String value, Runnable onSuccess) {
+    public static void setAvatar(String value, StringConsumer onSuccess) {
         setSetting(AVATAR, value, onSuccess);
     }
 
@@ -105,7 +104,7 @@ public class Store {
     }
 
 
-    public static void setFourMode(String value, Runnable onSuccess) {
+    public static void setFourMode(String value, StringConsumer onSuccess) {
         setSetting(FOUR_MODE, value, onSuccess);
     }
 
@@ -113,7 +112,7 @@ public class Store {
         return getSetting(FOUR_MODE, FourMode.ASK_EVERYTIME.getText());
     }
 
-    public static void setLanguage(String value, Runnable onSuccess) {
+    public static void setLanguage(String value, StringConsumer onSuccess) {
         setSetting(LANGUAGE, value, onSuccess);
     }
 
@@ -121,7 +120,7 @@ public class Store {
         return getSetting(LANGUAGE, "en_us");
     }
 
-    public static void setLogs(String value, Runnable onSuccess) {
+    public static void setLogs(String value, StringConsumer onSuccess) {
         setSetting(LOGS, value, onSuccess);
     }
 
@@ -129,7 +128,7 @@ public class Store {
         return getSetting(LOGS, "");
     }
 
-    public static void setTimer(String value, Runnable onSuccess) {
+    public static void setTimer(String value, StringConsumer onSuccess) {
         setSetting(TIMER, value, onSuccess);
     }
 

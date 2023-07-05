@@ -1,7 +1,6 @@
 package org.luke.diminou.abs.animation.view;
 
 import static android.util.TypedValue.COMPLEX_UNIT_PX;
-import static android.util.TypedValue.COMPLEX_UNIT_SP;
 
 import android.view.View;
 import android.widget.TextView;

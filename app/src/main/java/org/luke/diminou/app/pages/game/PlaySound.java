@@ -3,7 +3,6 @@ package org.luke.diminou.app.pages.game;
 import androidx.annotation.RawRes;
 
 import org.luke.diminou.R;
-import org.luke.diminou.app.avatar.Avatar;
 
 public enum PlaySound {
     SOUND_1(R.raw.play_1),

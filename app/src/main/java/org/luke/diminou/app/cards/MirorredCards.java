@@ -1,7 +1,6 @@
 package org.luke.diminou.app.cards;
 
 import android.view.Gravity;
-import android.view.ViewGroup;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;

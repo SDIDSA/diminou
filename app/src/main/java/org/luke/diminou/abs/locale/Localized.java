@@ -1,7 +1,5 @@
 package org.luke.diminou.abs.locale;
 
-import android.graphics.fonts.FontFamily;
-
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;

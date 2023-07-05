@@ -2,14 +2,13 @@ package org.luke.diminou.abs.components.controls.text.font;
 
 import android.graphics.Typeface;
 import android.graphics.fonts.FontFamily;
-import android.util.Log;
-import android.util.TypedValue;
+
+import androidx.annotation.NonNull;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.ViewUtils;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -163,6 +162,7 @@ public class Font {
         return this;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Font [family=" + family + ", size=" + size + ", weight=" + weight + ", italic=" + italic + "]";

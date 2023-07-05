@@ -5,8 +5,6 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
-import androidx.core.graphics.Insets;
-
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.image.ColoredIcon;
@@ -68,7 +66,7 @@ public class AvatarSelectOverlay extends PartialSlideOverlay {
                 ad.setValue(a);
                 hbx.addView(ad);
 
-                ad.setOnClick(() -> Store.setAvatar(a.name(), () -> {hide(); onDone.run();}));
+                ad.setOnClick(() -> Store.setAvatar(a.name(), s -> {hide(); onDone.run();}));
             }
         }
         fl.addView(res);

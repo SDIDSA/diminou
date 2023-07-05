@@ -37,18 +37,6 @@ public class ViewUtils {
         view.setLayoutParams(params);
     }
 
-    public static void spacer(View view, Orientation orientation) {
-        int width = view.getLayoutParams() != null ? view.getLayoutParams().width : LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = view.getLayoutParams() != null ? view.getLayoutParams().height : LinearLayout.LayoutParams.WRAP_CONTENT;
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                orientation == Orientation.HORIZONTAL ?
-                        width : LinearLayout.LayoutParams.WRAP_CONTENT,
-                orientation == Orientation.VERTICAL ?
-                        height : LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.weight = 1;
-        view.setLayoutParams(params);
-    }
-
     public static View spacer(Context context) {
         View view = new View(context);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -88,24 +76,12 @@ public class ViewUtils {
         setMargin(view, context, 0, val, 0, 0);
     }
 
-    public static void setMarginLeft(View view, Context context, float val) {
-        setMargin(view, context, val, 0, 0, 0);
-    }
-
     public static void setMarginRight(View view, Context context, float val) {
         setMargin(view, context, 0, 0, val, 0);
     }
 
-    public static void setHorizontalMargin(View view, Context context, float val) {
-        setMargin(view, context, val, 0, val, 0);
-    }
-
     public static void setMarginBottom(View view, Context context, float val) {
         setMargin(view, context, 0, 0, 0, val);
-    }
-
-    public static void setMarginUnified(View view, Context context, float val) {
-        setMargin(view, context, val, val, val, val);
     }
 
     public static void setMargin(View view, Context context, float left, float top, float right, float bottom) {
@@ -127,11 +103,6 @@ public class ViewUtils {
 
             view.setLayoutParams(marginLayoutParams);
         }
-    }
-
-    public static void setFont(EditText input, Font font) {
-        input.setTypeface(font.getFont());
-        input.setTextSize(COMPLEX_UNIT_SP, font.getSize());
     }
 
     public static float pxToSp(float px, Context context) {
@@ -188,8 +159,7 @@ public class ViewUtils {
             params.height = old.height;
             params.width = old.width;
 
-            if (old instanceof ViewGroup.MarginLayoutParams) {
-                ViewGroup.MarginLayoutParams marginedOld = (ViewGroup.MarginLayoutParams) old;
+            if (old instanceof ViewGroup.MarginLayoutParams marginedOld) {
                 params.bottomMargin = marginedOld.bottomMargin;
                 params.topMargin = marginedOld.topMargin;
                 params.rightMargin = marginedOld.rightMargin;
