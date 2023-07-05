@@ -10,7 +10,7 @@ public class ErrorHandler {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);
-        String trace = throwable.getMessage() + " happend while " + action + "\n" + sw;
+        String trace = throwable.getClass().getSimpleName() + " happend while " + action + "\n" + sw;
         Log.e(throwable.getClass().getSimpleName(), trace);
 
         Store.setLogs(Store.getLogs() + "\n----------------\n" + trace, null);

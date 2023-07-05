@@ -16,10 +16,8 @@ import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.padding.PaddingAnimation;
-import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.Page;
-import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.layout.linear.HBox;
@@ -32,6 +30,7 @@ import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
+import org.luke.diminou.app.pages.game.piece.Stock;
 import org.luke.diminou.app.pages.game.player.PieceHolder;
 import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.game.player.PlayerType;
@@ -45,7 +44,6 @@ import org.luke.diminou.data.property.Property;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Game extends Page {
@@ -56,10 +54,8 @@ public class Game extends Page {
     private final Table table;
 
     private final HBox center;
-    private final HBox cherat;
-    private final PassInit passInit;
-    private final Semaphore stockMutex = new Semaphore(1);
-    private ArrayList<Piece> stock;
+    private final Cherrat cherat;
+    private Stock stock;
 
     private final ScoreBoard scoreBoard;
 
@@ -85,43 +81,7 @@ public class Game extends Page {
         center.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         center.setClipChildren(false);
 
-        cherat = new HBox(owner);
-        cherat.setGravity(Gravity.BOTTOM);
-        cherat.setPadding(7);
-
-        ColoredIcon khabt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.khabet_static);
-        khabt.setSize(38);
-
-        ColoredIcon sakt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.saket_static);
-        sakt.setSize(38);
-
-        khabt.setOnClick(() -> {
-            getBottomHolder().cherra(R.drawable.khabet, R.raw.khabet);
-            if(host) {
-                owner.getSockets().forEach(s -> s.emit("khabet", getBottomHolder().getPlayer().serialize()));
-            } else {
-                owner.getSocket().emit("khabet", getBottomHolder().getPlayer().serialize());
-            }
-        });
-
-        sakt.setOnClick(() -> {
-            getBottomHolder().cherra(R.drawable.saket, R.raw.saket);
-            if(host) {
-                owner.getSockets().forEach(s -> s.emit("saket", getBottomHolder().getPlayer().serialize()));
-            } else {
-                owner.getSocket().emit("saket", getBottomHolder().getPlayer().serialize());
-            }
-        });
-
-        passInit = new PassInit(owner);
-
-        cherat.addView(sakt);
-        cherat.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
-        cherat.addView(passInit);
-        cherat.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
-        cherat.addView(khabt);
-
-        ViewUtils.setMarginBottom(cherat, owner, 20);
+        cherat = new Cherrat(owner);
 
         root.addView(ViewUtils.spacer(owner, Orientation.VERTICAL));
         root.addView(center);
@@ -129,6 +89,7 @@ public class Game extends Page {
         root.addView(cherat);
 
         scoreBoard = new ScoreBoard(owner);
+        scoreBoard.addOnShowing(() -> owner.playSound(R.raw.end));
         scoreBoard.addOnShowing(() -> {
             for (PieceHolder holder : holders) {
                 holder.setEnabled(false);
@@ -149,8 +110,12 @@ public class Game extends Page {
         applyStyle(owner.getStyle());
     }
 
+    public Cherrat getCherrat() {
+        return cherat;
+    }
+
     public PassInit getPassInit() {
-        return passInit;
+        return cherat.getPassInit();
     }
 
     public PieceHolder getForPlayer(Player player) {
@@ -180,10 +145,7 @@ public class Game extends Page {
                     lostTurn = true;
                     break;
                 }
-                stockMutex.acquireUninterruptibly();
-                toAdd.add(stock.get(0));
-                stock.remove(0);
-                stockMutex.release();
+                toAdd.add(stock.getOne());
             }
             toAdd.removeAll(holder.getPieces());
             if(!toAdd.isEmpty()) {
@@ -224,7 +186,9 @@ public class Game extends Page {
                         if(holder.getPieces().isEmpty()) {
                             emitWin(p);
                         }else {
-                            nextTurn(holder);
+                            holder.setEnabled(false);
+                            Platform.runAfter(() ->
+                                    nextTurn(holder), 750);
                         }
                     } else {
                         pass(holder);
@@ -360,14 +324,7 @@ public class Game extends Page {
     }
 
     public List<Piece> deal() {
-        stockMutex.acquireUninterruptibly();
-        ArrayList<Piece> res = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            res.add(stock.get(i));
-        }
-        stock.removeAll(res);
-        stockMutex.release();
-        return res;
+        return stock.deal();
     }
 
     private Player checkForWinner() {
@@ -444,7 +401,7 @@ public class Game extends Page {
         super.setup();
         root.setBackground(Color.TRANSPARENT);
         leftInStock.setAlpha(0);
-        stock = Piece.pack();
+        stock = new Stock();
         table.clear();
         holders.forEach(h -> {
             root.removeView(h);
@@ -532,8 +489,7 @@ public class Game extends Page {
                 .setInterpolator(Interpolator.EASE_OUT);
 
         if(owner.getFourMode() == FourMode.TEAM_MODE) {
-            show.addAnimation(new AlphaAnimation(cherat, 1))
-                    .addAnimation(new TranslateYAnimation(cherat, 0));
+            show.addAnimation(cherat.show());
         }else {
             root.removeView(cherat);
         }
@@ -731,8 +687,7 @@ public class Game extends Page {
                         0,
                         0,
                         0))
-                .addAnimation(new AlphaAnimation(cherat, 0))
-                .addAnimation(new TranslateYAnimation(cherat, ViewUtils.dipToPx(80, owner)))
+                .addAnimation(cherat.hide())
                 .addAnimation(new ColorAnimation(style.getTextMuted(), style.getBackgroundTertiary()) {
                     @Override
                     public void updateValue(int color) {

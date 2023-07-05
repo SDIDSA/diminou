@@ -146,6 +146,7 @@ public class App extends AppCompatActivity {
             loadSound(R.raw.pass);
             loadSound(R.raw.khabet);
             loadSound(R.raw.saket);
+            loadSound(R.raw.end);
             for(PlaySound s : PlaySound.values()) {
                 loadSound(s.getRes());
             }

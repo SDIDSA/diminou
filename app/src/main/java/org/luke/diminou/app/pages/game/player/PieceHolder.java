@@ -264,13 +264,14 @@ public class PieceHolder extends FrameLayout implements Styleable {
     private void applyMove(Move m) {
         game.getPassInit().hide();
         play(m);
+        setEnabled(false);
         Platform.runAfter(() -> {
             if (pieces.isEmpty()) {
                 game.emitWin(player);
                 if (game.isHost()) return;
             }
             game.nextTurn(this);
-        }, 500);
+        }, 750);
         try {
             JSONObject obj = new JSONObject();
             obj.put("player", player.serialize());
@@ -290,6 +291,9 @@ public class PieceHolder extends FrameLayout implements Styleable {
         gameTable.play(move, piecesDisplay.get(move.getPlayed().getPiece()), player);
         remove(move.getPlayed().getPiece());
         gameTable.removePossiblePlays();
+        if(player.isSelf(game.isHost()) && owner.getFourMode() == FourMode.TEAM_MODE && (pieces.size() <= 1 || game.getForPlayer(game.otherPlayer(player)).pieces.size() <= 1)) {
+            game.getCherrat().hide().start();
+        }
     }
 
     public void deselect(Piece p) {
