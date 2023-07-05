@@ -15,12 +15,9 @@ import org.luke.diminou.abs.animation.base.ColorAnimation;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
-import org.luke.diminou.abs.animation.view.corner_radii.CornerRadiiAnimation;
 import org.luke.diminou.abs.animation.view.padding.PaddingAnimation;
-import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.Page;
-import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.layout.linear.HBox;
@@ -30,9 +27,16 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.app.pages.game.piece.Move;
+import org.luke.diminou.app.pages.game.piece.Piece;
+import org.luke.diminou.app.pages.game.piece.Stock;
+import org.luke.diminou.app.pages.game.player.PieceHolder;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.player.PlayerType;
+import org.luke.diminou.app.pages.game.player.Side;
 import org.luke.diminou.app.pages.game.score.ScoreBoard;
+import org.luke.diminou.app.pages.game.table.Table;
 import org.luke.diminou.app.pages.home.Home;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
@@ -40,7 +44,6 @@ import org.luke.diminou.data.property.Property;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Game extends Page {
@@ -51,9 +54,8 @@ public class Game extends Page {
     private final Table table;
 
     private final HBox center;
-    private final HBox cherat;
-    private final Semaphore stockMutex = new Semaphore(1);
-    private ArrayList<Piece> stock;
+    private final Cherrat cherat;
+    private Stock stock;
 
     private final ScoreBoard scoreBoard;
 
@@ -65,7 +67,7 @@ public class Game extends Page {
         super(owner);
         setLayoutDirection(LAYOUT_DIRECTION_LTR);
 
-        host = owner.getTypedData("host");
+        host = owner.isHost();
 
         root = new VBox(owner);
         root.setGravity(Gravity.BOTTOM | Gravity.CENTER);
@@ -79,40 +81,7 @@ public class Game extends Page {
         center.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         center.setClipChildren(false);
 
-        cherat = new HBox(owner);
-        cherat.setPadding(7);
-
-        ColoredIcon khabt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.khabet_static);
-        khabt.setSize(38);
-
-        ColoredIcon sakt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.saket_static);
-        sakt.setSize(38);
-
-        khabt.setOnClick(() -> {
-            getBottomHolder().cherra(R.drawable.khabet, R.raw.khabet);
-            if(host) {
-                broadCast().forEach(s -> s.emit("khabet", getBottomHolder().getPlayer().serialize()));
-            } else {
-                SocketConnection host = owner.getTypedData("socket");
-                host.emit("khabet", getBottomHolder().getPlayer().serialize());
-            }
-        });
-
-        sakt.setOnClick(() -> {
-            getBottomHolder().cherra(R.drawable.saket, R.raw.saket);
-            if(host) {
-                broadCast().forEach(s -> s.emit("saket", getBottomHolder().getPlayer().serialize()));
-            } else {
-                SocketConnection host = owner.getTypedData("socket");
-                host.emit("saket", getBottomHolder().getPlayer().serialize());
-            }
-        });
-
-        cherat.addView(sakt);
-        cherat.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
-        cherat.addView(khabt);
-
-        ViewUtils.setMarginBottom(cherat, owner, 20);
+        cherat = new Cherrat(owner);
 
         root.addView(ViewUtils.spacer(owner, Orientation.VERTICAL));
         root.addView(center);
@@ -120,6 +89,7 @@ public class Game extends Page {
         root.addView(cherat);
 
         scoreBoard = new ScoreBoard(owner);
+        scoreBoard.addOnShowing(() -> owner.playSound(R.raw.end));
         scoreBoard.addOnShowing(() -> {
             for (PieceHolder holder : holders) {
                 holder.setEnabled(false);
@@ -140,6 +110,14 @@ public class Game extends Page {
         applyStyle(owner.getStyle());
     }
 
+    public Cherrat getCherrat() {
+        return cherat;
+    }
+
+    public PassInit getPassInit() {
+        return cherat.getPassInit();
+    }
+
     public PieceHolder getForPlayer(Player player) {
         for (PieceHolder holder : holders) {
             if (holder.getPlayer().equals(player)) return holder;
@@ -156,7 +134,7 @@ public class Game extends Page {
     public void turn(Player p) {
         holders.forEach(h -> h.setEnabled(p.equals(h.getPlayer())));
         if(host) {
-            broadCast().forEach(socket -> socket.emit("turn", p.serialize()));
+            owner.getSockets().forEach(socket -> socket.emit("turn", p.serialize()));
             PieceHolder holder = getForPlayer(p);
             assert holder != null;
             ArrayList<Piece> toAdd = new ArrayList<>(holder.getPieces());
@@ -167,10 +145,7 @@ public class Game extends Page {
                     lostTurn = true;
                     break;
                 }
-                stockMutex.acquireUninterruptibly();
-                toAdd.add(stock.get(0));
-                stock.remove(0);
-                stockMutex.release();
+                toAdd.add(stock.getOne());
             }
             toAdd.removeAll(holder.getPieces());
             if(!toAdd.isEmpty()) {
@@ -182,7 +157,7 @@ public class Game extends Page {
                     obj.put("player", p.serialize());
                     obj.put("pieces", arr);
                     Platform.runAfter(() -> {
-                        broadCast().forEach(socket -> socket.emit("deal", obj));
+                        owner.getSockets().forEach(socket -> socket.emit("deal", obj));
                         holder.add(toAdd.toArray(new Piece[0]));
                     }, 300);
                 }catch(Exception x) {
@@ -191,7 +166,7 @@ public class Game extends Page {
             }
             if(p.getType() == PlayerType.BOT && !lostTurn && checkForWinner() == null) {
                 Platform.runAfter(() -> {
-                    if(owner.getLoaded() != this) return;
+                    if(owner.getLoaded() != this || scoreBoard.isShown()) return;
                     List<Piece> possible = table.getPossiblePlays(holder.getPieces());
                     if(!possible.isEmpty()) {
                         Piece piece = possible.get(0);
@@ -203,7 +178,7 @@ public class Game extends Page {
                             JSONObject obj = new JSONObject();
                             obj.put("player", p.serialize());
                             obj.put("move", m.serialize());
-                            broadCast().forEach(socket -> socket.emit("move", obj));
+                            owner.getSockets().forEach(socket -> socket.emit("move", obj));
                         }catch (Exception x) {
                             ErrorHandler.handle(x, "playing bot");
                         }
@@ -211,7 +186,9 @@ public class Game extends Page {
                         if(holder.getPieces().isEmpty()) {
                             emitWin(p);
                         }else {
-                            nextTurn(holder);
+                            holder.setEnabled(false);
+                            Platform.runAfter(() ->
+                                    nextTurn(holder), 750);
                         }
                     } else {
                         pass(holder);
@@ -229,8 +206,7 @@ public class Game extends Page {
         if(holders.isEmpty()) return;
         PieceHolder next = holders.get((holders.indexOf(holder) + 1) % holders.size());
         if(!host) {
-            SocketConnection socket = owner.getTypedData("socket");
-            socket.emit("turn", next.getPlayer().serialize());
+            owner.getSocket().emit("turn", next.getPlayer().serialize());
         }
         if(host) {
             boolean m9foul = stock.isEmpty();
@@ -256,9 +232,8 @@ public class Game extends Page {
                     }
                 }
 
-                FourMode mode = FourMode.byText(owner.getString("mode"));
                 if(winner.size() == 1 ||
-                        (mode == FourMode.TEAM_MODE &&
+                        (owner.getFourMode() == FourMode.TEAM_MODE &&
                                 winner.size() == 2 &&
                                 index(winner.get(0)) % 2 == index(winner.get(1)) % 2)) {
                     emitWin(winner.get(0));
@@ -273,17 +248,8 @@ public class Game extends Page {
         }
     }
 
-    private HashMap<Player, Integer> getScore() {
-        HashMap<Player, Integer> score = owner.getTypedData("score");
-        if(score == null) {
-            score = new HashMap<>();
-            owner.putData("score", score);
-        }
-        return score;
-    }
-
-    int getScoreOf(Player player) {
-        HashMap<Player, Integer> score = getScore();
+    public int getScoreOf(Player player) {
+        HashMap<Player, Integer> score = owner.getScore();
 
         Integer i = score.get(player);
         if(i != null)
@@ -294,7 +260,7 @@ public class Game extends Page {
     }
 
     private void addScoreOf(Player player, int add) {
-        HashMap<Player, Integer> score = getScore();
+        HashMap<Player, Integer> score = owner.getScore();
 
         int oldScore = getScoreOf(player);
 
@@ -302,13 +268,13 @@ public class Game extends Page {
     }
 
     public void setScoreOf(Player player, int val) {
-        HashMap<Player, Integer> score = getScore();
+        HashMap<Player, Integer> score = owner.getScore();
 
         score.put(player, val);
     }
 
     private int index(Player player) {
-        ArrayList<Player> players = owner.getTypedData("players");
+        List<Player> players = owner.getPlayers();
         for(int i = 0; i < players.size(); i++) {
             if(players.get(i).equals(player)) {
                 return i;
@@ -318,18 +284,17 @@ public class Game extends Page {
     }
 
     public Player otherPlayer(Player player) {
-        ArrayList<Player> players = owner.getTypedData("players");
+        List<Player> players = owner.getPlayers();
         return players.get((index(player) + 2) % players.size());
     }
 
     private int scoreToAdd(Player winner) {
         int sum = 0;
-        FourMode mode = FourMode.byText(owner.getString("mode"));
 
         ArrayList<Player> winners = new ArrayList<>();
         winners.add(winner);
 
-        if(mode == FourMode.TEAM_MODE) {
+        if(owner.getFourMode() == FourMode.TEAM_MODE) {
             winners.add(otherPlayer(winner));
         }
 
@@ -343,7 +308,7 @@ public class Game extends Page {
 
     private void pass(PieceHolder holder) {
         if(host) {
-            broadCast().forEach(socket -> socket.emit("pass", holder.getPlayer().serialize()));
+            owner.getSockets().forEach(socket -> socket.emit("pass", holder.getPlayer().serialize()));
         }
         Platform.runAfter(() -> {
             if(holder.getPlayer().isSelf(host)) {
@@ -358,19 +323,8 @@ public class Game extends Page {
         return table;
     }
 
-    public List<SocketConnection> broadCast() {
-        return owner.getTypedData("sockets");
-    }
-
     public List<Piece> deal() {
-        stockMutex.acquireUninterruptibly();
-        ArrayList<Piece> res = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            res.add(stock.get(i));
-        }
-        stock.removeAll(res);
-        stockMutex.release();
-        return res;
+        return stock.deal();
     }
 
     private Player checkForWinner() {
@@ -385,16 +339,14 @@ public class Game extends Page {
 
     public void emitWin(Player winner) {
         if(host) {
-            FourMode mode = FourMode.byText(owner.getString("mode"));
-
             int scoreToAdd = scoreToAdd(winner);
 
             addScoreOf(winner, scoreToAdd);
-            if(mode == FourMode.TEAM_MODE) {
+            if(owner.getFourMode() == FourMode.TEAM_MODE) {
                 addScoreOf(otherPlayer(winner), scoreToAdd);
             }
 
-            broadCast().forEach(s -> s.emit("winner", scoreBoard(winner).toString()));
+            owner.getSockets().forEach(s -> s.emit("winner", scoreBoard(winner).toString()));
             owner.putData("winner", winner);
             victory(scoreBoard(winner));
         }
@@ -403,7 +355,7 @@ public class Game extends Page {
     private JSONArray scoreBoard(Player winner) {
         JSONArray arr = new JSONArray();
         try {
-            ArrayList<Player> players = owner.getTypedData("players");
+            List<Player> players = owner.getPlayers();
             for(Player player : players) {
                 JSONObject obj = new JSONObject();
                 if(player.equals(winner)) {
@@ -421,7 +373,7 @@ public class Game extends Page {
 
     public void emitDraw() {
         if(host) {
-            broadCast().forEach(s -> s.emit("winner", scoreBoard(null).toString()));
+            owner.getSockets().forEach(s -> s.emit("winner", scoreBoard(null).toString()));
             owner.putData("winner", null);
         }
         victory(scoreBoard(null));
@@ -449,7 +401,7 @@ public class Game extends Page {
         super.setup();
         root.setBackground(Color.TRANSPARENT);
         leftInStock.setAlpha(0);
-        stock = Piece.pack();
+        stock = new Stock();
         table.clear();
         holders.forEach(h -> {
             root.removeView(h);
@@ -460,7 +412,7 @@ public class Game extends Page {
         cherat.setAlpha(0);
         cherat.setTranslationY(ViewUtils.dipToPx(80, owner));
 
-        ArrayList<Player> players = owner.getTypedData("players");
+        List<Player> players = owner.getPlayers();
 
         int index = 0;
         for (int i = 0; i < players.size(); i++) {
@@ -533,18 +485,18 @@ public class Game extends Page {
                     leftInStock.setTranslationX(-preRoot.getPaddingRight());
                     leftInStock.setAlpha(v);
                 })
+                .setOnFinished(table::adjustBoard)
                 .setInterpolator(Interpolator.EASE_OUT);
-        FourMode mode = FourMode.byText(owner.getString("mode"));
-        if(mode == FourMode.TEAM_MODE) {
-            show.addAnimation(new AlphaAnimation(cherat, 1))
-                    .addAnimation(new TranslateYAnimation(cherat, 0));
+
+        if(owner.getFourMode() == FourMode.TEAM_MODE) {
+            show.addAnimation(cherat.show());
+        }else {
+            root.removeView(cherat);
         }
         show.start();
 
-
-
         if (host) {
-            broadCast().forEach(socket -> {
+            owner.getSockets().forEach(socket -> {
                 socket.on("deal", data -> {
                     JSONArray arr = new JSONArray();
                     Player player = Player.deserialize(new JSONObject(data));
@@ -570,16 +522,16 @@ public class Game extends Page {
                     assert holder != null;
                     assert move != null;
 
-                    broadCast().forEach(s -> s.emit("move", data));
+                    owner.getSockets().forEach(s -> s.emit("move", data));
                     Platform.runLater(() -> holder.play(move));
                 });
                 socket.on("khabet", data -> {
-                    broadCast().forEach(s -> s.emit("khabet", data));
+                    owner.getSockets().forEach(s -> s.emit("khabet", data));
                     Player player = Player.deserialize(new JSONObject(data));
                     getForPlayer(player).cherra(R.drawable.khabet, R.raw.khabet);
                 });
                 socket.on("saket", data -> {
-                    broadCast().forEach(s -> s.emit("saket", data));
+                    owner.getSockets().forEach(s -> s.emit("saket", data));
                     Player player = Player.deserialize(new JSONObject(data));
                     getForPlayer(player).cherra(R.drawable.saket, R.raw.saket);
                 });
@@ -594,7 +546,7 @@ public class Game extends Page {
                 });
             });
         } else {
-            SocketConnection socket = owner.getTypedData("socket");
+            SocketConnection socket = owner.getSocket();
             socket.on("deal", data -> {
                 JSONObject all = new JSONObject(data);
                 Player player = Player.deserialize(all.getJSONObject("player"));
@@ -670,7 +622,7 @@ public class Game extends Page {
 
             Platform.runAfter(() -> {
                 if (host) {
-                    Player winner = owner.getTypedData("winner");
+                    Player winner = owner.getWinner();
                     if (winner != null)
                         turn(winner);
                     else {
@@ -735,8 +687,7 @@ public class Game extends Page {
                         0,
                         0,
                         0))
-                .addAnimation(new AlphaAnimation(cherat, 0))
-                .addAnimation(new TranslateYAnimation(cherat, ViewUtils.dipToPx(80, owner)))
+                .addAnimation(cherat.hide())
                 .addAnimation(new ColorAnimation(style.getTextMuted(), style.getBackgroundTertiary()) {
                     @Override
                     public void updateValue(int color) {

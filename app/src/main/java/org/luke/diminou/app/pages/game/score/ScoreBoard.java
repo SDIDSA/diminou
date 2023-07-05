@@ -24,7 +24,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.Player;
+import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
@@ -99,13 +99,12 @@ public class ScoreBoard extends Overlay implements Styleable {
     private void loadScores() {
         root.removeAllViews();
         boolean gameEnd = false;
-        ArrayList<Player> players = new ArrayList<>(owner.getTypedData("players"));
+        ArrayList<Player> players = new ArrayList<>(owner.getPlayers());
 
         Game game = (Game) Page.getInstance(owner, Game.class);
         assert game != null;
 
-        FourMode mode = FourMode.byText(owner.getString("mode"));
-        if(mode == FourMode.NORMAL_MODE) {
+        if(owner.getFourMode() == FourMode.NORMAL_MODE) {
             root.setPadding(15);
             players.sort((p1, p2) -> Integer.compare(getScoreOf(p2), getScoreOf(p1)));
 
@@ -156,7 +155,7 @@ public class ScoreBoard extends Overlay implements Styleable {
             skip.setOnClick(() -> {
                 hide();
                 owner.getLoaded().setup();
-                game.broadCast().forEach(s -> s.emit("skip", ""));
+                owner.getSockets().forEach(s -> s.emit("skip", ""));
             });
             root.addView(skip);
         }else {
@@ -167,7 +166,7 @@ public class ScoreBoard extends Overlay implements Styleable {
     }
 
     private HashMap<Player, Integer> getScore() {
-        HashMap<Player, Integer> score = owner.getTypedData("score");
+        HashMap<Player, Integer> score = owner.getScore();
         if(score == null) {
             score = new HashMap<>();
             owner.putData("score", score);
@@ -193,7 +192,7 @@ public class ScoreBoard extends Overlay implements Styleable {
 
     @Override
     public void applyStyle(Style style) {
-        FourMode mode = FourMode.byText(owner.getString("mode"));
+        FourMode mode = owner.getFourMode();
         root.setBackground(mode == FourMode.NORMAL_MODE ? style.getBackgroundTertiary() : Color.TRANSPARENT);
         waiting.setFill(style.getTextMuted());
         skip.setFill(mode == FourMode.NORMAL_MODE ? App.adjustAlpha(style.getSecondaryButtonBack(), .3f) : style.getBackgroundPrimary());

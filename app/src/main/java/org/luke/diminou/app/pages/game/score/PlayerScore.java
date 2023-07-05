@@ -15,7 +15,7 @@ import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.Player;
+import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
@@ -72,8 +72,7 @@ public class PlayerScore extends HBox implements Styleable {
     public void applyStyle(Style style) {
         name.setFill(style.getTextNormal());
         score.setFill(style.getTextNormal());
-        FourMode mode = FourMode.byText(getOwner().getString("mode"));
-        if(scoreVal >= 100 && mode == FourMode.NORMAL_MODE) {
+        if(scoreVal >= 100 && getOwner().getFourMode() == FourMode.NORMAL_MODE) {
             setPadding(15);
             setBackground(App.adjustAlpha(style.getTextPositive(), .4f));
         }

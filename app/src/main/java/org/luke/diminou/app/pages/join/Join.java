@@ -27,14 +27,13 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.cards.DisplayCards;
 import org.luke.diminou.app.cards.PlayerCard;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.Player;
+import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.home.Home;
 
 import java.io.IOException;

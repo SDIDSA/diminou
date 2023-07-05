@@ -26,11 +26,6 @@ public abstract class PartialSlideOverlay extends SlideOverlay {
     }
 
     @Override
-    public void show() {
-        super.show();
-    }
-
-    @Override
     public final void applySystemInsets(Insets insets) {
         //IGNORE
     }

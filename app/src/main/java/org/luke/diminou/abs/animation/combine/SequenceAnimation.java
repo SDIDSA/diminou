@@ -41,8 +41,7 @@ public class SequenceAnimation extends Animation {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Animation> T start() {
+    public void start() {
         runner = new Thread(() -> {
             for (int i = 0; i < animations.size() - 1 && !Thread.currentThread().isInterrupted(); i++) {
                 Animation current = animations.get(i);
@@ -55,7 +54,6 @@ public class SequenceAnimation extends Animation {
             }
         }, "sequence_animation_thread");
         runner.start();
-        return (T) this;
     }
 
     @Override

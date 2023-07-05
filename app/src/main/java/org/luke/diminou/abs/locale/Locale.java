@@ -14,11 +14,9 @@ public class Locale {
 	private final HashMap<String, String> values;
 
 	private final String fontFamily;
-	private final String name;
 
 	public Locale(App owner, String name, String fontFamily) {
 		this.fontFamily = fontFamily;
-		this.name = name;
 		cache.put(name.toLowerCase(), this);
 		values = new HashMap<>();
 		String file = Assets.readAsset(owner, "locales/".concat(name).concat(".json"));

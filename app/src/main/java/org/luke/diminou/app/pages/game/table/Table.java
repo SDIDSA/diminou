@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.table;
 
 import android.graphics.Rect;
 import android.view.Gravity;
@@ -20,6 +20,15 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.pages.game.Game;
+import org.luke.diminou.app.pages.game.PlaySound;
+import org.luke.diminou.app.pages.game.piece.Move;
+import org.luke.diminou.app.pages.game.piece.Piece;
+import org.luke.diminou.app.pages.game.piece.PieceRotation;
+import org.luke.diminou.app.pages.game.piece.PlayedPiece;
+import org.luke.diminou.app.pages.game.player.PieceHolder;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.player.Side;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +36,7 @@ import java.util.stream.Collectors;
 
 public class Table extends FrameLayout {
     private static final int SPACING = 2;
-    private static final int offsetY = 25;
-    private static final int CENTER_SIZE = 9;
+    private static final int CENTER_SIZE = 8;
     private final App owner;
     private final ArrayList<PlayedPiece> onTable = new ArrayList<>();
     private final ArrayList<PlayedPiece> center = new ArrayList<>();
@@ -36,15 +44,12 @@ public class Table extends FrameLayout {
     private final ArrayList<PlayedPiece> left_down = new ArrayList<>();
     private final ArrayList<PlayedPiece> right = new ArrayList<>();
     private final ArrayList<PlayedPiece> right_up = new ArrayList<>();
-
     public Table(App owner) {
         super(owner);
         this.owner = owner;
 
         setLayoutParams(new LayoutParams(owner.getScreenWidth() * 3, owner.getScreenHeight() * 3));
         ViewUtils.alignInFrame(this, Gravity.CENTER);
-
-        setTranslationY(-ViewUtils.dipToPx(offsetY, owner));
 
         setOnTouchListener((v, e) -> {
             float rawX = e.getRawX();
@@ -66,7 +71,8 @@ public class Table extends FrameLayout {
 
                 float dx = px - x;
                 float dy = py - y;
-                double distance = Math.sqrt(dx * dx + dy * dy) / getScaleY();
+                double unscaled = Math.sqrt(dx * dx + dy * dy);
+                double distance = unscaled * getScaleY();
 
                 if(distance < minDistance) {
                     closest = possible;
@@ -287,7 +293,6 @@ public class Table extends FrameLayout {
     public void play(Move move, ColorIcon source, Player player) {
         playing = player;
         owner.putData("winner", null);
-        owner.putData("last_player", player);
         ColorIcon target = getPlayPosition(move);
         target.setAlpha(0f);
 
@@ -335,8 +340,7 @@ public class Table extends FrameLayout {
                     .addAnimation(new TranslateYAnimation(target, oldY))
                     .addAnimation(new AlphaAnimation(target, 1))
                     .setInterpolator(Interpolator.EASE_OUT)
-                    .setOnFinished(this::adjustBoard)
-                    .start();
+                    .setOnFinished(this::adjustBoard);
             anim.start();
         }, 50);
     }
@@ -345,34 +349,46 @@ public class Table extends FrameLayout {
         return onTable.size();
     }
 
-    private void adjustBoard() {
+    public void adjustBoard() {
         if(!isAttachedToWindow()) return;
 
-        int top = getMaxTop();
-        int bottom = getMaxBottom();
-        int right = getMaxRight();
-        int left = getMaxLeft();
+        int top = getMaxTop() + getHeight() / 2;
+        int bottom = getMaxBottom() + getHeight() / 2;
+        int right = getMaxRight() + getWidth() / 2;
+        int left = getMaxLeft() + getWidth() / 2;
 
-        float height = (bottom - top);
-        float width = (right - left);
+        Rect pbounds = new Rect(left, top, right, bottom);
 
         Rect bounds = tableBounds();
 
-        float maxHeight = bounds.bottom - bounds.top;
-        float maxWidth = bounds.right - bounds.left;
+        float height = pbounds.height();
+        float width = pbounds.width();
 
-        int centerY = (bottom + top) / 2 - (bounds.top + bounds.bottom) / 2 + owner.getScreenHeight() / 2;
-        int centerX = (left + right) / 2 - (bounds.right + bounds.left) / 2 + owner.getScreenWidth() / 2;
+        float maxHeight = bounds.height();
+        float maxWidth = bounds.width();
 
         float factorY = maxHeight / height;
         float factorX = maxWidth / width;
 
+        float factor = Math.min(1, Math.min(factorX, factorY));
+
+        int pcenterX = pbounds.centerX() - getWidth() / 2;
+        int pcenterY = pbounds.centerY() - getHeight() / 2;
+
+        int dcx = (bounds.centerX() - owner.getScreenWidth() / 2);
+        int dcy = (bounds.centerY() - owner.getScreenHeight() / 2);
+
+        FrameLayout par = ((FrameLayout) getParent());
+
+        int centerX = -pcenterX + dcx - par.getPaddingLeft() / 2 + par.getPaddingRight() / 2;
+        int centerY = -pcenterY + dcy - par.getPaddingTop() / 2 + par.getPaddingBottom() / 2;
+
         ParallelAnimation anim = new ParallelAnimation(400)
-                .addAnimation(new ScaleXYAnimation(this, Math.min(1, Math.min(factorX, factorY))))
-                .addAnimation(new PivotYAnimation(this, getHeight() / 2f + centerY))
-                .addAnimation(new PivotXAnimation(this, getWidth() / 2f + centerX))
-                .addAnimation(new TranslateXAnimation(this, -centerX))
-                .addAnimation(new TranslateYAnimation(this, -centerY))
+                .addAnimation(new ScaleXYAnimation(this, factor))
+                .addAnimation(new PivotYAnimation(this, getHeight() / 2f + pcenterY))
+                .addAnimation(new PivotXAnimation(this, getWidth() / 2f + pcenterX))
+                .addAnimation(new TranslateXAnimation(this, centerX))
+                .addAnimation(new TranslateYAnimation(this, centerY))
                 .setOnFinished(() -> playing = null)
                 .setInterpolator(Interpolator.EASE_OUT);
         anim.start();
@@ -649,25 +665,29 @@ public class Table extends FrameLayout {
         return offsetViewBounds.top;
     }
 
+    private Rect bounds = null;
     private Rect tableBounds() {
-        Game game = owner.getLoaded();
-        PieceHolder leftHolder = game.getLeftHolder();
-        PieceHolder rightHolder = game.getRightHolder();
-        PieceHolder topHolder = game.getTopHolder();
-        PieceHolder bottomHolder = game.getBottomHolder();
-        int maxLeft = (leftHolder == null ? ViewUtils.dipToPx(5, owner) : getXInParent(leftHolder) + leftHolder.getWidth()) + ViewUtils.dipToPx(15, owner);
-        int maxRight = (rightHolder == null ? owner.getScreenWidth() - ViewUtils.dipToPx(5, owner) : getXInParent(rightHolder)) - ViewUtils.dipToPx(15, owner);
-        int maxTop = getYInParent(topHolder) + topHolder.getHeight() + ViewUtils.dipToPx(10, owner);
-        int maxBottom = getYInParent(bottomHolder) - ViewUtils.dipToPx(35, owner);
-        return new Rect(maxLeft, maxTop, maxRight, maxBottom);
+        if(bounds == null) {
+            Game game = owner.getLoaded();
+            PieceHolder leftHolder = game.getLeftHolder();
+            PieceHolder rightHolder = game.getRightHolder();
+            PieceHolder topHolder = game.getTopHolder();
+            PieceHolder bottomHolder = game.getBottomHolder();
+            int maxLeft = (leftHolder == null ? ViewUtils.dipToPx(5, owner) : getXInParent(leftHolder) + leftHolder.getWidth()) + ViewUtils.dipToPx(10, owner);
+            int maxRight = (rightHolder == null ? owner.getScreenWidth() - ViewUtils.dipToPx(5, owner) : getXInParent(rightHolder)) - ViewUtils.dipToPx(10, owner);
+            int maxTop = getYInParent(topHolder) + topHolder.getHeight() + ViewUtils.dipToPx(5, owner);
+            int maxBottom = getYInParent(bottomHolder) - ViewUtils.dipToPx(30, owner);
+            bounds = new Rect(maxLeft, maxTop, maxRight, maxBottom);
+        }
+        return bounds;
     }
 
     public void clear() {
+        bounds = null;
         playing = null;
         removeAllViews();
         setScaleX(1);
         setScaleY(1);
-        setTranslationY(-ViewUtils.dipToPx(offsetY, owner));
         setTranslationX(0);
         setAlpha(1);
         onTable.clear();

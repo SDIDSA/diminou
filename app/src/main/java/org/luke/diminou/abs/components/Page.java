@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 public abstract class Page extends FrameLayout implements Styleable {
     private static final HashMap<Class<? extends Page>, Page> cache = new HashMap<>();
-    protected App owner;
+    protected final App owner;
 
     public Page(App owner) {
         super(owner);

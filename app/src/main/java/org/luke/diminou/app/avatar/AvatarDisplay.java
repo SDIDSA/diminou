@@ -19,7 +19,7 @@ public class AvatarDisplay extends FrameLayout implements Styleable {
 
     private final Image img;
 
-    public static int preSize = 64;
+    public static final int preSize = 64;
 
     public AvatarDisplay(App owner) {
         super(owner);

@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.piece;
 
 import org.json.JSONException;
 import org.json.JSONObject;

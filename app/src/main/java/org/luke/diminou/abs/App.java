@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -35,18 +36,22 @@ import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.components.layout.overlay.Overlay;
+import org.luke.diminou.abs.local.SocketConnection;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.PlaySound;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.settings.FourMode;
+import org.luke.diminou.app.pages.settings.Timer;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class App extends AppCompatActivity {
@@ -54,7 +59,7 @@ public class App extends AppCompatActivity {
     private final ArrayList<Overlay> loadedOverlay = new ArrayList<>();
     public Style dark, light;
     public Style dark_auto, light_auto;
-    public Locale fr_fr, en_us, ar_ar;
+    public Locale ar_ar;
     Animation running = null;
     private FrameLayout root;
     private Page loaded;
@@ -80,6 +85,8 @@ public class App extends AppCompatActivity {
         Store.init(this);
 
         ViewUtils.scale = Float.parseFloat(Store.getScale());
+
+        Log.i("4px", String.valueOf(ViewUtils.pxToDip(4, this)));
 
         dark = new Style(this, "dark", true);
         light = new Style(this, "light", false);
@@ -114,9 +121,9 @@ public class App extends AppCompatActivity {
         });
 
         new Thread(() -> {
-            fr_fr = new Locale(this, "fr_FR", Font.DEFAULT_FAMILY_LATIN);
-            en_us = new Locale(this, "en_US", Font.DEFAULT_FAMILY_LATIN);
-            ar_ar = new Locale(this, "ar_AR", Font.DEFAULT_FAMILY_ARABIC);
+            new Locale(this, "fr_FR", Font.DEFAULT_FAMILY_LATIN);
+            new Locale(this, "en_US", Font.DEFAULT_FAMILY_LATIN);
+            new Locale(this, "ar_AR", Font.DEFAULT_FAMILY_ARABIC);
 
             Font.init(this);
 
@@ -139,21 +146,30 @@ public class App extends AppCompatActivity {
             loadSound(R.raw.pass);
             loadSound(R.raw.khabet);
             loadSound(R.raw.saket);
+            loadSound(R.raw.end);
             for(PlaySound s : PlaySound.values()) {
                 loadSound(s.getRes());
             }
         }, "app_init_thread").start();
     }
 
-    private void loadSound(@RawRes int res) {
-        sounds.put(res, MediaPlayer.create(this, res));
+    private MediaPlayer loadSound(@RawRes int res) {
+        MediaPlayer mp = MediaPlayer.create(this, res);
+        sounds.put(res, mp);
+        assert mp != null;
+        mp.setVolume(1, 1);
+        return mp;
     }
 
     public synchronized void playSound(@RawRes int res) {
         MediaPlayer mp = sounds.get(res);
-        assert mp != null;
-        mp.seekTo(0);
-        mp.start();
+        if(mp == null) return;
+        try {
+            mp.seekTo(0);
+            mp.start();
+        }catch(Exception x) {
+            loadSound(res).start();
+        }
     }
 
     public void reloadPage() {
@@ -177,11 +193,14 @@ public class App extends AppCompatActivity {
             AtomicReference<Page> page = new AtomicReference<>();
             Page old = loaded;
             if (old != null)
+            {
                 running = new ParallelAnimation(500).addAnimation(new AlphaAnimation(old, 0)).addAnimation(new TranslateYAnimation(old, ViewUtils.dipToPx(-30, this))).setInterpolator(Interpolator.EASE_OUT).setOnFinished(() -> {
                     root.removeView(old);
                     old.destroy();
                     if (post != null) post.run();
-                }).start();
+                });
+                running.start();
+            }
 
             new Thread(() -> {
                 if (old != null)
@@ -346,10 +365,6 @@ public class App extends AppCompatActivity {
         return style;
     }
 
-    public void setStyle(Style style) {
-        this.style.set(style);
-    }
-
     public void setBackgroundColor(int color) {
         int trans = adjustAlpha(color, 0.005f);
         Window win = getWindow();
@@ -402,7 +417,7 @@ public class App extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getTypedData(String key) {
+    private <T> T getTypedData(String key) {
         return (T) data.get(key);
     }
 
@@ -418,7 +433,44 @@ public class App extends AppCompatActivity {
         putData(key, value);
     }
 
-    public String getString(String key) {
+    private String getString(String key) {
         return getTypedData(key);
+    }
+
+    public FourMode getFourMode() {
+        return FourMode.byText(getString("mode"));
+    }
+
+    public Timer getTimer() {
+        return Timer.byText(getString("timer"));
+    }
+
+    public List<Player> getPlayers() {
+        return getTypedData("players");
+    }
+
+    public HashMap<Player, Integer> getScore() {
+        HashMap<Player, Integer> score = getTypedData("score");
+        if(score == null) {
+            score = new HashMap<>();
+            putData("score", score);
+        }
+        return score;
+    }
+
+    public List<SocketConnection> getSockets() {
+        return getTypedData("sockets");
+    }
+
+    public SocketConnection getSocket() {
+        return getTypedData("socket");
+    }
+
+    public Player getWinner() {
+        return getTypedData("winner");
+    }
+
+    public boolean isHost() {
+        return getTypedData("host");
     }
 }

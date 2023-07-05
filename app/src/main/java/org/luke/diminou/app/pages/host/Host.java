@@ -26,8 +26,8 @@ import org.luke.diminou.app.cards.MirorredCards;
 import org.luke.diminou.app.cards.PlayerCard;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.Player;
-import org.luke.diminou.app.pages.game.PlayerType;
+import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.player.PlayerType;
 import org.luke.diminou.app.pages.home.Home;
 import org.luke.diminou.app.pages.settings.FourMode;
 
@@ -89,8 +89,8 @@ public class Host extends Titled {
                 try {
                     JSONObject game = new JSONObject();
                     game.put("players", arr);
-                    game.put("mode", owner.getString("mode"));
-                    game.put("timer", owner.getString("timer"));
+                    game.put("mode", owner.getFourMode().getText());
+                    game.put("timer", owner.getTimer().getText());
                     socket.emit("begin", game);
                 } catch (Exception x) {
                     ErrorHandler.handle(x, "starting game");

@@ -19,7 +19,7 @@ public class Loading extends HBox implements ColoredView {
     private final Rectangle[] rectangles;
     private final ParallelAnimation loader;
 
-    public Loading(App owner, double size) {
+    public Loading(App owner, float size) {
         super(owner);
         setAlpha(.6f);
 
@@ -40,7 +40,7 @@ public class Loading extends HBox implements ColoredView {
             addView(rectangles[i]);
         }
 
-        float shift = ViewUtils.dipToPx((float) -(size * 2), owner);
+        float shift = ViewUtils.dipToPx(-(size * 2), owner);
         Runnable preLoad = () -> {
             for(Rectangle rect : rectangles) {
                 rect.setTranslationX(shift);

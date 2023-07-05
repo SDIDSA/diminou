@@ -7,7 +7,6 @@ import org.luke.diminou.abs.animation.base.ViewAnimation;
 import org.luke.diminou.abs.utils.ErrorHandler;
 
 public class LinearWidthAnimation extends ViewAnimation {
-    private int height;
     public LinearWidthAnimation(long duration, View view, float to) {
         super(duration, view, to);
         check(view);
@@ -26,12 +25,12 @@ public class LinearWidthAnimation extends ViewAnimation {
 
     @Override
     protected float getFrom(View view) {
-        height = view.getLayoutParams().height;
         return view.getLayoutParams().width;
     }
 
     @Override
     protected void apply(View view, float v) {
-        view.setLayoutParams(new LinearLayout.LayoutParams((int) v, height));
+        view.getLayoutParams().width = (int) v;
+        view.requestLayout();
     }
 }

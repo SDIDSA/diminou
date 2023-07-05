@@ -37,10 +37,9 @@ public class Label extends androidx.appcompat.widget.AppCompatTextView implement
         ((FrameLayout.LayoutParams) getLayoutParams()).gravity = gravity;
     }
 
-    public Label setFont(Font font) {
+    public void setFont(Font font) {
         setTypeface(font.getFont());
         setTextSize(TypedValue.COMPLEX_UNIT_SP, font.getSize());
-        return this;
     }
 
     public void setKey(String key) {

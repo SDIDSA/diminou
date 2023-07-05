@@ -67,7 +67,14 @@ public abstract class Overlay extends FrameLayout {
         this.autoHide = autoHide;
     }
 
+    private boolean shown = false;
+    public boolean isShown() {
+        return shown;
+    }
+
     public void show() {
+        if(shown) return;
+        shown = true;
         hide.stop();
         show.stop();
         for(Runnable act : onShowing) {
@@ -78,6 +85,8 @@ public abstract class Overlay extends FrameLayout {
     }
 
     public void hide() {
+        if(!shown) return;
+        shown = false;
         show.stop();
         hide.stop();
         hide.start();

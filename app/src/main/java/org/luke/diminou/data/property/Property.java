@@ -1,10 +1,6 @@
 package org.luke.diminou.data.property;
 
 import org.luke.diminou.abs.utils.ErrorHandler;
-import org.luke.diminou.data.binding.Binding;
-import org.luke.diminou.data.binding.Bindings;
-import org.luke.diminou.data.binding.boolean_type.BooleanBinding;
-import org.luke.diminou.data.observable.BooleanObservable;
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.observable.Observable;
 
@@ -62,7 +58,7 @@ public class Property<T> implements Observable<T> {
                     }
                     success = true;
                 }catch (Exception x) {
-
+                    ErrorHandler.handle(x, "notifying change listeners");
                 }
             }
         }
@@ -83,10 +79,6 @@ public class Property<T> implements Observable<T> {
         return value == null;
     }
 
-    public Observable<Boolean> isNullBinding() {
-        return new Binding<>(this::isNull, this);
-    }
-
     @Override
     public void removeListener(ChangeListener<? super T> listener) {
         listeners.remove(listener);
@@ -95,13 +87,5 @@ public class Property<T> implements Observable<T> {
     @Override
     public void clearListeners() {
         listeners.clear();
-    }
-
-    public BooleanBinding isEqualTo(Observable<T> other) {
-        return new BooleanBinding(() -> Objects.equals(get(), other.get()), this, other);
-    }
-
-    public BooleanBinding isEqualTo(T other) {
-        return new BooleanBinding(() -> Objects.equals(get(), other), this);
     }
 }

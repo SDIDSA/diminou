@@ -2,7 +2,6 @@ package org.luke.diminou.abs.animation.view;
 
 import androidx.annotation.ColorInt;
 
-import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.base.ColorAnimation;
 import org.luke.diminou.abs.components.controls.abs.ColoredView;
 
@@ -25,9 +24,9 @@ public class ColorTransition extends ColorAnimation {
     }
 
     @Override
-    public <T extends Animation> T start() {
+    public void start() {
         setFrom(view.getFill());
-        return super.start();
+        super.start();
     }
 
     @Override

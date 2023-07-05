@@ -29,7 +29,7 @@ public enum PlaySound {
     SOUND_21(R.raw.play_21),
     SOUND_22(R.raw.play_22);
 
-    private @RawRes int res;
+    private final @RawRes int res;
     PlaySound(@RawRes int res) {
         this.res = res;
     }

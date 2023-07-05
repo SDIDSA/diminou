@@ -1,6 +1,5 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.piece;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.DrawableRes;
@@ -79,7 +78,7 @@ public enum Piece implements Styleable {
         return priority;
     }
 
-    private int n0, n1;
+    private final int n0, n1;
     public static void initAll(App owner) {
         for(Piece piece : Piece.values()) {
             piece.init(owner);
@@ -90,7 +89,7 @@ public enum Piece implements Styleable {
         return values()[(int) (Math.random() * values().length)];
     }
     private final @DrawableRes int res;
-    private @DrawableRes int resHor;
+    private final @DrawableRes int resHor;
     Piece(@DrawableRes int res, @DrawableRes int resHor, int n0, int n1) {
         this.res = res;
         this.resHor = resHor;

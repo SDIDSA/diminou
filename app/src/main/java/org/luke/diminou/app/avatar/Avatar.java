@@ -126,7 +126,7 @@ public enum Avatar {
     B_18(R.drawable.b_18),
     B_19(R.drawable.b_19);
 
-    private static Avatar[] avatars = new Avatar[]{
+    private static final Avatar[] avatars = new Avatar[]{
             A_0,
             A_1,
             A_2,
@@ -149,7 +149,7 @@ public enum Avatar {
             A_19
     };
 
-    private static Avatar[] shapes = new Avatar[]{
+    private static final Avatar[] shapes = new Avatar[]{
             S_0,
             S_1,
             S_2,
@@ -172,7 +172,7 @@ public enum Avatar {
             S_19
     };
 
-    private static Avatar[] fulls = new Avatar[]{
+    private static final Avatar[] fulls = new Avatar[]{
             F_0,
             F_1,
             F_2,
@@ -195,7 +195,7 @@ public enum Avatar {
             F_19
     };
 
-    private static Avatar[] smiles = new Avatar[]{
+    private static final Avatar[] smiles = new Avatar[]{
             M_0,
             M_1,
             M_2,
@@ -218,7 +218,7 @@ public enum Avatar {
             M_19
     };
 
-    private static Avatar[] micahs = new Avatar[]{
+    private static final Avatar[] micahs = new Avatar[]{
             Mi_0,
             Mi_1,
             Mi_2,
@@ -241,7 +241,7 @@ public enum Avatar {
             Mi_19
     };
 
-    private static Avatar[] bots = new Avatar[]{
+    private static final Avatar[] bots = new Avatar[]{
             B_0,
             B_1,
             B_2,
@@ -264,7 +264,7 @@ public enum Avatar {
             B_19
     };
 
-    private @DrawableRes int res;
+    private final @DrawableRes int res;
     Avatar(@DrawableRes int res) {
         this.res = res;
     }

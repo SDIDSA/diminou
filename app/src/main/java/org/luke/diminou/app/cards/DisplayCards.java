@@ -145,7 +145,7 @@ public class DisplayCards extends HBox {
         return arr.toString();
     }
 
-    private static String[] botNames = new String[] {"William","James","Emma","Noah","Oliver","Benjamin","Thomas","Jack","Olivia","Harper","Alexander","Evelyn","Anna","Amelia","Sophia","Lucas","Liam","Jacob","Isabella","Theodore","Abigail","Christopher","Nathan","Logan"};
+    private static final String[] botNames = new String[] {"William","James","Emma","Noah","Oliver","Benjamin","Thomas","Jack","Olivia","Harper","Alexander","Evelyn","Anna","Amelia","Sophia","Lucas","Liam","Jacob","Isabella","Theodore","Abigail","Christopher","Nathan","Logan"};
 
     public String botName() {
         String name = randomBotName();
