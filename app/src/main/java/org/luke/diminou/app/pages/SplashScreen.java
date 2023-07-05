@@ -8,6 +8,7 @@ import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
+import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
@@ -32,9 +33,9 @@ public class SplashScreen extends Page implements Styleable {
         subIcon = new ColorIcon(owner, R.drawable.diminou);
         subIcon.setSize(80);
 
-        root.addView(ViewUtils.spacer(owner));
+        root.addView(ViewUtils.spacer(owner, Orientation.VERTICAL));
         root.addView(icon);
-        root.addView(ViewUtils.spacer(owner));
+        root.addView(ViewUtils.spacer(owner, Orientation.VERTICAL));
         root.addView(subIcon);
 
         addView(root);

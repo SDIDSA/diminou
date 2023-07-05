@@ -5,6 +5,7 @@ import android.widget.LinearLayout;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.image.Image;
+import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.HBox;
@@ -46,7 +47,7 @@ public class PartyDisplay extends HBox implements Styleable {
 
         addView(avatar);
         addView(username);
-        addView(ViewUtils.spacer(owner));
+        addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         addView(players);
 
         avatar.setImageResource(Avatar.valueOf(data.getAvatar()).getRes());

@@ -187,7 +187,7 @@ public class Home extends Page {
     }
     private void setEffects() {
         VBox all = new VBox(owner);
-        all.setLayoutParams(new ViewGroup.LayoutParams(owner.getScreenWidth() * 2, owner.getScreenWidth() * 2));
+        all.setLayoutParams(new ViewGroup.LayoutParams(owner.getScreenWidth() * 2, owner.getScreenHeight() * 2));
         all.setClipChildren(false);
         effects.addView(all);
         all.setPivotX(0);

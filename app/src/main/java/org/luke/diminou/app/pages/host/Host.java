@@ -1,5 +1,7 @@
 package org.luke.diminou.app.pages.host;
 
+import android.widget.LinearLayout;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,6 +59,7 @@ public class Host extends Titled {
         mirorredCards = new MirorredCards(owner);
 
         start = new Button(owner, "start_game");
+        start.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
         start.setFont(new Font(18));
 
         TeamModeOverlay teamModeOverlay = new TeamModeOverlay(owner);

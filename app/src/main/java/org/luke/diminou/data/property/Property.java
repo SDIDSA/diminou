@@ -1,6 +1,7 @@
 package org.luke.diminou.data.property;
 
 import org.luke.diminou.abs.utils.ErrorHandler;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.observable.Observable;
 
@@ -50,17 +51,20 @@ public class Property<T> implements Observable<T> {
         T ov = this.value;
         this.value = value;
         if (!Objects.equals(ov, value)) {
-            boolean success = false;
-            while(!success) {
-                try {
-                    for (ChangeListener<? super T> listener : listeners) {
-                        listener.changed(this, ov, value);
+            Platform.runBack(() -> {
+                boolean success = false;
+                while(!success) {
+                    try {
+                        for (ChangeListener<? super T> listener : listeners) {
+                            Platform.runLater(() -> listener.changed(this, ov, value));
+                        }
+                        success = true;
+                    }catch (Exception x) {
+                        Platform.sleep(100);
+                        ErrorHandler.handle(x, "notifying change listeners");
                     }
-                    success = true;
-                }catch (Exception x) {
-                    ErrorHandler.handle(x, "notifying change listeners");
                 }
-            }
+            });
         }
     }
 

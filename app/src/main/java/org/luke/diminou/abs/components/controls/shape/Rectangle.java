@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.annotation.ColorInt;
 
@@ -41,6 +42,8 @@ public class Rectangle extends View implements ColoredView {
         ChangeListener<Float> sizeListener = (obs, ov, nv) -> {
             if (getParent() instanceof FrameLayout) {
                 setLayoutParams(new FrameLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
+            } else if(getParent() instanceof LinearLayout) {
+                setLayoutParams(new LinearLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
             } else {
                 setLayoutParams(new ViewGroup.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
             }

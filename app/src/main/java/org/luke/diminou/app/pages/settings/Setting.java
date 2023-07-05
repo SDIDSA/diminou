@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.button.Button;
+import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.controls.text.transformationMethods.Capitalize;
@@ -47,7 +48,7 @@ public class Setting extends Button implements Styleable {
 
         value = new Label(owner, get.get());
         value.setTransformationMethod(new Capitalize());
-        addPostLabel(ViewUtils.spacer(owner));
+        addPostLabel(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         addPostLabel(value);
 
         overlay = setOverlay();

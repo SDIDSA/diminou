@@ -36,8 +36,9 @@ public class Loading extends HBox implements ColoredView {
 
         for(int i = 0; i < count; i++) {
             rectangles[i] = new Rectangle(owner, size, size);
-            rectangles[i].setRadius(size);
             addView(rectangles[i]);
+            rectangles[i].setRadius(size);
+            rectangles[i].setSize(size, size);
         }
 
         float shift = ViewUtils.dipToPx(-(size * 2), owner);

@@ -38,23 +38,20 @@ public class ViewUtils {
         view.setLayoutParams(params);
     }
 
-    public static View spacer(Context context) {
-        View view = new View(context);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.weight = 1;
-        view.setLayoutParams(params);
-        return view;
-    }
-
     public static View spacer(Context context, Orientation orientation) {
-        boolean hor = orientation == Orientation.HORIZONTAL;
-        View view = new View(context);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                hor ? LinearLayout.LayoutParams.WRAP_CONTENT : 1,
-                hor ? 1 : LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.weight = 1;
-        view.setLayoutParams(params);
-        return view;
+        try {
+            boolean hor = orientation == Orientation.HORIZONTAL;
+            View view = new View(context);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    hor ? LinearLayout.LayoutParams.WRAP_CONTENT : 1,
+                    hor ? 1 : LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.weight = 1;
+            view.setLayoutParams(params);
+            return view;
+        }catch (Exception x) {
+            ErrorHandler.handle(x, "creating spacer");
+            return null;
+        }
     }
 
     public static float pxToDip(int input, Context context) {
@@ -86,23 +83,27 @@ public class ViewUtils {
     }
 
     public static void setMargin(View view, Context context, float left, float top, float right, float bottom) {
-        ViewGroup.LayoutParams old = view.getLayoutParams();
-        if (old instanceof LinearLayout.LayoutParams) {
-            LinearLayout.LayoutParams marginLayoutParams = duplicateLinearLayoutParams((LinearLayout.LayoutParams) old);
-            marginLayoutParams.setMargins(dipToPx(left, context), dipToPx(top, context), dipToPx(right, context), dipToPx(bottom, context));
+        try {
+            ViewGroup.LayoutParams old = view.getLayoutParams();
+            if (old instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams marginLayoutParams = duplicateLinearLayoutParams((LinearLayout.LayoutParams) old);
+                marginLayoutParams.setMargins(dipToPx(left, context), dipToPx(top, context), dipToPx(right, context), dipToPx(bottom, context));
 
-            marginLayoutParams.setMarginStart(dipToPx(left, context));
-            marginLayoutParams.setMarginEnd(dipToPx(right, context));
+                marginLayoutParams.setMarginStart(dipToPx(left, context));
+                marginLayoutParams.setMarginEnd(dipToPx(right, context));
 
-            view.setLayoutParams(marginLayoutParams);
-        } else {
-            ViewGroup.MarginLayoutParams marginLayoutParams = duplicateViewGroupParams(old);
-            marginLayoutParams.setMargins(dipToPx(left, context), dipToPx(top, context), dipToPx(right, context), dipToPx(bottom, context));
+                view.setLayoutParams(marginLayoutParams);
+            } else {
+                ViewGroup.MarginLayoutParams marginLayoutParams = duplicateViewGroupParams(old);
+                marginLayoutParams.setMargins(dipToPx(left, context), dipToPx(top, context), dipToPx(right, context), dipToPx(bottom, context));
 
-            marginLayoutParams.setMarginStart(dipToPx(left, context));
-            marginLayoutParams.setMarginEnd(dipToPx(right, context));
+                marginLayoutParams.setMarginStart(dipToPx(left, context));
+                marginLayoutParams.setMarginEnd(dipToPx(right, context));
 
-            view.setLayoutParams(marginLayoutParams);
+                view.setLayoutParams(marginLayoutParams);
+            }
+        }catch(Exception x) {
+            ErrorHandler.handle(x, "setting margin");
         }
     }
 
@@ -146,18 +147,22 @@ public class ViewUtils {
     }
 
     public static void alignInFrame(View view, @GravityInt int gravity) {
-        ViewGroup.LayoutParams old = view.getLayoutParams();
-        FrameLayout.LayoutParams n = new FrameLayout.LayoutParams(
-                ViewGroup.MarginLayoutParams.WRAP_CONTENT,
-                ViewGroup.MarginLayoutParams.WRAP_CONTENT
-        );
+        try {
+            ViewGroup.LayoutParams old = view.getLayoutParams();
+            FrameLayout.LayoutParams n = new FrameLayout.LayoutParams(
+                    ViewGroup.MarginLayoutParams.WRAP_CONTENT,
+                    ViewGroup.MarginLayoutParams.WRAP_CONTENT
+            );
 
-        if(old != null) {
-            n.width = old.width;
-            n.height = old.height;
+            if(old != null) {
+                n.width = old.width;
+                n.height = old.height;
+            }
+            n.gravity = gravity;
+            view.setLayoutParams(n);
+        }catch(Exception x) {
+            ErrorHandler.handle(x, "aligning child in frame");
         }
-        n.gravity = gravity;
-        view.setLayoutParams(n);
     }
 
     private static ViewGroup.MarginLayoutParams duplicateViewGroupParams(ViewGroup.LayoutParams old) {

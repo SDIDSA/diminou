@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -58,7 +59,6 @@ public class App extends AppCompatActivity {
     private final HashMap<String, Object> data = new HashMap<>();
     private final ArrayList<Overlay> loadedOverlay = new ArrayList<>();
     public Style dark, light;
-    public Style dark_auto, light_auto;
     public Locale ar_ar;
     Animation running = null;
     private FrameLayout root;
@@ -91,9 +91,6 @@ public class App extends AppCompatActivity {
         dark = new Style(this, "dark", true);
         light = new Style(this, "light", false);
 
-        dark_auto = dark.copy();
-        light_auto = light.copy();
-
         style = new Property<>();
         applyTheme();
 
@@ -123,7 +120,7 @@ public class App extends AppCompatActivity {
         new Thread(() -> {
             new Locale(this, "fr_FR", Font.DEFAULT_FAMILY_LATIN);
             new Locale(this, "en_US", Font.DEFAULT_FAMILY_LATIN);
-            new Locale(this, "ar_AR", Font.DEFAULT_FAMILY_ARABIC);
+            ar_ar = new Locale(this, "ar_AR", Font.DEFAULT_FAMILY_ARABIC);
 
             Font.init(this);
 
@@ -137,7 +134,7 @@ public class App extends AppCompatActivity {
                     }
                 });
 
-                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                     Font.DEFAULT_FAMILY = nv.getFontFamily();
                     Font.DEFAULT = new Font(nv.getFontFamily());
                 }
@@ -385,7 +382,7 @@ public class App extends AppCompatActivity {
         style.set(
                 theme.equals(Style.THEME_DARK) ? dark :
                         theme.equals(Style.THEME_LIGHT) ? light :
-                                isDarkMode(getResources().getConfiguration()) ? dark_auto : light_auto);
+                                isDarkMode(getResources().getConfiguration()) ? dark : light);
         setTheme(style.get().isDark() ? R.style.Theme_Diminou_Dark : R.style.Theme_Diminou_Light);
     }
 
