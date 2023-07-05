@@ -3,16 +3,17 @@ package org.luke.diminou.abs.utils;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 
 import android.content.Context;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import androidx.annotation.GravityInt;
 
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
-import org.luke.diminou.abs.components.controls.text.font.Font;
 
 public class ViewUtils {
     public static float scale = 1f;
@@ -106,11 +107,21 @@ public class ViewUtils {
     }
 
     public static float pxToSp(float px, Context context) {
-        return px / (context.getResources().getDisplayMetrics().scaledDensity * scale);
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        if (Build.VERSION.SDK_INT >= 34) {
+            return TypedValue.convertPixelsToDimension(COMPLEX_UNIT_SP, px, metrics) / scale;
+        } else {
+            return px / (context.getResources().getDisplayMetrics().scaledDensity * scale);
+        }
     }
 
     public static float spToPx(float sp, Context context) {
-        return sp * context.getResources().getDisplayMetrics().scaledDensity * scale;
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        if (Build.VERSION.SDK_INT >= 34) {
+            return TypedValue.convertDimensionToPixels(COMPLEX_UNIT_SP, sp, metrics) * scale;
+        } else {
+            return sp * context.getResources().getDisplayMetrics().scaledDensity * scale;
+        }
     }
 
     private static LinearLayout.LayoutParams duplicateLinearLayoutParams(LinearLayout.LayoutParams old) {
