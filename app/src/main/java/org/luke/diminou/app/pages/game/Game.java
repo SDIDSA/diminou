@@ -1,6 +1,7 @@
 package org.luke.diminou.app.pages.game;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -44,6 +45,7 @@ import org.luke.diminou.data.property.Property;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Game extends Page {
@@ -89,7 +91,7 @@ public class Game extends Page {
         root.addView(cherat);
 
         scoreBoard = new ScoreBoard(owner);
-        scoreBoard.addOnShowing(() -> owner.playSound(R.raw.end));
+        scoreBoard.addOnShowing(() -> owner.playMenuSound(R.raw.end));
         scoreBoard.addOnShowing(() -> {
             for (PieceHolder holder : holders) {
                 holder.setEnabled(false);
@@ -132,6 +134,7 @@ public class Game extends Page {
     }
 
     public void turn(Player p) {
+        if(isEnded()) return;
         holders.forEach(h -> h.setEnabled(p.equals(h.getPlayer())));
         if(host) {
             owner.getSockets().forEach(socket -> socket.emit("turn", p.serialize()));
@@ -166,7 +169,7 @@ public class Game extends Page {
             }
             if(p.getType() == PlayerType.BOT && !lostTurn && checkForWinner() == null) {
                 Platform.runAfter(() -> {
-                    if(owner.getLoaded() != this || scoreBoard.isShown()) return;
+                    if(owner.getLoaded() != this || scoreBoard.isShown() || isEnded()) return;
                     List<Piece> possible = table.getPossiblePlays(holder.getPieces());
                     if(!possible.isEmpty()) {
                         Piece piece = possible.get(0);
@@ -203,6 +206,7 @@ public class Game extends Page {
     }
 
     public void nextTurn(PieceHolder holder) {
+        if(ended) return;
         if(holders.isEmpty()) return;
         PieceHolder next = holders.get((holders.indexOf(holder) + 1) % holders.size());
         if(!host) {
@@ -249,7 +253,7 @@ public class Game extends Page {
     }
 
     public int getScoreOf(Player player) {
-        HashMap<Player, Integer> score = owner.getScore();
+        ConcurrentHashMap<Player, Integer> score = owner.getScore();
 
         Integer i = score.get(player);
         if(i != null)
@@ -260,7 +264,7 @@ public class Game extends Page {
     }
 
     private void addScoreOf(Player player, int add) {
-        HashMap<Player, Integer> score = owner.getScore();
+        ConcurrentHashMap<Player, Integer> score = owner.getScore();
 
         int oldScore = getScoreOf(player);
 
@@ -268,7 +272,7 @@ public class Game extends Page {
     }
 
     public void setScoreOf(Player player, int val) {
-        HashMap<Player, Integer> score = owner.getScore();
+        ConcurrentHashMap<Player, Integer> score = owner.getScore();
 
         score.put(player, val);
     }
@@ -312,9 +316,9 @@ public class Game extends Page {
         }
         Platform.runAfter(() -> {
             if(holder.getPlayer().isSelf(host)) {
-                owner.toast("Pass");
+                owner.toast("pass");
             }
-            owner.playSound(R.raw.pass);
+            owner.playGameSound(R.raw.pass);
         }, 300);
         Platform.runAfter(() -> nextTurn(holder), 1000);
     }
@@ -399,6 +403,7 @@ public class Game extends Page {
     @Override
     public void setup() {
         super.setup();
+        ended = false;
         root.setBackground(Color.TRANSPARENT);
         leftInStock.setAlpha(0);
         stock = new Stock();
@@ -597,8 +602,8 @@ public class Game extends Page {
                 Platform.runAfter(() -> {
                     assert p != null;
                     if(p.isSelf(false))
-                        owner.toast("Pass");
-                    owner.playSound(R.raw.pass);
+                        owner.toast("pass");
+                    owner.playGameSound(R.raw.pass);
                 }, 300);
             });
             socket.on("skip", data -> Platform.runLater(() -> {
@@ -606,6 +611,9 @@ public class Game extends Page {
                 setup();
             }));
         }
+
+        if(host && owner.getWinner() == null)
+            emitWin(getBottomHolder().getPlayer());
 
         Platform.runBack(() -> {
             boolean empty = true;
@@ -671,6 +679,17 @@ public class Game extends Page {
 
     @Override
     public boolean onBack() {
+        endGame();
+        return true;
+    }
+
+    private boolean ended = false;
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    private void endGame() {
         owner.putData("score", null);
         owner.putData("winner", null);
         owner.putData("players", null);
@@ -714,7 +733,7 @@ public class Game extends Page {
                     owner.removeLoaded();
                     owner.loadPage(Home.class);
                 }).start();
-        return true;
+        ended = true;
     }
 
     public boolean isHost() {

@@ -43,11 +43,12 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PieceHolder extends FrameLayout implements Styleable {
     private final App owner;
     private final ArrayList<Piece> pieces;
-    private final HashMap<Piece, ColorIcon> piecesDisplay;
+    private final ConcurrentHashMap<Piece, ColorIcon> piecesDisplay;
     private final ArrayList<ColorIcon> adding;
     private final int size;
     private final boolean mine;
@@ -106,7 +107,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
 
 
         pieces = new ArrayList<>();
-        piecesDisplay = new HashMap<>();
+        piecesDisplay = new ConcurrentHashMap<>();
         adding = new ArrayList<>();
 
         name = new Label(owner, "");
@@ -288,8 +289,8 @@ public class PieceHolder extends FrameLayout implements Styleable {
     }
 
     public void play(Move move) {
-        gameTable.play(move, piecesDisplay.get(move.getPlayed().getPiece()), player);
-        remove(move.getPlayed().getPiece());
+        gameTable.play(move, piecesDisplay.get(move.played().getPiece()), player);
+        remove(move.played().getPiece());
         gameTable.removePossiblePlays();
         if(player.isSelf(game.isHost()) && owner.getFourMode() == FourMode.TEAM_MODE && (pieces.size() <= 1 || game.getForPlayer(game.otherPlayer(player)).pieces.size() <= 1)) {
             game.getCherrat().hide().start();
@@ -367,7 +368,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                 piecesDisplay.put(p, piece);
                 game.updateStock();
 
-                owner.playSound(PlaySound.SOUND_16.getRes());
+                owner.playGameSound(PlaySound.SOUND_16.getRes());
                 new ParallelAnimation(300).addAnimation(new ValueAnimation(0, calcPieceSize()) {
                     @Override
                     public void updateValue(float v) {
@@ -423,24 +424,16 @@ public class PieceHolder extends FrameLayout implements Styleable {
         resizing = new ParallelAnimation(300).addAnimation(new ValueAnimation(ViewUtils.pxToDip(side.isHorizontal() ? ref.getWidth() : ref.getHeight(), owner), pieceSize) {
             @Override
             public void updateValue(float v) {
-                try {
-                    piecesDisplay.values().forEach(p -> {
-                        if (p != removing && !adding.contains(p)) applySize(p, v);
-                    });
-                } catch (ConcurrentModificationException x) {
-                    ErrorHandler.handle(x, "resizing pieces");
-                }
+                piecesDisplay.values().forEach(p -> {
+                    if (p != removing && !adding.contains(p)) applySize(p, v);
+                });
             }
         }).addAnimation(new ValueAnimation(ref.getAlpha(), 1) {
             @Override
             public void updateValue(float v) {
-                try {
-                    piecesDisplay.values().forEach(p -> {
-                        if (p != removing && !adding.contains(p)) p.setAlpha(v);
-                    });
-                } catch (ConcurrentModificationException x) {
-                    ErrorHandler.handle(x, "resizing pieces");
-                }
+                piecesDisplay.values().forEach(p -> {
+                    if (p != removing && !adding.contains(p)) p.setAlpha(v);
+                });
             }
         }).setInterpolator(Interpolator.EASE_OUT);
         resizing.start();
@@ -555,6 +548,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
 
     @Override
     public void setEnabled(boolean enabled) {
+        if(game.isEnded()) return;
         Platform.runLater(() -> {
             super.setEnabled(enabled);
 
@@ -587,7 +581,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     long start = System.currentTimeMillis();
                     boolean yellow = false;
                     boolean red = false;
-                    while (isEnabled() && isAttachedToWindow()) {
+                    while (isEnabled() && isAttachedToWindow() && !game.isEnded()) {
                         long passed = System.currentTimeMillis() - start;
                         float factor = Math.max(0, 1 - passed / (time * 1000f));
 

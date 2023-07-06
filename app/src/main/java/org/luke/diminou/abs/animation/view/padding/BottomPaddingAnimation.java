@@ -5,9 +5,6 @@ import android.view.View;
 import org.luke.diminou.abs.animation.base.ViewAnimation;
 
 public class BottomPaddingAnimation extends ViewAnimation {
-    public BottomPaddingAnimation(long duration, View view, float to) {
-        super(duration, view, to);
-    }
 
     public BottomPaddingAnimation(View view, float to) {
         super(view, to);

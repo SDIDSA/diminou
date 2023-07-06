@@ -1,5 +1,7 @@
 package org.luke.diminou.abs.components.layout.overlay;
 
+import android.view.Gravity;
+
 import androidx.core.graphics.Insets;
 
 import org.luke.diminou.abs.App;
@@ -34,6 +36,7 @@ public abstract class PartialSlideOverlay extends SlideOverlay {
     protected void setHeight(int height) {
         LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, height);
         int marg = ViewUtils.dipToPx(15, owner);
+        params.gravity = Gravity.BOTTOM;
         params.bottomMargin = owner.getSystemInsets().bottom + marg;
         params.rightMargin = marg;
         params.leftMargin = marg;

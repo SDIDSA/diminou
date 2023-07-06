@@ -11,6 +11,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class Local {
                 while (enumInetAddress.hasMoreElements()) {
                     InetAddress inetAddress = enumInetAddress
                             .nextElement();
-                    if (inetAddress.isSiteLocalAddress() && !inetAddress.getHostAddress().contains(":")) {
+                    if (inetAddress.isSiteLocalAddress() && !Objects.requireNonNull(inetAddress.getHostAddress()).contains(":")) {
                         String add = inetAddress.getHostAddress();
                         if(!res.contains(add)) res.add(add);
                     }

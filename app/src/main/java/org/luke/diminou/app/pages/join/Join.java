@@ -17,6 +17,7 @@ import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.image.Image;
 import org.luke.diminou.abs.components.controls.scratches.Loading;
+import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.HBox;
@@ -108,7 +109,7 @@ public class Join extends Titled {
         bottom.setCornerRadius(7);
 
         bottom.addView(joiningAs);
-        bottom.addView(ViewUtils.spacer(owner));
+        bottom.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         bottom.addView(avatar);
         bottom.addView(username);
 
@@ -195,7 +196,7 @@ public class Join extends Titled {
                 .addAnimation(new ScaleXYAnimation(cards, .7f))
                 .setInterpolator(Interpolator.EASE_OUT);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     private final ArrayList<PartyDisplay> parties = new ArrayList<>();

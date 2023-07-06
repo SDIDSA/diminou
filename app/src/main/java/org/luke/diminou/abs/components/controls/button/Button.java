@@ -47,6 +47,7 @@ public class Button extends FrameLayout implements ColoredView {
 
         content = new HBox(owner);
         content.setGravity(Gravity.CENTER);
+        ViewUtils.alignInFrame(content, Gravity.CENTER);
 
         content.addView(label);
 

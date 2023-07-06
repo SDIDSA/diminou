@@ -1,7 +1,5 @@
 package org.luke.diminou.abs.animation.combine;
 
-import android.util.Log;
-
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.functional.FloatConsumer;

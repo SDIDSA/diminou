@@ -4,13 +4,13 @@ import android.view.View;
 
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Platform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ViewAnimation extends ValueAnimation {
-    private static final HashMap<String, HashMap<View, ViewAnimation>> running = new HashMap<>();
+    private static final ConcurrentHashMap<String, ConcurrentHashMap<View, ViewAnimation>> running = new ConcurrentHashMap<>();
 
     static {
         Platform.runBack(ViewAnimation::clear);
@@ -20,16 +20,12 @@ public abstract class ViewAnimation extends ValueAnimation {
         Platform.sleep(10000);
         running.values().forEach(val -> {
             ArrayList<View> toClear = new ArrayList<>();
-            try {
-                val.keySet().forEach(view -> {
-                    if(!view.isAttachedToWindow()) {
-                        toClear.add(view);
-                    }
-                });
-                toClear.forEach(val::remove);
-            }catch(Exception x) {
-                ErrorHandler.handle(x, "clearing view animation cache");
-            }
+            val.keySet().forEach(view -> {
+                if(!view.isAttachedToWindow()) {
+                    toClear.add(view);
+                }
+            });
+            toClear.forEach(val::remove);
         });
         clear();
     }
@@ -67,14 +63,14 @@ public abstract class ViewAnimation extends ValueAnimation {
             setFrom(getFrom(view));
         }
 
-        HashMap<View, ViewAnimation> forType = running.get(getClass().getSimpleName());
+        ConcurrentHashMap<View, ViewAnimation> forType = running.get(getClass().getSimpleName());
         if(forType != null) {
             ViewAnimation forView = forType.get(view);
             if(forView != null && forView.isRunning() && forView != this && forView.getView() == view) {
                 forView.stop();
             }
         } else {
-            forType = new HashMap<>();
+            forType = new ConcurrentHashMap<>();
             running.put(getClass().getSimpleName(), forType);
         }
 

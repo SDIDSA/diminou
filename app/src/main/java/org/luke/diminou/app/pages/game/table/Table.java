@@ -167,18 +167,18 @@ public class Table extends FrameLayout {
     private final ArrayList<ColorIcon> possiblePlays = new ArrayList<>();
 
     private ColorIcon getPlayPositionCenter(Move move) {
-        ColorIcon icon = move.getPlayed().getPiece().getImage(owner, 32, move.getPlayed().getPiece().isDouble() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
+        ColorIcon icon = move.played().getPiece().getImage(owner, 32, move.played().getPiece().isDouble() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
 
-        if((move.getSide() == Side.TOP && move.getPlayed().isFlipped()) ||
-                (move.getSide() == Side.BOTTOM &&  !move.getPlayed().isFlipped())) {
+        if((move.side() == Side.TOP && move.played().isFlipped()) ||
+                (move.side() == Side.BOTTOM &&  !move.played().isFlipped())) {
             icon.setRotation(180);
         }
 
         if(!onTable.isEmpty()) {
-            if(move.getSide() == Side.TOP) {
-                icon.setTranslationY(getTopEndY() - ViewUtils.dipToPx(move.getPlayed().getPiece().isDouble() ? (16 + SPACING) : (32 + SPACING), owner));
+            if(move.side() == Side.TOP) {
+                icon.setTranslationY(getTopEndY() - ViewUtils.dipToPx(move.played().getPiece().isDouble() ? (16 + SPACING) : (32 + SPACING), owner));
             }else {
-                icon.setTranslationY(getBottomEndY() + ViewUtils.dipToPx(move.getPlayed().getPiece().isDouble() ? (16 + SPACING) : (32 + SPACING), owner));
+                icon.setTranslationY(getBottomEndY() + ViewUtils.dipToPx(move.played().getPiece().isDouble() ? (16 + SPACING) : (32 + SPACING), owner));
             }
         }
 
@@ -188,16 +188,16 @@ public class Table extends FrameLayout {
     }
 
     private ColorIcon getPlayPositionLeft(Move move) {
-        ColorIcon icon = move.getPlayed().getPiece().getImage(owner, 32,
-                move.getPlayed().getPiece().isDouble() && !left.isEmpty()
+        ColorIcon icon = move.played().getPiece().getImage(owner, 32,
+                move.played().getPiece().isDouble() && !left.isEmpty()
                         ? Orientation.VERTICAL : Orientation.HORIZONTAL);
 
-        if(!move.getPlayed().isFlipped()) {
+        if(!move.played().isFlipped()) {
             icon.setRotation(180);
         }
 
         icon.setTranslationY(getTopEndY());
-        icon.setTranslationX(getTopEndX() - ViewUtils.dipToPx(move.getPlayed().getPiece().isDouble() && !left.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
+        icon.setTranslationX(getTopEndX() - ViewUtils.dipToPx(move.played().getPiece().isDouble() && !left.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
 
         ViewUtils.alignInFrame(icon, Gravity.CENTER);
         addView(icon);
@@ -205,16 +205,16 @@ public class Table extends FrameLayout {
     }
 
     private ColorIcon getPlayPositionRight(Move move) {
-        ColorIcon icon = move.getPlayed().getPiece().getImage(owner, 32,
-                move.getPlayed().getPiece().isDouble() && !right.isEmpty()
+        ColorIcon icon = move.played().getPiece().getImage(owner, 32,
+                move.played().getPiece().isDouble() && !right.isEmpty()
                         ? Orientation.VERTICAL : Orientation.HORIZONTAL);
 
-        if(move.getPlayed().isFlipped()) {
+        if(move.played().isFlipped()) {
             icon.setRotation(180);
         }
 
         icon.setTranslationY(getBottomEndY());
-        icon.setTranslationX(getBottomEndX() + ViewUtils.dipToPx(move.getPlayed().getPiece().isDouble() && !right.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
+        icon.setTranslationX(getBottomEndX() + ViewUtils.dipToPx(move.played().getPiece().isDouble() && !right.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
 
         ViewUtils.alignInFrame(icon, Gravity.CENTER);
         addView(icon);
@@ -222,15 +222,15 @@ public class Table extends FrameLayout {
     }
 
     private ColorIcon getPlayPositionLeftDown(Move move) {
-        ColorIcon icon = move.getPlayed().getPiece().getImage(owner, 32,
-                move.getPlayed().getPiece().isDouble() && !left_down.isEmpty() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
+        ColorIcon icon = move.played().getPiece().getImage(owner, 32,
+                move.played().getPiece().isDouble() && !left_down.isEmpty() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
 
 
-        if(!move.getPlayed().isFlipped()) {
+        if(!move.played().isFlipped()) {
             icon.setRotation(180);
         }
 
-        icon.setTranslationY(getTopEndY() + ViewUtils.dipToPx(move.getPlayed().getPiece().isDouble() && !left_down.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
+        icon.setTranslationY(getTopEndY() + ViewUtils.dipToPx(move.played().getPiece().isDouble() && !left_down.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
         icon.setTranslationX(getTopEndX() + ViewUtils.dipToPx(16, owner));
 
         ViewUtils.alignInFrame(icon, Gravity.CENTER);
@@ -239,15 +239,15 @@ public class Table extends FrameLayout {
     }
 
     private ColorIcon getPlayPositionRightUp(Move move) {
-        ColorIcon icon = move.getPlayed().getPiece().getImage(owner, 32,
-                move.getPlayed().getPiece().isDouble() && !right_up.isEmpty() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
+        ColorIcon icon = move.played().getPiece().getImage(owner, 32,
+                move.played().getPiece().isDouble() && !right_up.isEmpty() ? Orientation.HORIZONTAL : Orientation.VERTICAL);
 
 
-        if(move.getPlayed().isFlipped()) {
+        if(move.played().isFlipped()) {
             icon.setRotation(180);
         }
 
-        icon.setTranslationY(getBottomEndY() - ViewUtils.dipToPx(move.getPlayed().getPiece().isDouble() && !right_up.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
+        icon.setTranslationY(getBottomEndY() - ViewUtils.dipToPx(move.played().getPiece().isDouble() && !right_up.isEmpty() ? (16 + SPACING) : (32 + SPACING), owner));
         icon.setTranslationX(getBottomEndX() - ViewUtils.dipToPx(16, owner));
 
         ViewUtils.alignInFrame(icon, Gravity.CENTER);
@@ -259,7 +259,7 @@ public class Table extends FrameLayout {
         if(center.size() < CENTER_SIZE) {
             return getPlayPositionCenter(move);
         }else {
-            if(move.getSide() == Side.TOP) {
+            if(move.side() == Side.TOP) {
                 if(left.size() < 2) {
                     return getPlayPositionLeft(move);
                 }else {
@@ -296,31 +296,31 @@ public class Table extends FrameLayout {
         ColorIcon target = getPlayPosition(move);
         target.setAlpha(0f);
 
-        if(move.getSide() == Side.TOP)
-            onTable.add(0, move.getPlayed());
+        if(move.side() == Side.TOP)
+            onTable.add(0, move.played());
         else
-            onTable.add(move.getPlayed());
+            onTable.add(move.played());
 
         if(center.size() < CENTER_SIZE) {
-            if(move.getSide() == Side.TOP)
-                center.add(0, move.getPlayed());
+            if(move.side() == Side.TOP)
+                center.add(0, move.played());
             else
-                center.add(move.getPlayed());
-        }else if(move.getSide() == Side.TOP) {
+                center.add(move.played());
+        }else if(move.side() == Side.TOP) {
             if(left.size() < 2) {
-                left.add(0, move.getPlayed());
+                left.add(0, move.played());
             }else {
-                left_down.add(0, move.getPlayed());
+                left_down.add(0, move.played());
             }
-        }else if(move.getSide() == Side.BOTTOM) {
+        }else if(move.side() == Side.BOTTOM) {
             if(right.size() < 2) {
-                right.add(move.getPlayed());
+                right.add(move.played());
             }else {
-                right_up.add(move.getPlayed());
+                right_up.add(move.played());
             }
         }
 
-        owner.playSound(PlaySound.random().getRes());
+        owner.playGameSound(PlaySound.random().getRes());
 
         Platform.runAfter(() -> {
             float oldX = target.getTranslationX();

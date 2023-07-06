@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 
 import androidx.core.content.res.ResourcesCompat;

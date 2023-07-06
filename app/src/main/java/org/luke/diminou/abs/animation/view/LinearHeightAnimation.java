@@ -7,10 +7,6 @@ import org.luke.diminou.abs.animation.base.ViewAnimation;
 import org.luke.diminou.abs.utils.ErrorHandler;
 
 public class LinearHeightAnimation extends ViewAnimation {
-    public LinearHeightAnimation(long duration, View view, float to) {
-        super(duration, view, to);
-        check(view);
-    }
 
     public LinearHeightAnimation(View view, float to) {
         super(view, to);

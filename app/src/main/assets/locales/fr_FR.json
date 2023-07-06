@@ -9,48 +9,75 @@
 
   "exit_confirm" : "Voulez-vous vraiment quitter ?",
 
-  "select_avatar" : "Sélectionnez votre avatar",
+  "select_avatar" : "Sélectionner votre avatar",
   "displayed_name": "Nom affiché",
   "join": "Joindre",
   "host" : "Créer",
   "settings" : "Paramètres",
   "exit" : "Quitter",
 
-  "set_app_theme" : "Définir le thème de l'application",
-  "app_theme" : "Thème de l'application",
+  "set_app_theme" : "Thème de l'application",
+  "app_theme" : "Thème",
   "theme_system" : "Suivre le système",
   "theme_dark" : "Sombre",
   "theme_light" : "Clair",
 
-  "set_ui_scale" : "Définir l'échelle de l'interface",
-  "ui_scale" : "Échelle de l'interface",
-  "1.25" : "Grande",
-  "1.0" : "Normale",
-  "0.75" : "Petite",
+  "set_ui_scale" : "Échelle de l'interface",
+  "ui_scale" : "Échelle",
+  "1.25" : "Grand",
+  "1.0" : "Normal",
+  "0.75" : "Petit",
 
-  "set_language" : "Définir la langue",
+  "set_language" : "Langue",
   "language" : "Langue",
 
-  "set_4_players_mode" : "Définir le mode 4 joueurs",
+  "set_4_players_mode" : "Mode 4 joueurs",
   "4_players_mode" : "Mode 4 joueurs",
   "ask_everytime" : "Non spécifié",
   "normal_mode" : "Mode normal",
   "team_mode" : "Mode équipe",
 
-  "kick_confirm" : "Voulez-vous expulser ce joueur de la partie ?",
+  "kick_confirm" : "Voulez-vous exclure ce joueur de la partie ?",
 
   "dont_ask" : "Ne plus demander",
   "start_game" : "Démarrer",
   "empty" : "Vide",
   "create_party" : "Créer une partie",
 
-  "join_party" : "Rejoindre une partie",
-  "scanning_network" : "Analyse du réseau en cours...",
+  "join_party" : "Rejoindre la partie",
+  "scanning_network" : "Analyse du réseau...",
   "joining_as" : "Rejoindre en tant que",
 
   "leave" : "Quitter",
   "stock" : "Stock {$0}",
   "continue" : "Continuer",
   "waiting_for_host" : "- en attente de l'hôte pour continuer -",
-  "kicked" : "Vous avez été expulsé de la partie"
+  "kicked" : "Vous avez été exclu de la partie",
+
+  "set_play_timer" : "Définir la minuterie",
+  "play_timer" : "Minuterie",
+  "play_timer_very_short" : "20 secondes",
+  "play_timer_short" : "30 secondes",
+  "play_timer_default" : "40 secondes",
+  "play_timer_long" : "50 secondes",
+
+  "pass_init" : "Laissez votre coéquipier commencer",
+
+  "game_settings" : "Paramètres du jeu",
+  "display_settings" : "Paramètres d'affichage",
+  "sound_settings" : "Paramètres audio",
+
+  "set_ambient_music" : "Activer la musique d'ambiance",
+  "ambient_music" : "Musique d'ambiance",
+
+  "set_game_sounds" : "Activer les sons du jeu",
+  "game_sounds" : "Sons du jeu",
+
+  "set_other_sounds" : "Activer les autres sons",
+  "other_sounds" : "Autres sons",
+
+  "on" : "Activé",
+  "off" : "Désactivé",
+
+  "pass" : "Passer"
 }

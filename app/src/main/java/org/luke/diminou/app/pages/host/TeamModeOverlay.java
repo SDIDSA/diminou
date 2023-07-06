@@ -18,9 +18,8 @@ public class TeamModeOverlay extends MultipleOptionOverlay {
 
         addButton("team_mode", () -> {
             if (remember.isChecked()) {
-                Store.setFourMode(FourMode.TEAM_MODE.getText(), () -> {
-                    Page.clearCache(Settings.class);
-                });
+                Store.setFourMode(FourMode.TEAM_MODE.getText(),
+                        s -> Page.clearCache(Settings.class));
             }
             owner.putString("mode", FourMode.TEAM_MODE.getText());
             if (onDone != null) {
@@ -31,9 +30,8 @@ public class TeamModeOverlay extends MultipleOptionOverlay {
 
         addButton("normal_mode", () -> {
             if (remember.isChecked()) {
-                Store.setFourMode(FourMode.NORMAL_MODE.getText(), () -> {
-                    Page.clearCache(Settings.class);
-                });
+                Store.setFourMode(FourMode.NORMAL_MODE.getText(),
+                        s -> Page.clearCache(Settings.class));
             }
             owner.putString("mode", FourMode.NORMAL_MODE.getText());
             if (onDone != null) {
@@ -44,7 +42,7 @@ public class TeamModeOverlay extends MultipleOptionOverlay {
 
         root.addView(remember);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     public void setOnDone(Runnable onDone) {

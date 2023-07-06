@@ -155,6 +155,7 @@ public class Home extends Page {
                     .setDelay(-300)
                     .setInterpolator(Interpolator.OVERSHOOT);
             show.start();
+            owner.startAmbient();
             Platform.runAfter(this::setupFloatingPieces, 400);
         });
 
@@ -187,7 +188,7 @@ public class Home extends Page {
     }
     private void setEffects() {
         VBox all = new VBox(owner);
-        all.setLayoutParams(new ViewGroup.LayoutParams(owner.getScreenWidth() * 10, owner.getScreenWidth() * 10));
+        all.setLayoutParams(new ViewGroup.LayoutParams(owner.getScreenWidth() * 2, owner.getScreenHeight() * 2));
         all.setClipChildren(false);
         effects.addView(all);
         all.setPivotX(0);

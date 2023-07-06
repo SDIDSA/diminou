@@ -60,10 +60,6 @@ public class LinearBox extends LinearLayout {
         ViewUtils.setPaddingUnified(this, padding, owner);
     }
 
-    public double getSpacing() {
-        return spacing.get();
-    }
-
     public void setBackground(int color) {
         background.setColor(color);
     }

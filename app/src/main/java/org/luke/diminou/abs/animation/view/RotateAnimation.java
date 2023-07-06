@@ -1,6 +1,5 @@
 package org.luke.diminou.abs.animation.view;
 
-import android.util.Log;
 import android.view.View;
 
 import org.luke.diminou.abs.animation.base.ViewAnimation;
@@ -13,10 +12,6 @@ public class RotateAnimation extends ViewAnimation {
 
     public RotateAnimation(View view, float to) {
         super(view, to);
-    }
-
-    public RotateAnimation(View view, float from, float to) {
-        super(view, from, to);
     }
 
     @Override

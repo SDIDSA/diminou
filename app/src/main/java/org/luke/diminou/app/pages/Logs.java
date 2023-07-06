@@ -35,7 +35,7 @@ public class Logs extends Titled {
 
         getPreTitle().addView(clear);
 
-        clear.setOnClick(() -> Store.setLogs("", this::setup));
+        clear.setOnClick(() -> Store.setLogs("", s -> setup()));
 
         content.addView(sv);
     }

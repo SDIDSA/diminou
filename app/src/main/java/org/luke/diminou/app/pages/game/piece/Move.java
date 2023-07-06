@@ -5,25 +5,9 @@ import org.json.JSONObject;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.app.pages.game.player.Side;
 
-public class Move {
+public record Move(PlayedPiece played, Side side) {
     private static final String PLAYED = "played";
     private static final String SIDE = "side";
-
-    private final PlayedPiece played;
-    private final Side side;
-
-    public Move(PlayedPiece played, Side side) {
-        this.played = played;
-        this.side = side;
-    }
-
-    public PlayedPiece getPlayed() {
-        return played;
-    }
-
-    public Side getSide() {
-        return side;
-    }
 
     public JSONObject serialize() {
         try {
@@ -31,7 +15,7 @@ public class Move {
             obj.put(PLAYED, played.serialize());
             obj.put(SIDE, side.name());
             return obj;
-        }catch(JSONException x) {
+        } catch (JSONException x) {
             ErrorHandler.handle(x, "serializing piece");
             return null;
         }
@@ -42,7 +26,7 @@ public class Move {
             return new Move(
                     PlayedPiece.deserialize(obj.getString(PLAYED)),
                     Side.valueOf(obj.getString(SIDE)));
-        }catch(JSONException x) {
+        } catch (JSONException x) {
             ErrorHandler.handle(x, "deserializing piece");
             return null;
         }

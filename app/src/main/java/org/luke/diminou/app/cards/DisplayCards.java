@@ -88,14 +88,16 @@ public class DisplayCards extends HBox {
         }
     }
 
-    public void unloadExact(SocketConnection connection) {
+    public boolean unloadExact(SocketConnection connection) {
         for(PlayerCard card : cards) {
             SocketConnection con = card.getConnection();
             if(con == connection) {
                 card.unloadPlayer();
-                return;
+                return true;
             }
         }
+
+        return false;
     }
 
     public int size() {

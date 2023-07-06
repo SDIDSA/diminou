@@ -30,6 +30,7 @@ import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ScoreBoard extends Overlay implements Styleable {
     private final App owner;
@@ -162,20 +163,11 @@ public class ScoreBoard extends Overlay implements Styleable {
             root.addView(waiting);
         }
 
-        applyStyle(owner.getStyle().get());
-    }
-
-    private HashMap<Player, Integer> getScore() {
-        HashMap<Player, Integer> score = owner.getScore();
-        if(score == null) {
-            score = new HashMap<>();
-            owner.putData("score", score);
-        }
-        return score;
+        applyStyle(owner.getStyle());
     }
 
     private int getScoreOf(Player player) {
-        HashMap<Player, Integer> score = getScore();
+        ConcurrentHashMap<Player, Integer> score = owner.getScore();
 
         Integer i = score.get(player);
         if(i != null)

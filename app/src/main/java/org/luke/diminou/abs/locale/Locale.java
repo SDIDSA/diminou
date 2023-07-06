@@ -6,19 +6,19 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.Assets;
 import org.luke.diminou.abs.utils.ErrorHandler;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Locale {
-	private final static HashMap<String, Locale> cache = new HashMap<>();
-	private final HashMap<String, String> values;
+	private final static ConcurrentHashMap<String, Locale> cache = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, String> values;
 
 	private final String fontFamily;
 
 	public Locale(App owner, String name, String fontFamily) {
 		this.fontFamily = fontFamily;
 		cache.put(name.toLowerCase(), this);
-		values = new HashMap<>();
+		values = new ConcurrentHashMap<>();
 		String file = Assets.readAsset(owner, "locales/".concat(name).concat(".json"));
 		try {
 			assert file != null;
@@ -40,7 +40,7 @@ public class Locale {
 
 		if (found == null) {
 			found = key;
-			//ErrorHandler.handle(new RuntimeException("Missing Key From Locale " + name), "getting value of key [" + key + "] for locale " + name);
+			ErrorHandler.handle(new RuntimeException("Missing Key From Locale"), "getting value of key [" + key + "] for locale ");
 		}
 
 		return found;

@@ -11,9 +11,10 @@ import org.luke.diminou.abs.utils.ViewUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Page extends FrameLayout implements Styleable {
-    private static final HashMap<Class<? extends Page>, Page> cache = new HashMap<>();
+    private static final ConcurrentHashMap<Class<? extends Page>, Page> cache = new ConcurrentHashMap<>();
     protected final App owner;
 
     public Page(App owner) {

@@ -1,8 +1,11 @@
 package org.luke.diminou.app.pages.host;
 
+import android.widget.LinearLayout;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
@@ -49,6 +52,7 @@ public class Host extends Titled {
 
         cards.forEach(card -> card.setOnClickListener(e -> {
             if(!card.isLoaded()) {
+                owner.playMenuSound(R.raw.joined);
                 card.loadPlayer(cards.botName(), Avatar.randomBot().name(), PlayerCard.Type.BOT);
                 updateCards();
             }
@@ -57,6 +61,7 @@ public class Host extends Titled {
         mirorredCards = new MirorredCards(owner);
 
         start = new Button(owner, "start_game");
+        start.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
         start.setFont(new Font(18));
 
         TeamModeOverlay teamModeOverlay = new TeamModeOverlay(owner);
@@ -136,7 +141,7 @@ public class Host extends Titled {
                 .addAnimation(new ScaleXYAnimation(start, 1))
                 .setInterpolator(Interpolator.OVERSHOOT);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     private final ArrayList<SocketConnection> connections = new ArrayList<>();
@@ -172,7 +177,8 @@ public class Host extends Titled {
 
                 client.setOnError(() -> {
                     Platform.runLater(() -> {
-                        cards.unloadExact(client);
+                        if(cards.unloadExact(client))
+                            owner.playMenuSound(R.raw.left);
                         updateCards();
                     });
                     client.emit("leave", "");
@@ -196,11 +202,12 @@ public class Host extends Titled {
     }
 
     private void unloadPlayer(SocketConnection connection) {
+        owner.playMenuSound(R.raw.left);
         cards.unloadPlayer(connection);
         Platform.runAfter(this::updateCards, 100);
     }
 
-    private void loadPlayer(String username, String avatar, SocketConnection connection, PlayerCard.Type type) {
+    private synchronized void loadPlayer(String username, String avatar, SocketConnection connection, PlayerCard.Type type) {
         if(isPresent(connection)) {
             connection.emit("already_in", "");
             updateCards();
@@ -215,8 +222,10 @@ public class Host extends Titled {
         }
 
         card.loadPlayer(username, avatar, connection, type);
-        if(connection != null)
+        if(connection != null) {
+            owner.playMenuSound(R.raw.joined);
             connection.emit("joined", "");
+        }
         updateCards();
     }
 
