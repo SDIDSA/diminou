@@ -20,16 +20,15 @@ import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
 
 public class AvatarSelectOverlay extends PartialSlideOverlay {
-    private final VBox root;
     private final Label text;
     private final Runnable onDone;
     public AvatarSelectOverlay(App owner, Runnable onDone) {
         super(owner, .6);
         this.onDone = onDone;
 
-        root = new VBox(owner);
+        VBox root = new VBox(owner);
         root.setSpacing(20);
-        root.setPadding(20);
+        root.setPadding(10);
         root.setGravity(Gravity.TOP | Gravity.CENTER);
 
         text = new Label(owner, "select_avatar");
@@ -47,7 +46,7 @@ public class AvatarSelectOverlay extends PartialSlideOverlay {
         sv.addView(root);
         list.addView(sv);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     private FrameLayout category(Avatar[] avatars, boolean locked) {
@@ -97,7 +96,7 @@ public class AvatarSelectOverlay extends PartialSlideOverlay {
 
     @Override
     public void applyStyle(Style style) {
-        if(root == null) return;
+        if(text == null) return;
         super.applyStyle(style);
 
         text.setFill(style.getTextNormal());

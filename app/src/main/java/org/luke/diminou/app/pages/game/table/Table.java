@@ -320,7 +320,7 @@ public class Table extends FrameLayout {
             }
         }
 
-        owner.playSound(PlaySound.random().getRes());
+        owner.playGameSound(PlaySound.random().getRes());
 
         Platform.runAfter(() -> {
             float oldX = target.getTranslationX();

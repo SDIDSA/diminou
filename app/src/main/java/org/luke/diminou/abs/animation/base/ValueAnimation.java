@@ -25,6 +25,11 @@ public abstract class ValueAnimation extends Animation {
         return this;
     }
 
+    public ValueAnimation setLateToInt(ObjectSupplier<Integer> lateTo) {
+        this.lateTo = () -> (float) lateTo.get();
+        return this;
+    }
+
     public ValueAnimation setLateFrom(ObjectSupplier<Float> lateFrom) {
         this.lateFrom = lateFrom;
         return this;

@@ -36,9 +36,10 @@ import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerCard extends VBox implements Styleable {
-    private static final HashMap<Integer, PlayerCard> track = new HashMap<>();
+    private static final ConcurrentHashMap<Integer, PlayerCard> track = new ConcurrentHashMap<>();
     private final Loading loading;
     private final GradientDrawable avatarBack;
     private final FrameLayout preAvatar;
@@ -98,6 +99,7 @@ public class PlayerCard extends VBox implements Styleable {
             if (!connection.isNull())
                 connection.get().emit("leave", "kick");
             unloadPlayer();
+            owner.playMenuSound(R.raw.left);
 
             Host hp = (Host) Page.getInstance(owner, Host.class);
             assert hp != null;
@@ -264,6 +266,7 @@ public class PlayerCard extends VBox implements Styleable {
 
     public void swap(PlayerCard other) {
         if (other == this) return;
+        getOwner().playMenuSound(R.raw.swap);
         String otherUsername = other.getUsername();
         String otherAvatar = other.getAvatar();
         SocketConnection otherConnection = other.getConnection();

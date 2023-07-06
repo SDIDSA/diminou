@@ -53,15 +53,16 @@ public class Platform {
         }
     }
 
-    public static void runBack(Runnable action, Runnable post) {
+    public static Thread runBack(Runnable action, Runnable post) {
         Thread t = new Thread(()-> {
             action.run();
             if(post != null) post.run();
         },"run_back_thread");
         t.start();
+        return t;
     }
 
-    public static void runBack(Runnable action) {
-        runBack(action, null);
+    public static Thread runBack(Runnable action) {
+        return runBack(action, null);
     }
 }

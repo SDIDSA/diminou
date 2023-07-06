@@ -1,5 +1,6 @@
 package org.luke.diminou.app.pages.settings;
 
+import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.layout.overlay.MultipleOptionOverlay;
 import org.luke.diminou.abs.utils.ErrorHandler;
@@ -15,8 +16,9 @@ public class SettingOverlay extends MultipleOptionOverlay {
                 boolean success = false;
                 while(!success) {
                     try {
+                        owner.playMenuSound(R.raw.select);
                         set.accept(option);
-                        applyStyle(owner.getStyle().get());
+                        applyStyle(owner.getStyle());
                         success = true;
                     } catch (Exception e) {
                         ErrorHandler.handle(e, "setting " + key + " to " + option);

@@ -196,7 +196,7 @@ public class Join extends Titled {
                 .addAnimation(new ScaleXYAnimation(cards, .7f))
                 .setInterpolator(Interpolator.EASE_OUT);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     private final ArrayList<PartyDisplay> parties = new ArrayList<>();

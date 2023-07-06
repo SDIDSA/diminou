@@ -6,17 +6,18 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
+import org.luke.diminou.abs.components.controls.text.transformationMethods.Capitalize;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.data.ConcurrentArrayList;
 
-import java.util.ArrayList;
 import java.util.function.Function;
 
 public class MultipleOptionOverlay extends PartialSlideOverlay {
     protected final VBox root;
     private final Label text;
-    private final ArrayList<Button> buttons;
+    private final ConcurrentArrayList<Button> buttons;
 
     private final Function<String, Boolean> isSelected;
 
@@ -36,32 +37,33 @@ public class MultipleOptionOverlay extends PartialSlideOverlay {
         text.setLineSpacing(10);
         ViewUtils.setMarginBottom(text, owner, 20);
 
-        buttons = new ArrayList<>();
+        buttons = new ConcurrentArrayList<>();
 
         root.addView(text);
 
         list.addView(root);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     public void addButton(String text, Runnable onClick) {
         Button button = new Button(owner, text);
+        button.setTransformationMethod(new Capitalize());
         root.addView(button);
         buttons.add(button);
         button.setOnClick(onClick);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     @Override
     public void applyStyle(Style style) {
-        if(root == null) return;
+        if(text == null) return;
         super.applyStyle(style);
 
         text.setFill(style.getTextNormal());
 
-        for (Button button : buttons) {
+        buttons.forEach(button -> {
             if(isSelected.apply(button.getKey())) {
                 button.setFill(style.getBackgroundTertiary());
                 button.setTextFill(style.getTextNormal());
@@ -69,6 +71,6 @@ public class MultipleOptionOverlay extends PartialSlideOverlay {
                 button.setFill(style.getBackgroundPrimary());
                 button.setTextFill(style.getTextNormal());
             }
-        }
+        });
     }
 }

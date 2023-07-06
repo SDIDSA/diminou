@@ -10,6 +10,10 @@ public class RotateAnimation extends ViewAnimation {
         super(duration, view, to);
     }
 
+    public RotateAnimation(View view, float to) {
+        super(view, to);
+    }
+
     @Override
     protected void apply(View view, float v) {
         float norm = ((v + 360) % 360);

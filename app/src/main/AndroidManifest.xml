@@ -18,6 +18,8 @@
         android:theme="@style/Theme.Diminou.Dark"
         tools:targetApi="31">
         <activity
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
             android:name=".app.Diminou"
             android:configChanges="uiMode|screenSize|colorMode"
             android:exported="true"

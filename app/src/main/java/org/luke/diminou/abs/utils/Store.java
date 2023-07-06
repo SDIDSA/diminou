@@ -27,6 +27,9 @@ public class Store {
     private static final Preferences.Key<String> FOUR_MODE = PreferencesKeys.stringKey("four_mode");
     private static final Preferences.Key<String> TIMER = PreferencesKeys.stringKey("timer");
     private static final Preferences.Key<String> LOGS = PreferencesKeys.stringKey("logs");
+    private static final Preferences.Key<String> AMBIENT = PreferencesKeys.stringKey("ambient");
+    private static final Preferences.Key<String> MENU_SOUNDS = PreferencesKeys.stringKey("menu_sounds");
+    private static final Preferences.Key<String> GAME_SOUNDS = PreferencesKeys.stringKey("game_sounds");
 
 
     public static void init(App owner) {
@@ -59,7 +62,7 @@ public class Store {
                     onSuccess.accept(res);
                 success = true;
             }catch (Exception x) {
-                ErrorHandler.handle(new RuntimeException("failed to store"), "storing data at " + key.getName() + ", retrying...");
+                ErrorHandler.handle(x, "storing data at " + key.getName() + ", retrying...");
             }
         }
     }
@@ -134,5 +137,29 @@ public class Store {
 
     public static String getTimer() {
         return getSetting(TIMER, Timer.DEFAULT.getText());
+    }
+
+    public static void setAmbient(String value, StringConsumer onSuccess) {
+        setSetting(AMBIENT, value, onSuccess);
+    }
+
+    public static String getAmbient() {
+        return getSetting(AMBIENT, "on");
+    }
+
+    public static void setMenuSounds(String value, StringConsumer onSuccess) {
+        setSetting(MENU_SOUNDS, value, onSuccess);
+    }
+
+    public static String getMenuSounds() {
+        return getSetting(MENU_SOUNDS, "on");
+    }
+
+    public static void setGameSounds(String value, StringConsumer onSuccess) {
+        setSetting(GAME_SOUNDS, value, onSuccess);
+    }
+
+    public static String getGameSounds() {
+        return getSetting(GAME_SOUNDS, "on");
     }
 }

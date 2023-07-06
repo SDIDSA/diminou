@@ -42,7 +42,7 @@ public class Setting extends Button implements Styleable {
         this.set = set;
         this.options = options;
         setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewUtils.dipToPx(56, owner)));
-        ViewUtils.setPadding(this, 20, 10, 20, 10, owner);
+        ViewUtils.setPadding(this, 10, 10, 10, 10, owner);
 
         content.setGravity(Gravity.CENTER);
 

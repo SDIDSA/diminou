@@ -14,10 +14,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 public class SocketConnection {
-    private final HashMap<String, StringConsumer> listeners = new HashMap<>();
+    private final ConcurrentHashMap<String, StringConsumer> listeners = new ConcurrentHashMap<>();
 
     private DataInputStream din;
     private DataOutputStream dout;

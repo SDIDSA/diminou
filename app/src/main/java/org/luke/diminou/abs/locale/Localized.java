@@ -1,5 +1,6 @@
 package org.luke.diminou.abs.locale;
 
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;
@@ -24,10 +25,10 @@ public interface Localized {
 			public void changed(Observable<? extends Locale> obs, Locale ov, Locale nv) {
 				if (weakNode.get() != null) {
 					if (nv != ov) {
-						weakNode.get().applyLocale(nv);
+						Platform.runLater(() -> weakNode.get().applyLocale(nv));
 					}
 				} else {
-					locale.removeListener(this);
+					Platform.runBack(() -> locale.removeListener(this));
 				}
 			}
 		};

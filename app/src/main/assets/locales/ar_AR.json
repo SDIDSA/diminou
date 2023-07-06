@@ -52,5 +52,32 @@
   "stock" : "المخزون {$0}",
   "continue" : "متابعة",
   "waiting_for_host" : "- في انتظار المضيف للمتابعة -",
-  "kicked" : "تم طردك من الحفلة"
+  "kicked" : "تم طردك من الحفلة",
+
+  "set_play_timer" : "تعيين المؤقت",
+  "play_timer" : "المؤقت",
+  "play_timer_very_short" : "20 ثانية",
+  "play_timer_short" : "30 ثانية",
+  "play_timer_default" : "40 ثانية",
+  "play_timer_long" : "50 ثانية",
+
+  "pass_init" : "اسمح لزميلك بالبدء",
+
+  "game_settings" : "إعدادات اللعبة",
+  "display_settings" : "إعدادات العرض",
+  "sound_settings" : "إعدادات الصوت",
+
+  "set_ambient_music" : "الموسيقى الخلفية",
+  "ambient_music" : "الموسيقى الخلفية",
+
+  "set_game_sounds" : "أصوات اللعبة",
+  "game_sounds" : "أصوات اللعبة",
+
+  "set_other_sounds" : "أصوات أخرى",
+  "other_sounds" : "أصوات أخرى",
+
+  "on" : "مشغّل",
+  "off" : "معطل",
+
+  "pass" : "تجاوز"
 }

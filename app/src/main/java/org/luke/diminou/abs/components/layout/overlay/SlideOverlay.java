@@ -1,7 +1,9 @@
 package org.luke.diminou.abs.components.layout.overlay;
 
+import android.view.Gravity;
 import android.view.MotionEvent;
 
+import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
@@ -37,17 +39,15 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
         list.setElevation(ViewUtils.dipToPx(40, owner));
 
         addToShow(new TranslateYAnimation(list, 0)
-                .setLateTo(() -> (float) (owner.getScreenHeight() - list.getHeight() - getMarginBottom()))
-                .setLateFrom(() -> (float) owner.getScreenHeight() - list.getHeight() / 2 - getMarginBottom()));
+                .setLateFrom(() -> (float) (list.getHeight() / 2)));
         addToShow(new ScaleXYAnimation(list, .6f, 1));
         addToShow(new AlphaAnimation(list, 1));
 
         addToHide(new TranslateYAnimation(list, 0)
-                .setLateTo(() -> list.getTranslationY() + ViewUtils.dipToPx(40, owner)));
+                .setLateTo(() -> list.getTranslationY() + (float) (list.getHeight() / 2)));
         addToHide(new AlphaAnimation(list, 0));
 
         Animation releaseShow = new TranslateYAnimation(300, list, 0)
-                .setLateTo(() -> (float) (owner.getScreenHeight() - list.getHeight() - getMarginBottom()))
                 .setInterpolator(Interpolator.EASE_OUT);
 
         setOnTouchListener((v, event) -> {
@@ -71,8 +71,8 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
                         } else if (velocity < -10) {
                             releaseShow.start();
                         } else {
-                            int min = owner.getScreenHeight() - list.getHeight() - getMarginBottom();
-                            int max = owner.getScreenHeight();
+                            int min = 0;
+                            int max = list.getHeight();
                             int mid = (max + min) / 2;
                             if (list.getTranslationY() > mid) {
                                 hide();
@@ -88,7 +88,7 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
                     float dy = nty - initTY;
                     float ny = initPY + dy;
                     lastY = nty;
-                    list.setTranslationY(Math.max(ny, owner.getScreenHeight() - list.getHeight() - getMarginBottom()));
+                    list.setTranslationY(Math.max(ny, 0));
                     lastTime = System.currentTimeMillis();
                 }
             }
@@ -102,18 +102,20 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
     public void show() {
         owner.addOverlay(this);
         Platform.runBack(() -> {
-            while(list.getHeight() < ViewUtils.dipToPx(100, owner)) {
+            while(list.getHeight() < ViewUtils.dipToPx(50, owner)) {
                 Platform.sleep(10);
             }
             Platform.runLater(() -> {
                 owner.removeOverlay(this);
                 super.show();
+                owner.playMenuSound(R.raw.swap);
             });
         });
     }
 
     protected void setHeight(int height) {
         LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, height);
+        params.gravity = Gravity.BOTTOM;
         list.setLayoutParams(params);
     }
 

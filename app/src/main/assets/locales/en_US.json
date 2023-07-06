@@ -61,5 +61,23 @@
   "play_timer_default" : "40 seconds",
   "play_timer_long" : "50 seconds",
 
-  "pass_init" : "Let your mate start"
+  "pass_init" : "Let your mate start",
+
+  "game_settings" : "Game settings",
+  "display_settings" : "Display settings",
+  "sound_settings" : "Sound settings",
+
+  "set_ambient_music" : "Enable ambient music",
+  "ambient_music" : "Ambient music",
+
+  "set_game_sounds" : "Enable game sounds",
+  "game_sounds" :  "Game sounds",
+
+  "set_other_sounds" : "Enable other sounds",
+  "other_sounds" : "Other sounds",
+
+  "on" : "On",
+  "off" : "Off",
+
+  "pass" : "Pass"
 }

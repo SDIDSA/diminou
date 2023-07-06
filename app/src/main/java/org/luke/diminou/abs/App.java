@@ -24,6 +24,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+
 import org.luke.diminou.R;
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.base.ColorAnimation;
@@ -44,19 +45,19 @@ import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.SplashScreen;
-import org.luke.diminou.app.pages.game.PlaySound;
 import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Timer;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class App extends AppCompatActivity {
-    private final HashMap<String, Object> data = new HashMap<>();
+    private final ConcurrentHashMap<String, Object> data = new ConcurrentHashMap<>();
     private final ArrayList<Overlay> loadedOverlay = new ArrayList<>();
     public Style dark, light;
     public Locale ar_ar;
@@ -66,7 +67,7 @@ public class App extends AppCompatActivity {
     private Property<Style> style;
     private Property<Locale> locale;
     private Insets systemInsets;
-    private final HashMap<Integer, MediaPlayer> sounds = new HashMap<>();
+    private final ConcurrentHashMap<Integer, MediaPlayer> sounds = new ConcurrentHashMap<>();
     private View old = null;
 
     @ColorInt
@@ -94,7 +95,9 @@ public class App extends AppCompatActivity {
         style = new Property<>();
         applyTheme();
 
-        Platform.runLater(() -> style.addListener((obs, ov, nv) -> applyStyle()));
+        Platform.runLater(() -> style.addListener((obs, ov, nv) -> {
+            Platform.runLater(this::applyStyle);
+        }));
 
         root = new FrameLayout(this);
         root.setClipChildren(false);
@@ -139,40 +142,82 @@ public class App extends AppCompatActivity {
                     Font.DEFAULT = new Font(nv.getFontFamily());
                 }
             });
-
-            loadSound(R.raw.pass);
-            loadSound(R.raw.khabet);
-            loadSound(R.raw.saket);
-            loadSound(R.raw.end);
-            for(PlaySound s : PlaySound.values()) {
-                loadSound(s.getRes());
-            }
         }, "app_init_thread").start();
     }
 
-    private MediaPlayer loadSound(@RawRes int res) {
-        MediaPlayer mp = MediaPlayer.create(this, res);
-        sounds.put(res, mp);
-        assert mp != null;
+    private boolean paused = false;
+    @Override
+    protected void onPause() {
+        super.onPause();
+        paused = true;
+        muteAmbient();
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        paused = false;
+        if(Store.getAmbient().equals("off")) muteAmbient();
+        else unmuteAmbient();
+    }
+
+    public void startAmbient() {
+        MediaPlayer mp = getSound(R.raw.ambient);
+        if(mp == null) return;
+        mp.setLooping(true);
+        mp.start();
+        if(Store.getAmbient().equals("off")) muteAmbient();
+        else unmuteAmbient();
+    }
+
+    public void muteAmbient() {
+        Objects.requireNonNull(getSound(R.raw.ambient)).setVolume(0, 0);
+    }
+
+    public void unmuteAmbient() {
+        Objects.requireNonNull(getSound(R.raw.ambient)).setVolume(.6f, .6f);
+    }
+
+    private synchronized MediaPlayer getSound(@RawRes int res) {
+        MediaPlayer mp = sounds.get(res);
+        if(mp == null) {
+            mp = MediaPlayer.create(this, res);
+            sounds.put(res, mp);
+        }
+        if(mp == null) return null;
         mp.setVolume(1, 1);
         return mp;
     }
 
-    public synchronized void playSound(@RawRes int res) {
-        MediaPlayer mp = sounds.get(res);
+    public synchronized void playMenuSound(@RawRes int res) {
+        if(Store.getMenuSounds().equals("on")) playSound(res);
+    }
+
+    public synchronized void playGameSound(@RawRes int res) {
+        if(Store.getGameSounds().equals("on")) playSound(res);
+    }
+
+    private synchronized void playSound(@RawRes int res) {
+        if(paused) return;
+        MediaPlayer mp = getSound(res);
         if(mp == null) return;
         try {
             mp.seekTo(0);
             mp.start();
         }catch(Exception x) {
-            loadSound(res).start();
+            sounds.remove(res);
+            playSound(res);
         }
     }
 
     public void reloadPage() {
         if (loaded != null) {
-            root.removeView(loaded);
-            Platform.runAfter(() -> root.addView(loaded), 50);
+            Platform.runLater(() -> root.removeView(loaded));
+            Platform.runAfter(() -> root.addView(loaded), 100);
         }
     }
 
@@ -189,8 +234,9 @@ public class App extends AppCompatActivity {
 
             AtomicReference<Page> page = new AtomicReference<>();
             Page old = loaded;
-            if (old != null)
-            {
+            if (old != null) {
+                if(!(old instanceof SplashScreen))
+                    playMenuSound(R.raw.page);
                 running = new ParallelAnimation(500).addAnimation(new AlphaAnimation(old, 0)).addAnimation(new TranslateYAnimation(old, ViewUtils.dipToPx(-30, this))).setInterpolator(Interpolator.EASE_OUT).setOnFinished(() -> {
                     root.removeView(old);
                     old.destroy();
@@ -345,7 +391,7 @@ public class App extends AppCompatActivity {
         if (!loadedOverlay.isEmpty()) {
             loadedOverlay.get(0).back();
         } else if (loaded == null || !loaded.onBack()) {
-            moveTaskToBack(false);
+            moveTaskToBack(true);
             super.onBackPressed();
         }
     }
@@ -379,11 +425,13 @@ public class App extends AppCompatActivity {
 
     public void applyTheme() {
         String theme = Store.getTheme();
-        style.set(
-                theme.equals(Style.THEME_DARK) ? dark :
-                        theme.equals(Style.THEME_LIGHT) ? light :
-                                isDarkMode(getResources().getConfiguration()) ? dark : light);
-        setTheme(style.get().isDark() ? R.style.Theme_Diminou_Dark : R.style.Theme_Diminou_Light);
+        Style s = theme.equals(Style.THEME_DARK) ? dark :
+                theme.equals(Style.THEME_LIGHT) ? light :
+                        isDarkMode(getResources().getConfiguration()) ? dark : light;
+        Platform.runBack(() -> {
+            style.set(s);
+        });
+        setTheme(s.isDark() ? R.style.Theme_Diminou_Dark : R.style.Theme_Diminou_Light);
     }
 
     @Override
@@ -410,7 +458,7 @@ public class App extends AppCompatActivity {
     }
 
     public void setLocale(Locale locale) {
-        this.locale.set(locale);
+        Platform.runBack(() -> this.locale.set(locale));
     }
 
     @SuppressWarnings("unchecked")
@@ -419,7 +467,8 @@ public class App extends AppCompatActivity {
     }
 
     public void putData(String key, Object value) {
-        data.put(key, value);
+        if(value == null) data.remove(key);
+        else data.put(key, value);
     }
 
     public Object getData(String key) {
@@ -446,10 +495,10 @@ public class App extends AppCompatActivity {
         return getTypedData("players");
     }
 
-    public HashMap<Player, Integer> getScore() {
-        HashMap<Player, Integer> score = getTypedData("score");
+    public ConcurrentHashMap<Player, Integer> getScore() {
+        ConcurrentHashMap<Player, Integer> score = getTypedData("score");
         if(score == null) {
-            score = new HashMap<>();
+            score = new ConcurrentHashMap<>();
             putData("score", score);
         }
         return score;

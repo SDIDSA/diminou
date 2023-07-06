@@ -1,5 +1,6 @@
 package org.luke.diminou.abs.style;
 
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;
@@ -26,7 +27,7 @@ public interface Styleable {
     }
 
     private static void bindStyleWeak(Styleable node, Property<Style> style) {
-        node.applyStyle(style.get());
+        Platform.runLater(() -> node.applyStyle(style.get()));
         if(isBound(node)) return;
         WeakReference<Styleable> weakNode = new WeakReference<>(node);
         ChangeListener<Style> listener = new ChangeListener<>() {
@@ -34,10 +35,10 @@ public interface Styleable {
             public void changed(Observable<? extends Style> obs, Style ov, Style nv) {
                 if (weakNode.get() != null) {
                     if (nv != ov) {
-                        weakNode.get().applyStyle(nv);
+                        Platform.runLater(() -> weakNode.get().applyStyle(nv));
                     }
                 } else {
-                    style.removeListener(this);
+                    Platform.runBack(() -> style.removeListener(this));
                 }
             }
         };

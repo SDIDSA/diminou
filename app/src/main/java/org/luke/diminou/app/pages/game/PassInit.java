@@ -29,8 +29,10 @@ public class PassInit extends VBox implements Styleable {
 
         passInitLabel = new Label(owner, "pass_init");
         passInitYes = new Button(owner, "yes");
+        passInitYes.setMinimumWidth(ViewUtils.dipToPx(70, owner));
         ViewUtils.setMarginRight(passInitYes, owner, 15);
         passInitNo = new Button(owner, "no");
+        passInitNo.setMinimumWidth(ViewUtils.dipToPx(70, owner));
 
         HBox passInitButtons = new HBox(owner);
         ViewUtils.setMarginTop(passInitButtons, owner, 15);

@@ -42,7 +42,7 @@ public class TeamModeOverlay extends MultipleOptionOverlay {
 
         root.addView(remember);
 
-        applyStyle(owner.getStyle().get());
+        applyStyle(owner.getStyle());
     }
 
     public void setOnDone(Runnable onDone) {

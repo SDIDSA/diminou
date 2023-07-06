@@ -11,6 +11,7 @@ import org.luke.diminou.abs.utils.ViewUtils;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Font {
 
@@ -22,8 +23,8 @@ public class Font {
     public static final float DEFAULT_SIZE = 14;
 
     public static Font DEFAULT = new Font();
-    private static final HashMap<String, Typeface> base = new HashMap<>();
-    private static final HashMap<Font, Typeface> cache = new HashMap<>();
+    private static final ConcurrentHashMap<String, Typeface> base = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Font, Typeface> cache = new ConcurrentHashMap<>();
 
     private String family;
     private float size;
