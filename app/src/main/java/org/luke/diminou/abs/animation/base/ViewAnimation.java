@@ -2,11 +2,9 @@ package org.luke.diminou.abs.animation.base;
 
 import android.view.View;
 
-import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ViewAnimation extends ValueAnimation {

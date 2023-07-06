@@ -1,10 +1,13 @@
 package org.luke.diminou.app.pages.settings;
 
+import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
+import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.app.pages.Logs;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.home.Home;
 
@@ -54,12 +57,10 @@ public class Settings extends Titled {
         content.addView(display);
         content.addView(sound);
 
-        /*
-        Button logs = new HomeButton(owner, "logs", 100);
+        ColoredIcon logs = new ColoredIcon(owner, Style::getTextNormal, R.drawable.logs);
+        logs.setSize(32);
         logs.setOnClick(() -> owner.loadPage(Logs.class));
-
         getPreTitle().addView(logs);
-         */
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.luke.diminou.app.pages.game;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -20,10 +19,11 @@ import org.luke.diminou.abs.animation.view.padding.PaddingAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
+import org.luke.diminou.abs.components.controls.shape.Rectangle;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
-import org.luke.diminou.abs.local.SocketConnection;
+import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
@@ -34,7 +34,6 @@ import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.game.piece.Stock;
 import org.luke.diminou.app.pages.game.player.PieceHolder;
 import org.luke.diminou.app.pages.game.player.Player;
-import org.luke.diminou.app.pages.game.player.PlayerType;
 import org.luke.diminou.app.pages.game.player.Side;
 import org.luke.diminou.app.pages.game.score.ScoreBoard;
 import org.luke.diminou.app.pages.game.table.Table;
@@ -43,7 +42,6 @@ import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -64,6 +62,10 @@ public class Game extends Page {
     private final Label leftInStock;
 
     private final FrameLayout preRoot;
+
+    private final Rectangle background;
+
+    private final TurnManager turn;
 
     public Game(App owner) {
         super(owner);
@@ -99,6 +101,10 @@ public class Game extends Page {
         });
 
         preRoot = new FrameLayout(owner);
+        background = new Rectangle(owner);
+        background.setRadius(10);
+        background.setLayoutParams(new LayoutParams(-1, -1));
+        preRoot.addView(background);
         preRoot.addView(table);
         preRoot.addView(root);
         preRoot.setClipChildren(false);
@@ -106,6 +112,8 @@ public class Game extends Page {
         leftInStock = new Label(owner, "stock");
         addView(preRoot);
         addView(leftInStock);
+
+        turn = new TurnManager(owner, this);
 
         ViewUtils.alignInFrame(leftInStock, Gravity.TOP | Gravity.END);
 
@@ -133,123 +141,16 @@ public class Game extends Page {
         Platform.runLater(() -> leftInStock.addParam(0, String.valueOf(stock)));
     }
 
-    public void turn(Player p) {
-        if(isEnded()) return;
-        holders.forEach(h -> h.setEnabled(p.equals(h.getPlayer())));
-        if(host) {
-            owner.getSockets().forEach(socket -> socket.emit("turn", p.serialize()));
-            PieceHolder holder = getForPlayer(p);
-            assert holder != null;
-            ArrayList<Piece> toAdd = new ArrayList<>(holder.getPieces());
-            boolean lostTurn = false;
-            while(table.getPossiblePlays(toAdd).isEmpty()) {
-                if(stock.isEmpty()) {
-                    pass(holder);
-                    lostTurn = true;
-                    break;
-                }
-                toAdd.add(stock.getOne());
-            }
-            toAdd.removeAll(holder.getPieces());
-            if(!toAdd.isEmpty()) {
-                JSONArray arr = new JSONArray();
-
-                toAdd.forEach(piece -> arr.put(piece.name()));
-                JSONObject obj = new JSONObject();
-                try {
-                    obj.put("player", p.serialize());
-                    obj.put("pieces", arr);
-                    Platform.runAfter(() -> {
-                        owner.getSockets().forEach(socket -> socket.emit("deal", obj));
-                        holder.add(toAdd.toArray(new Piece[0]));
-                    }, 300);
-                }catch(Exception x) {
-                    ErrorHandler.handle(x, "dealing pieces");
-                }
-            }
-            if(p.getType() == PlayerType.BOT && !lostTurn && checkForWinner() == null) {
-                Platform.runAfter(() -> {
-                    if(owner.getLoaded() != this || scoreBoard.isShown() || isEnded()) return;
-                    List<Piece> possible = table.getPossiblePlays(holder.getPieces());
-                    if(!possible.isEmpty()) {
-                        Piece piece = possible.get(0);
-                        Move m = table.getPossiblePlays(piece, null).get(0);
-
-                        holder.play(m);
-
-                        try {
-                            JSONObject obj = new JSONObject();
-                            obj.put("player", p.serialize());
-                            obj.put("move", m.serialize());
-                            owner.getSockets().forEach(socket -> socket.emit("move", obj));
-                        }catch (Exception x) {
-                            ErrorHandler.handle(x, "playing bot");
-                        }
-
-                        if(holder.getPieces().isEmpty()) {
-                            emitWin(p);
-                        }else {
-                            holder.setEnabled(false);
-                            Platform.runAfter(() ->
-                                    nextTurn(holder), 750);
-                        }
-                    } else {
-                        pass(holder);
-                    }
-                }, 2000);
-            }
-        }
+    public ArrayList<PieceHolder> getHolders() {
+        return holders;
     }
 
-    public void turn(PieceHolder holder) {
-        turn(holder.getPlayer());
+    public Stock getStock() {
+        return stock;
     }
 
-    public void nextTurn(PieceHolder holder) {
-        if(ended) return;
-        if(holders.isEmpty()) return;
-        PieceHolder next = holders.get((holders.indexOf(holder) + 1) % holders.size());
-        if(!host) {
-            owner.getSocket().emit("turn", next.getPlayer().serialize());
-        }
-        if(host) {
-            boolean m9foul = stock.isEmpty();
-            if(m9foul) {
-                for(PieceHolder h : holders) {
-                    if(!table.getPossiblePlays(h.getPieces()).isEmpty()) {
-                        m9foul = false;
-                    }
-                }
-            }
-            if(m9foul) {
-                ArrayList<Player> winner = new ArrayList<>();
-                int min = Integer.MAX_VALUE;
-
-                for(PieceHolder h : holders) {
-                    int sum = h.sum();
-                    if(sum <= min) {
-                        if(sum < min) {
-                            winner.clear();
-                            min = sum;
-                        }
-                        winner.add(h.getPlayer());
-                    }
-                }
-
-                if(winner.size() == 1 ||
-                        (owner.getFourMode() == FourMode.TEAM_MODE &&
-                                winner.size() == 2 &&
-                                index(winner.get(0)) % 2 == index(winner.get(1)) % 2)) {
-                    emitWin(winner.get(0));
-                } else {
-                    emitDraw();
-                }
-            }else {
-                turn(next);
-            }
-        }else {
-            turn(next);
-        }
+    public ScoreBoard getScoreBoard() {
+        return scoreBoard;
     }
 
     public int getScoreOf(Player player) {
@@ -277,7 +178,7 @@ public class Game extends Page {
         score.put(player, val);
     }
 
-    private int index(Player player) {
+    public int index(Player player) {
         List<Player> players = owner.getPlayers();
         for(int i = 0; i < players.size(); i++) {
             if(players.get(i).equals(player)) {
@@ -310,7 +211,7 @@ public class Game extends Page {
         return sum;
     }
 
-    private void pass(PieceHolder holder) {
+    public void pass(PieceHolder holder) {
         if(host) {
             owner.getSockets().forEach(socket -> socket.emit("pass", holder.getPlayer().serialize()));
         }
@@ -320,7 +221,11 @@ public class Game extends Page {
             }
             owner.playGameSound(R.raw.pass);
         }, 300);
-        Platform.runAfter(() -> nextTurn(holder), 1000);
+        Platform.runAfter(() -> turn.nextTurn(holder), 1000);
+    }
+
+    public TurnManager getTurn() {
+        return turn;
     }
 
     public Table getTable() {
@@ -331,7 +236,7 @@ public class Game extends Page {
         return stock.deal();
     }
 
-    private Player checkForWinner() {
+    public Player checkForWinner() {
         AtomicReference<Player> winner = new AtomicReference<>();
         holders.forEach(h -> {
             if(h.getPieces().isEmpty()) {
@@ -469,7 +374,7 @@ public class Game extends Page {
         int add = ViewUtils.dipToPx(8, owner);
 
         preRoot.setPadding(0,0,0,0);
-        root.setCornerRadius(0);
+        root.setCornerRadius(10);
 
         ParallelAnimation show = new ParallelAnimation(400)
                 .addAnimation(new PaddingAnimation(400, preRoot,
@@ -547,7 +452,7 @@ public class Game extends Page {
                         return;
                     }
                     Player p = Player.deserialize(new JSONObject(data));
-                    turn(p);
+                    turn.turn(p);
                 });
             });
         } else {
@@ -570,7 +475,7 @@ public class Game extends Page {
             });
             socket.on("turn", data -> {
                 Player p = Player.deserialize(new JSONObject(data));
-                turn(p);
+                turn.turn(p);
             });
             socket.on("saket", data -> {
                 Player player = Player.deserialize(new JSONObject(data));
@@ -625,27 +530,7 @@ public class Game extends Page {
                 Platform.sleep(50);
             }
 
-            Platform.runAfter(() -> {
-                if (host) {
-                    Player winner = owner.getWinner();
-                    if (winner != null)
-                        turn(winner);
-                    else {
-                        List<Piece> priority = Piece.priority();
-                        for (Piece piece : priority) {
-                            boolean found = false;
-                            for (PieceHolder holder : holders) {
-                                if (holder.getPieces().contains(piece)) {
-                                    turn(holder);
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (found) break;
-                        }
-                    }
-                }
-            }, 300);
+            Platform.runAfter(turn::init, 300);
         });
     }
 
@@ -752,7 +637,7 @@ public class Game extends Page {
     @Override
     public void applyStyle(Style style) {
         preRoot.setBackgroundColor(style.getBackgroundPrimary());
-        table.setBackgroundColor(style.getBackgroundTertiary());
+        background.setFill(style.getBackgroundTertiary());
         root.setBorderColor(style.getBackgroundTertiary());
         leftInStock.setFill(style.getTextNormal());
     }

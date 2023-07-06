@@ -107,6 +107,7 @@ public class ViewUtils {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static float pxToSp(float px, Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         if (Build.VERSION.SDK_INT >= 34) {
@@ -116,6 +117,7 @@ public class ViewUtils {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static float spToPx(float sp, Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         if (Build.VERSION.SDK_INT >= 34) {

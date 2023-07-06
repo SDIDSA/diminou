@@ -38,7 +38,7 @@ import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.components.layout.overlay.Overlay;
-import org.luke.diminou.abs.local.SocketConnection;
+import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.Platform;
@@ -95,9 +95,8 @@ public class App extends AppCompatActivity {
         style = new Property<>();
         applyTheme();
 
-        Platform.runLater(() -> style.addListener((obs, ov, nv) -> {
-            Platform.runLater(this::applyStyle);
-        }));
+        Platform.runLater(() -> style.addListener((obs, ov, nv) ->
+                Platform.runLater(this::applyStyle)));
 
         root = new FrameLayout(this);
         root.setClipChildren(false);
@@ -188,7 +187,6 @@ public class App extends AppCompatActivity {
             mp = MediaPlayer.create(this, res);
             sounds.put(res, mp);
         }
-        if(mp == null) return null;
         mp.setVolume(1, 1);
         return mp;
     }
@@ -428,9 +426,7 @@ public class App extends AppCompatActivity {
         Style s = theme.equals(Style.THEME_DARK) ? dark :
                 theme.equals(Style.THEME_LIGHT) ? light :
                         isDarkMode(getResources().getConfiguration()) ? dark : light;
-        Platform.runBack(() -> {
-            style.set(s);
-        });
+        Platform.runBack(() -> style.set(s));
         setTheme(s.isDark() ? R.style.Theme_Diminou_Dark : R.style.Theme_Diminou_Light);
     }
 

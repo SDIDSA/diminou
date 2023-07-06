@@ -1,4 +1,4 @@
-package org.luke.diminou.abs.local;
+package org.luke.diminou.abs.net;
 
 import android.util.Log;
 
@@ -12,7 +12,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;

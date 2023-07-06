@@ -24,7 +24,7 @@ import org.luke.diminou.abs.components.controls.scratches.Loading;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.VBox;
-import org.luke.diminou.abs.local.SocketConnection;
+import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
@@ -35,7 +35,6 @@ import org.luke.diminou.app.pages.host.Host;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerCard extends VBox implements Styleable {

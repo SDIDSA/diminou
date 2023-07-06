@@ -6,7 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
-import org.luke.diminou.abs.local.Local;
+import org.luke.diminou.abs.net.Local;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.app.pages.game.Game;
 

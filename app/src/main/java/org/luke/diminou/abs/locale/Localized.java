@@ -28,7 +28,7 @@ public interface Localized {
 						Platform.runLater(() -> weakNode.get().applyLocale(nv));
 					}
 				} else {
-					Platform.runBack(() -> locale.removeListener(this));
+					Platform.runBack(() -> obs.removeListener(this));
 				}
 			}
 		};

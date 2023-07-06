@@ -38,7 +38,7 @@ public interface Styleable {
                         Platform.runLater(() -> weakNode.get().applyStyle(nv));
                     }
                 } else {
-                    Platform.runBack(() -> style.removeListener(this));
+                    Platform.runBack(() -> obs.removeListener(this));
                 }
             }
         };

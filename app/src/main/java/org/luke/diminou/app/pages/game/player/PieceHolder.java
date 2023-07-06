@@ -40,8 +40,6 @@ import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -271,7 +269,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                 game.emitWin(player);
                 if (game.isHost()) return;
             }
-            game.nextTurn(this);
+            game.getTurn().nextTurn(this);
         }, 750);
         try {
             JSONObject obj = new JSONObject();
@@ -557,7 +555,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
                     game.getPassInit().show(() -> {
                         game.getPassInit().hide();
                         Player mate = game.otherPlayer(player);
-                        game.turn(mate);
+                        game.getTurn().turn(mate);
                         if(!game.isHost()) {
                             owner.getSocket().emit("turn", mate.serialize());
                         }

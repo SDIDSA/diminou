@@ -10,7 +10,6 @@ import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Page extends FrameLayout implements Styleable {
