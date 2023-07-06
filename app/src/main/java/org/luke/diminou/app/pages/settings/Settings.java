@@ -1,28 +1,17 @@
 package org.luke.diminou.app.pages.settings;
 
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
-import org.luke.diminou.app.pages.Logs;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.home.Home;
-import org.luke.diminou.app.pages.home.HomeButton;
 
 public class Settings extends Titled {
 
     public Settings(App owner) {
         super(owner, "settings");
-
-        /*
-
-
-        content.addView(new ColoredSeparator(owner, Orientation.HORIZONTAL, 0, Style::getTextMuted));
-
-
-         */
 
         SettingsGroup game = new SettingsGroup(owner, "game_settings");
         SettingsGroup display = new SettingsGroup(owner, "display_settings");

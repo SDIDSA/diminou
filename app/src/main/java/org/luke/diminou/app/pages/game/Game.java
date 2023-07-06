@@ -612,9 +612,6 @@ public class Game extends Page {
             }));
         }
 
-        if(host && owner.getWinner() == null)
-            emitWin(getBottomHolder().getPlayer());
-
         Platform.runBack(() -> {
             boolean empty = true;
             while (empty) {
