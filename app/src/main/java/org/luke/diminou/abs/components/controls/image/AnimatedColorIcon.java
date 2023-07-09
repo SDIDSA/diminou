@@ -14,12 +14,17 @@ public class AnimatedColorIcon extends ColorIcon {
         this.audio = audio;
     }
 
+    public AnimatedColorIcon(App owner, int id) {
+        this(owner, id, Integer.MIN_VALUE);
+    }
+
     public void start() {
         start(1);
     }
 
     public void start(int count) {
-        owner.playGameSound(audio);
+        if(audio != Integer.MIN_VALUE)
+            owner.playGameSound(audio);
         Platform.runLater(() ->
         {
             if(count > 1) {

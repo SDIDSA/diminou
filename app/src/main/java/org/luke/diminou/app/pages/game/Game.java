@@ -16,8 +16,10 @@ import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.padding.PaddingAnimation;
+import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.Page;
+import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.shape.Rectangle;
 import org.luke.diminou.abs.components.controls.text.Label;
@@ -29,11 +31,13 @@ import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.app.pages.game.pause.GamePause;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.game.piece.Stock;
 import org.luke.diminou.app.pages.game.player.PieceHolder;
 import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.player.PlayerType;
 import org.luke.diminou.app.pages.game.player.Side;
 import org.luke.diminou.app.pages.game.score.ScoreBoard;
 import org.luke.diminou.app.pages.game.table.Table;
@@ -57,7 +61,11 @@ public class Game extends Page {
     private final Cherrat cherat;
     private Stock stock;
 
+    private final TurnManager turn;
+
     private final ScoreBoard scoreBoard;
+
+    private final GamePause gamePause;
 
     private final Label leftInStock;
 
@@ -65,8 +73,7 @@ public class Game extends Page {
 
     private final Rectangle background;
 
-    private final TurnManager turn;
-
+    private final ColoredIcon menu;
     public Game(App owner) {
         super(owner);
         setLayoutDirection(LAYOUT_DIRECTION_LTR);
@@ -100,6 +107,13 @@ public class Game extends Page {
             }
         });
 
+        menu = new ColoredIcon(owner, Style::getTextNormal, R.drawable.leave);
+        menu.setRotation(180);
+        ViewUtils.alignInFrame(menu, Gravity.TOP | Gravity.START);
+        menu.setSize(40);
+        ViewUtils.setPaddingUnified(menu, 7, owner);
+
+
         preRoot = new FrameLayout(owner);
         background = new Rectangle(owner);
         background.setRadius(10);
@@ -107,6 +121,8 @@ public class Game extends Page {
         preRoot.addView(background);
         preRoot.addView(table);
         preRoot.addView(root);
+        preRoot.addView(menu);
+
         preRoot.setClipChildren(false);
 
         leftInStock = new Label(owner, "stock");
@@ -114,6 +130,10 @@ public class Game extends Page {
         addView(leftInStock);
 
         turn = new TurnManager(owner, this);
+
+        gamePause = new GamePause(owner);
+
+        menu.setOnClick(this::onBack);
 
         ViewUtils.alignInFrame(leftInStock, Gravity.TOP | Gravity.END);
 
@@ -133,6 +153,16 @@ public class Game extends Page {
             if (holder.getPlayer().equals(player)) return holder;
         }
         ErrorHandler.handle(new IllegalStateException("player not found"), "getting pieceHolder for player " + player.serialize());
+        return null;
+    }
+
+    public Player getForSocket(SocketConnection socket) {
+        if(owner.getPlayers() == null) return null;
+        for(Player p : owner.getPlayers()){
+            if(!p.getIp().isBlank() && p.getIp().equals(socket.getIp())) {
+                return p;
+            }
+        }
         return null;
     }
 
@@ -305,6 +335,23 @@ public class Game extends Page {
         Platform.runAfter(scoreBoard::show, 200);
     }
 
+    private void playerLeft(Player left, SocketConnection socket) {
+        if(host) {
+            owner.getSockets().forEach(s -> s.emit("leave", left.serialize()));
+            owner.getSockets().remove(socket);
+            Platform.runLater(() -> {
+                owner.toast("player_left", left.getName());
+                owner.playMenuSound(R.raw.left);
+                getForPlayer(left).makeBot();
+            });
+        }else if(!left.equals(getBottomHolder().getPlayer())){
+            Platform.runLater(() -> {
+                owner.toast("player_left", left.getName());
+                owner.playMenuSound(R.raw.left);
+            });
+        }
+    }
+
     @Override
     public void setup() {
         super.setup();
@@ -379,7 +426,7 @@ public class Game extends Page {
         ParallelAnimation show = new ParallelAnimation(400)
                 .addAnimation(new PaddingAnimation(400, preRoot,
                         insets.left + add,
-                        insets.top + add + ViewUtils.dipToPx(15, owner),
+                        insets.top + add + ViewUtils.dipToPx(17, owner),
                         insets.right + add,
                         insets.bottom + add))
                 .addAnimation(new ColorAnimation(owner.getStyle().get().getBackgroundTertiary(), owner.getStyle().get().getTextMuted()) {
@@ -390,6 +437,8 @@ public class Game extends Page {
                 })
                 .addAnimations(
                         holders.stream().map(PieceHolder::setup).toArray(Animation[]::new))
+                .addAnimation(new TranslateYAnimation(menu, -ViewUtils.dipToPx(30, owner), 0))
+                .addAnimation(new AlphaAnimation(menu, 0, 1))
                 .setOnUpdate(v -> {
                     leftInStock.setTranslationY(owner.getSystemInsets().top * v);
                     leftInStock.setTranslationX(-preRoot.getPaddingRight());
@@ -407,6 +456,12 @@ public class Game extends Page {
 
         if (host) {
             owner.getSockets().forEach(socket -> {
+                socket.setOnError(() -> {
+                    Player client = getForSocket(socket);
+                    if(client == null || client.getType() == PlayerType.BOT) return;
+                    playerLeft(client, socket);
+                });
+
                 socket.on("deal", data -> {
                     JSONArray arr = new JSONArray();
                     Player player = Player.deserialize(new JSONObject(data));
@@ -454,9 +509,17 @@ public class Game extends Page {
                     Player p = Player.deserialize(new JSONObject(data));
                     turn.turn(p);
                 });
+                socket.on("leave", data ->
+                        playerLeft(Player.deserialize(new JSONObject(data)), socket));
             });
         } else {
             SocketConnection socket = owner.getSocket();
+            socket.setOnError(() -> Platform.runLater(() -> {
+                if(ended)
+                    return;
+                owner.toast("host_ended");
+                endGame();
+            }));
             socket.on("deal", data -> {
                 JSONObject all = new JSONObject(data);
                 Player player = Player.deserialize(all.getJSONObject("player"));
@@ -515,6 +578,14 @@ public class Game extends Page {
                 scoreBoard.hide();
                 setup();
             }));
+            socket.on("end_game", data -> Platform.runLater(() -> {
+                if(ended)
+                    return;
+                owner.toast("host_ended");
+                endGame();
+            }));
+            socket.on("leave", data ->
+                    playerLeft(Player.deserialize(new JSONObject(data)), socket));
         }
 
         Platform.runBack(() -> {
@@ -561,7 +632,15 @@ public class Game extends Page {
 
     @Override
     public boolean onBack() {
-        endGame();
+        gamePause.setOnExit(() -> {
+            if(host) {
+                owner.getSockets().forEach(s -> s.emit("end_game", ""));
+            }else {
+                owner.getSocket().emit("leave", getBottomHolder().getPlayer().serialize());
+            }
+            endGame();
+        });
+        gamePause.show();
         return true;
     }
 
@@ -572,6 +651,8 @@ public class Game extends Page {
     }
 
     private void endGame() {
+        ended = true;
+        gamePause.hide();
         owner.putData("score", null);
         owner.putData("winner", null);
         owner.putData("players", null);
@@ -601,6 +682,8 @@ public class Game extends Page {
                         root.setBackground(color);
                     }
                 })
+                .addAnimation(new TranslateYAnimation(menu, 0, -ViewUtils.dipToPx(30, owner)))
+                .addAnimation(new AlphaAnimation(menu, 1, 0))
                 .setOnUpdate(v -> {
                     leftInStock.setTranslationY(owner.getSystemInsets().top * (1 - v));
                     leftInStock.setAlpha(1 - v);
@@ -614,8 +697,16 @@ public class Game extends Page {
                     holders.clear();
                     owner.removeLoaded();
                     owner.loadPage(Home.class);
+                    if(host) {
+                        owner.getSockets().forEach(s -> s.setOnError(null));
+                        owner.getSockets().forEach(SocketConnection::stop);
+                        owner.getSockets().clear();
+                    }else {
+                        owner.getSocket().setOnError(null);
+                        owner.getSocket().stop();
+                        owner.putData("socket", null);
+                    }
                 }).start();
-        ended = true;
     }
 
     public boolean isHost() {
@@ -638,7 +729,7 @@ public class Game extends Page {
     public void applyStyle(Style style) {
         preRoot.setBackgroundColor(style.getBackgroundPrimary());
         background.setFill(style.getBackgroundTertiary());
-        root.setBorderColor(style.getBackgroundTertiary());
+        root.setBorderColor(style.getTextMuted());
         leftInStock.setFill(style.getTextNormal());
     }
 

@@ -411,6 +411,7 @@ public class Join extends Titled {
                                     cards.swap(a, b);
                                 });
                                 server.on("begin", data -> {
+                                    Platform.runLater(this::left);
                                     owner.putData("host", false);
                                     JSONObject dataObj = new JSONObject(data);
                                     ArrayList<Player> players = new ArrayList<>();

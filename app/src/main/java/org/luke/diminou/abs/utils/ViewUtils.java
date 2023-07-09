@@ -78,6 +78,14 @@ public class ViewUtils {
         setMargin(view, context, 0, 0, val, 0);
     }
 
+    public static void setMarginLeft(View view, Context context, float val) {
+        setMargin(view, context, val, 0, 0, 0);
+    }
+
+    public static void setMarginHorizontal(View view, Context context, float val) {
+        setMargin(view, context, val, 0, val, 0);
+    }
+
     public static void setMarginBottom(View view, Context context, float val) {
         setMargin(view, context, 0, 0, 0, val);
     }
@@ -159,6 +167,9 @@ public class ViewUtils {
             if(old != null) {
                 n.width = old.width;
                 n.height = old.height;
+                if(old instanceof ViewGroup.MarginLayoutParams mold) {
+                    n.setMargins(mold.leftMargin, mold.topMargin, mold.rightMargin, mold.bottomMargin);
+                }
             }
             n.gravity = gravity;
             view.setLayoutParams(n);

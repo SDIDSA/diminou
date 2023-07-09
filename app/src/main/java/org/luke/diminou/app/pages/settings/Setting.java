@@ -74,7 +74,9 @@ public class Setting extends Button implements Styleable {
             value.setKey(v);
             Page.clearCache();
             if(reset)
-                resetOverlay(() -> owner.loadPage(Settings.class, () -> overlay.show()));
+                resetOverlay(() -> owner.loadPage(Settings.class, () -> {
+                    overlay.show();
+                }));
         }, options);
     }
 

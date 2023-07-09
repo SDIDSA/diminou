@@ -83,7 +83,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         root.setOrientation(side.isHorizontal() ? LinearBox.HORIZONTAL : LinearBox.VERTICAL);
         root.setGravity(Gravity.CENTER);
         root.setClipToPadding(false);
-        root.setZ(5);
+        root.setZ(ViewUtils.dipToPx(5, owner));
         setClipChildren(false);
 
         ViewUtils.setPadding(root, side == Side.LEFT ? 0 : padding, side == Side.TOP ? 0 : padding, side == Side.RIGHT ? 0 : padding, side == Side.BOTTOM ? 0 : padding, owner);
@@ -124,7 +124,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         int timerBy = 0;
         int timerShow = ViewUtils.dipToPx(3, owner);
         timer = new Rectangle(owner);
-        timer.setZ(4);
+        timer.setZ(ViewUtils.dipToPx(4, owner));
         timer.setRadius(radius);
         timerClip = new Rect();
         timer.setClipBounds(timerClip);
@@ -196,7 +196,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
             icon.setCornerRadius(padding);
             icon.setAlpha(0f);
 
-            icon.setZ(2);
+            icon.setZ(ViewUtils.dipToPx(2, owner));
 
             addView(icon);
 
@@ -366,7 +366,8 @@ public class PieceHolder extends FrameLayout implements Styleable {
                 piecesDisplay.put(p, piece);
                 game.updateStock();
 
-                owner.playGameSound(PlaySound.SOUND_16.getRes());
+                if(side == Side.BOTTOM)
+                    owner.playGameSound(PlaySound.SOUND_16.getRes());
                 new ParallelAnimation(300).addAnimation(new ValueAnimation(0, calcPieceSize()) {
                     @Override
                     public void updateValue(float v) {
@@ -544,6 +545,7 @@ public class PieceHolder extends FrameLayout implements Styleable {
         return player;
     }
 
+    private Thread timerThread;
     @Override
     public void setEnabled(boolean enabled) {
         if(game.isEnded()) return;
@@ -575,7 +577,10 @@ public class PieceHolder extends FrameLayout implements Styleable {
             if (enabled) {
                 timer.setFill(owner.getStyle().get().getTextPositive());
                 int time = owner.getTimer().getDuration();
-                Platform.runBack(() -> {
+                if(timerThread != null && timerThread.isAlive()) {
+                    timerThread.interrupt();
+                }
+                timerThread = Platform.runBack(() -> {
                     long start = System.currentTimeMillis();
                     boolean yellow = false;
                     boolean red = false;
@@ -637,11 +642,11 @@ public class PieceHolder extends FrameLayout implements Styleable {
     @Override
     public void applyStyle(Style style) {
         root.setBackground(style.getBackgroundPrimary());
-        root.setBorderColor(style.getBackgroundTertiary());
-        name.setFill(style.getTextNormal());
-        name.setFill(style.getTextNormal());
+        root.setBorderColor(style.getTextMuted());
+        name.setFill(App.adjustAlpha(style.getTextNormal(), isEnabled() ? 1 : .5f));
+        score.setFill(App.adjustAlpha(style.getTextNormal(), isEnabled() ? 1 : .5f));
 
-        timer.setFill(style.getTextNormal());
+        root.setForeground(App.adjustAlpha(style.getBackgroundPrimary(), isEnabled() ? 0 : .6f));
 
         yellow = new ColorAnimation(400, style.getTextPositive(), style.getTextWarning()) {
             @Override
@@ -658,8 +663,47 @@ public class PieceHolder extends FrameLayout implements Styleable {
         }.setInterpolator(Interpolator.EASE_OUT);
     }
 
+    public void playBot() {
+        Platform.runAfter(() -> {
+            if(owner.getLoaded() != game || game.getScoreBoard().isShown() || game.isEnded() || owner.isPaused()) return;
+            List<Piece> possible = game.getTable().getPossiblePlays(getPieces());
+            if(!possible.isEmpty()) {
+                Piece piece = possible.get(0);
+                Move m = game.getTable().getPossiblePlays(piece, null).get(0);
+
+                play(m);
+
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("player", player.serialize());
+                    obj.put("move", m.serialize());
+                    owner.getSockets().forEach(socket -> socket.emit("move", obj));
+                }catch (Exception x) {
+                    ErrorHandler.handle(x, "playing bot");
+                }
+
+                if(getPieces().isEmpty()) {
+                    game.emitWin(player);
+                }else {
+                    setEnabled(false);
+                    Platform.runAfter(() ->
+                            game.getTurn().nextTurn(this), 750);
+                }
+            } else {
+                game.pass(this);
+            }
+        }, 2000);
+    }
+
     @Override
     public void applyStyle(Property<Style> style) {
         Styleable.bindStyle(this, style);
+    }
+
+    public void makeBot() {
+        player.makeBot();
+        if(isEnabled()) {
+            playBot();
+        }
     }
 }

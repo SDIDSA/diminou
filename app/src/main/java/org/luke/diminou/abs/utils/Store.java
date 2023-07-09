@@ -45,6 +45,7 @@ public class Store {
         try {
             return settings.data().map(prefs -> prefs.get(key)).first(def).blockingGet();
         }catch(Exception x) {
+            Platform.runBack(() -> setSetting(key, def, null));
             return def;
         }
     }

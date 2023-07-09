@@ -40,7 +40,7 @@ public class AvatarSelectOverlay extends PartialSlideOverlay {
         root.addView(category(Avatar.micahs(), true));
         root.addView(category(Avatar.smiles(), true));
         root.addView(category(Avatar.fulls(), true));
-        root.addView(category(Avatar.avatars(), true));
+        root.addView(category(Avatar.avatars(), false));
 
         ScrollView sv = new ScrollView(owner);
         sv.addView(root);

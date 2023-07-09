@@ -9,7 +9,7 @@ import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.app.pages.home.HomeButton;
+import org.luke.diminou.abs.components.controls.button.HomeButton;
 import org.luke.diminou.app.pages.settings.Settings;
 
 public class Logs extends Titled {

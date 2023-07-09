@@ -18,6 +18,8 @@ import org.luke.diminou.abs.animation.view.position.TranslateXAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.Page;
+import org.luke.diminou.abs.components.controls.button.HomeButton;
+import org.luke.diminou.abs.components.controls.button.HomeButtonPlay;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
 import org.luke.diminou.abs.components.controls.input.InputField;
 import org.luke.diminou.abs.components.controls.text.font.Font;
@@ -25,11 +27,13 @@ import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.avatar.AvatarSelect;
+import org.luke.diminou.app.pages.game.pause.GamePause;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.host.Host;
 import org.luke.diminou.app.pages.join.Join;
@@ -118,6 +122,7 @@ public class Home extends Page {
         host.setOnClick(() -> owner.loadPage(Host.class));
         settings.setOnClick(() -> owner.loadPage(Settings.class));
         exit.setOnClick(confirmExit::show);
+        //exit.setOnClick(() -> new GamePause(owner).show());
 
         addView(root);
 
@@ -294,6 +299,7 @@ public class Home extends Page {
                 try {
                     replacePiece(floating.get(0));
                 }catch(Exception x) {
+                    ErrorHandler.handle(x, "setting up floating pieces");
                     return;
                 }
             }

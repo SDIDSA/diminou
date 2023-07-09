@@ -29,6 +29,7 @@ public class SocketConnection {
     private Runnable onError;
 
     private final Semaphore readMutex = new Semaphore(1);
+
     public SocketConnection(Socket socket) {
         this.socket = socket;
         try {
@@ -79,13 +80,17 @@ public class SocketConnection {
     }
 
     public void stop() {
-        thread.interrupt();
-        try {
-            socket.close();
-            socket.setReuseAddress(true);
-        } catch (IOException e) {
-            ErrorHandler.handle(e, "stopping socket");
-        }
+        Platform.runBack(() -> {
+            emitMutex.acquireUninterruptibly();
+            thread.interrupt();
+            try {
+                socket.close();
+                socket.setReuseAddress(true);
+            } catch (IOException e) {
+                ErrorHandler.handle(e, "stopping socket");
+            }
+            emitMutex.release();
+        });
     }
 
     public void on(String action, StringConsumer listener) {

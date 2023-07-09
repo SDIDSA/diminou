@@ -40,8 +40,12 @@ public class Rectangle extends View implements ColoredView {
         stroke = new Property<>(Color.TRANSPARENT);
 
         ChangeListener<Float> sizeListener = (obs, ov, nv) -> {
+            ViewGroup.LayoutParams old = getLayoutParams();
             if (getParent() instanceof FrameLayout) {
-                setLayoutParams(new FrameLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner));
+                if(old instanceof FrameLayout.LayoutParams oldParam)
+                    params.gravity = oldParam.gravity;
+                setLayoutParams(params);
             } else if(getParent() instanceof LinearLayout) {
                 setLayoutParams(new LinearLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
             } else {
@@ -84,6 +88,10 @@ public class Rectangle extends View implements ColoredView {
 
     public void setStrokeWidth(int strokeWidth) {
         this.strokeWidth.set(strokeWidth);
+    }
+
+    public void setStroke(@ColorInt int col) {
+        stroke.set(col);
     }
 
     @Override

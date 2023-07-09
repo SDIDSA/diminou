@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.annotation.ColorInt;
 
@@ -43,7 +44,8 @@ public class Button extends FrameLayout implements ColoredView {
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
         label = new Label(owner, text);
-        label.setLayoutGravity(Gravity.CENTER);
+        label.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        label.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
 
         content = new HBox(owner);
         content.setGravity(Gravity.CENTER);
@@ -111,7 +113,7 @@ public class Button extends FrameLayout implements ColoredView {
 
     public void setBackgroundColor(int color) {
         background.setColor(color);
-        setRippleColor(App.adjustAlpha(getComplementaryColor(color), .6f));
+        setRippleColor(App.adjustAlpha(getComplementaryColor(owner.getStyle().get().getBackgroundPrimary()), .6f));
         this.color = color;
     }
 

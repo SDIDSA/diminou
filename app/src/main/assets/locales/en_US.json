@@ -75,6 +75,7 @@
 
   "set_other_sounds" : "Enable other sounds",
   "other_sounds" : "Other sounds",
+  "sound" : "Sound",
 
   "on" : "On",
   "off" : "Off",

@@ -59,35 +59,7 @@ public class TurnManager {
                 }
             }
             if(p.getType() == PlayerType.BOT && !lostTurn && game.checkForWinner() == null) {
-                Platform.runAfter(() -> {
-                    if(owner.getLoaded() != game || game.getScoreBoard().isShown() || game.isEnded() || owner.isPaused()) return;
-                    List<Piece> possible = game.getTable().getPossiblePlays(holder.getPieces());
-                    if(!possible.isEmpty()) {
-                        Piece piece = possible.get(0);
-                        Move m = game.getTable().getPossiblePlays(piece, null).get(0);
-
-                        holder.play(m);
-
-                        try {
-                            JSONObject obj = new JSONObject();
-                            obj.put("player", p.serialize());
-                            obj.put("move", m.serialize());
-                            owner.getSockets().forEach(socket -> socket.emit("move", obj));
-                        }catch (Exception x) {
-                            ErrorHandler.handle(x, "playing bot");
-                        }
-
-                        if(holder.getPieces().isEmpty()) {
-                            game.emitWin(p);
-                        }else {
-                            holder.setEnabled(false);
-                            Platform.runAfter(() ->
-                                    nextTurn(holder), 750);
-                        }
-                    } else {
-                        game.pass(holder);
-                    }
-                }, 2000);
+                holder.playBot();
             }
         }
     }

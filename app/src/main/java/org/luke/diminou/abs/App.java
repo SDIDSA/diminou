@@ -2,6 +2,7 @@ package org.luke.diminou.abs;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
@@ -41,6 +42,7 @@ import org.luke.diminou.abs.components.layout.overlay.Overlay;
 import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
@@ -95,8 +97,8 @@ public class App extends AppCompatActivity {
         style = new Property<>();
         applyTheme();
 
-        Platform.runLater(() -> style.addListener((obs, ov, nv) ->
-                Platform.runLater(this::applyStyle)));
+        style.addListener((obs, ov, nv) ->
+                Platform.runLater(() -> applyStyle(nv)));
 
         root = new FrameLayout(this);
         root.setClipChildren(false);
@@ -144,6 +146,18 @@ public class App extends AppCompatActivity {
         }, "app_init_thread").start();
     }
 
+    public Bitmap screenCap() {
+        root.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        root.setDrawingCacheEnabled(true);
+        Bitmap bitmap = Bitmap.createBitmap(root.getDrawingCache());
+        root.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
+
+    public FrameLayout getRoot() {
+        return root;
+    }
+
     private boolean paused = false;
     @Override
     protected void onPause() {
@@ -171,6 +185,12 @@ public class App extends AppCompatActivity {
         mp.start();
         if(Store.getAmbient().equals("off")) muteAmbient();
         else unmuteAmbient();
+    }
+
+    public void applyAmbient(boolean b) {
+        Store.setAmbient(b ? "on" : "off", null);
+        if(b) unmuteAmbient();
+        else muteAmbient();
     }
 
     public void muteAmbient() {
@@ -359,12 +379,15 @@ public class App extends AppCompatActivity {
         old = toast;
     }
 
-    public void toast(String content) {
+    public void toast(String content, String...params) {
         Label lab = new Label(this, content);
         lab.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         lab.setLineSpacing(10);
         lab.setFont(new Font(18));
         lab.setFill(style.get().getTextNormal());
+        for(int i = 0; i < params.length; i++) {
+            lab.addParam(i, params[i]);
+        }
         toast(lab);
     }
 
@@ -426,7 +449,7 @@ public class App extends AppCompatActivity {
         Style s = theme.equals(Style.THEME_DARK) ? dark :
                 theme.equals(Style.THEME_LIGHT) ? light :
                         isDarkMode(getResources().getConfiguration()) ? dark : light;
-        Platform.runBack(() -> style.set(s));
+        style.set(s);
         setTheme(s.isDark() ? R.style.Theme_Diminou_Dark : R.style.Theme_Diminou_Light);
     }
 
@@ -436,13 +459,13 @@ public class App extends AppCompatActivity {
         applyTheme();
     }
 
-    public void applyStyle() {
+    public void applyStyle(Style style) {
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         WindowInsetsControllerCompat controllerCompat = new WindowInsetsControllerCompat(window, root);
-        controllerCompat.setAppearanceLightStatusBars(style.get().isLight());
-        controllerCompat.setAppearanceLightNavigationBars(style.get().isLight());
+        controllerCompat.setAppearanceLightStatusBars(style.isLight());
+        controllerCompat.setAppearanceLightNavigationBars(style.isLight());
     }
 
     public boolean isDarkMode(Configuration newConfig) {

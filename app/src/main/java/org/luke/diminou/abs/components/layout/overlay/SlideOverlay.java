@@ -3,6 +3,8 @@ package org.luke.diminou.abs.components.layout.overlay;
 import android.view.Gravity;
 import android.view.MotionEvent;
 
+import androidx.core.view.ViewCompat;
+
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
@@ -95,22 +97,9 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
             return true;
         });
 
-        applyStyle(owner.getStyle());
-    }
+        addOnShowing(() -> owner.playMenuSound(R.raw.swap));
 
-    @Override
-    public void show() {
-        owner.addOverlay(this);
-        Platform.runBack(() -> {
-            while(list.getHeight() < ViewUtils.dipToPx(50, owner)) {
-                Platform.sleep(10);
-            }
-            Platform.runLater(() -> {
-                owner.removeOverlay(this);
-                super.show();
-                owner.playMenuSound(R.raw.swap);
-            });
-        });
+        applyStyle(owner.getStyle());
     }
 
     protected void setHeight(int height) {
@@ -121,10 +110,6 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
 
     protected void setHeightFactor(double factor) {
         setHeight((int) (owner.getScreenHeight() * factor));
-    }
-
-    private int getMarginBottom() {
-        return ((MarginLayoutParams)list.getLayoutParams()).bottomMargin;
     }
 
     @Override
