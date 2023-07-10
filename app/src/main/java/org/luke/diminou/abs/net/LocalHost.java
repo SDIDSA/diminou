@@ -1,6 +1,5 @@
-package org.luke.diminou.abs.local.host;
+package org.luke.diminou.abs.net;
 
-import org.luke.diminou.abs.local.Local;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.functional.SocketConsumer;
 

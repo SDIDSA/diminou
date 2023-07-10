@@ -22,8 +22,8 @@ import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
-import org.luke.diminou.abs.local.Local;
-import org.luke.diminou.abs.local.SocketConnection;
+import org.luke.diminou.abs.net.Local;
+import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
@@ -220,18 +219,10 @@ public class Join extends Titled {
         leave.setTranslationY(-30);
         leave.setAlpha(0);
 
-        boolean success = false;
-        while(!success) {
-            try {
-                parties.forEach(p -> {
-                    p.getData().getConnection().stop();
-                    found.removeView(p);
-                });
-                success = true;
-            }catch(ConcurrentModificationException x) {
-                ErrorHandler.handle(x, "joining party");
-            }
-        }
+        parties.forEach(p -> {
+            p.getData().getConnection().stop();
+            found.removeView(p);
+        });
         parties.clear();
 
         if(loader != null) loader.interrupt();
@@ -411,6 +402,7 @@ public class Join extends Titled {
                                     cards.swap(a, b);
                                 });
                                 server.on("begin", data -> {
+                                    Platform.runLater(this::left);
                                     owner.putData("host", false);
                                     JSONObject dataObj = new JSONObject(data);
                                     ArrayList<Player> players = new ArrayList<>();

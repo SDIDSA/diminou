@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
@@ -24,7 +24,7 @@ import org.luke.diminou.abs.components.controls.scratches.Loading;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.VBox;
-import org.luke.diminou.abs.local.SocketConnection;
+import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
@@ -35,14 +35,13 @@ import org.luke.diminou.app.pages.host.Host;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerCard extends VBox implements Styleable {
     private static final ConcurrentHashMap<Integer, PlayerCard> track = new ConcurrentHashMap<>();
     private final Loading loading;
     private final GradientDrawable avatarBack;
-    private final FrameLayout preAvatar;
+    private final StackPane preAvatar;
     private final AvatarDisplay avatarDisplay;
     private final Label name;
     private final Property<String> username = new Property<>(null);
@@ -75,7 +74,7 @@ public class PlayerCard extends VBox implements Styleable {
         avatarBack.setCornerRadius(ViewUtils.dipToPx(7, owner));
 
         int size = ViewUtils.dipToPx(AvatarDisplay.preSize, owner);
-        preAvatar = new FrameLayout(owner);
+        preAvatar = new StackPane(owner);
         preAvatar.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         preAvatar.setLayoutParams(new LayoutParams(size, size));
         preAvatar.setBackground(avatarBack);

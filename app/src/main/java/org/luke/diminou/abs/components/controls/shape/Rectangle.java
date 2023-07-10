@@ -4,18 +4,17 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
 import androidx.annotation.ColorInt;
 
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.components.controls.abs.ColoredView;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.property.Property;
 
-public class Rectangle extends View implements ColoredView {
+public class Rectangle extends View {
     private final GradientDrawable background;
 
     private final Property<Float> width;
@@ -40,8 +39,12 @@ public class Rectangle extends View implements ColoredView {
         stroke = new Property<>(Color.TRANSPARENT);
 
         ChangeListener<Float> sizeListener = (obs, ov, nv) -> {
-            if (getParent() instanceof FrameLayout) {
-                setLayoutParams(new FrameLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
+            ViewGroup.LayoutParams old = getLayoutParams();
+            if (getParent() instanceof StackPane) {
+                StackPane.LayoutParams params = new StackPane.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner));
+                if(old instanceof StackPane.LayoutParams oldParam)
+                    params.gravity = oldParam.gravity;
+                setLayoutParams(params);
             } else if(getParent() instanceof LinearLayout) {
                 setLayoutParams(new LinearLayout.LayoutParams(ViewUtils.dipToPx(width.get(), owner), ViewUtils.dipToPx(height.get(), owner)));
             } else {
@@ -86,12 +89,10 @@ public class Rectangle extends View implements ColoredView {
         this.strokeWidth.set(strokeWidth);
     }
 
-    @Override
-    public int getFill() {
-        return fill.get();
+    public void setStroke(@ColorInt int col) {
+        stroke.set(col);
     }
 
-    @Override
     public void setFill(@ColorInt int fill) {
         this.fill.set(fill);
     }

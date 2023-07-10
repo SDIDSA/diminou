@@ -1,28 +1,26 @@
 package org.luke.diminou.app.pages.settings;
 
+import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.components.controls.button.Button;
+import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.Logs;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.home.Home;
-import org.luke.diminou.app.pages.home.HomeButton;
+
+import java.util.ArrayList;
 
 public class Settings extends Titled {
+    private final ArrayList<SettingsGroup> groups;
 
     public Settings(App owner) {
         super(owner, "settings");
 
-        /*
-
-
-        content.addView(new ColoredSeparator(owner, Orientation.HORIZONTAL, 0, Style::getTextMuted));
-
-
-         */
+        groups = new ArrayList<>();
 
         SettingsGroup game = new SettingsGroup(owner, "game_settings");
         SettingsGroup display = new SettingsGroup(owner, "display_settings");
@@ -35,7 +33,10 @@ public class Settings extends Titled {
                 v -> Store.setTimer(v, null), false, Timer.names()));
 
         display.addSetting(new Setting(owner, "app_theme", Store::getTheme,
-                v -> Store.setTheme(v, s -> owner.applyTheme()), false,
+                v -> Store.setTheme(v, s -> Platform.runAfter(() -> {
+                    owner.applyTheme();
+                    owner.reloadPage();
+                }, 300)), false,
                 Style.THEME_SYSTEM, Style.THEME_DARK, Style.THEME_LIGHT));
 
         display.addSetting(new Setting(owner, "ui_scale",
@@ -61,21 +62,50 @@ public class Settings extends Titled {
         sound.addSetting(new Setting(owner, "other_sounds", Store::getMenuSounds,
                 v -> Store.setMenuSounds(v, null), false, "on", "off"));
 
-        content.addView(game);
-        content.addView(display);
-        content.addView(sound);
+        addGroup(game);
+        addGroup(display);
+        addGroup(sound);
 
-        /*
-        Button logs = new HomeButton(owner, "logs", 100);
+        ColoredIcon logs = new ColoredIcon(owner, Style::getTextNormal, R.drawable.logs);
+        logs.setSize(32);
         logs.setOnClick(() -> owner.loadPage(Logs.class));
-
         getPreTitle().addView(logs);
-         */
+    }
+
+    private void addGroup(SettingsGroup group) {
+        content.addView(group);
+        groups.add(group);
+    }
+
+    private SettingsGroup getForKey(String key) {
+        for(SettingsGroup group : groups) {
+            if(group.getKey().equals(key)) return group;
+        }
+
+        return null;
+    }
+
+    @Override
+    public void setup() {
+        super.setup();
+        SettingsGroup open = getForKey((String) owner.getData("open_cat"));
+        if(open != null) Platform.runBack(() -> {
+            while(!open.isLaidOut()) {
+                Platform.sleep(5);
+            }
+            Platform.runLater(open::open);
+        });
+        owner.putData("open_cat", null);
     }
 
     @Override
     public boolean onBack() {
+        SettingsGroup open = SettingsGroup.openGroup;
+        if(SettingsGroup.openGroup != null)
+            SettingsGroup.openGroup.close();
         owner.loadPage(Home.class);
+        if(open != null)
+            owner.putData("open_cat", open.getKey());
         return true;
     }
 }

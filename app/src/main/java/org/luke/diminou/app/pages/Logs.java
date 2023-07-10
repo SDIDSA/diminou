@@ -9,7 +9,7 @@ import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
-import org.luke.diminou.app.pages.home.HomeButtonPlay;
+import org.luke.diminou.abs.components.controls.button.HomeButton;
 import org.luke.diminou.app.pages.settings.Settings;
 
 public class Logs extends Titled {
@@ -31,7 +31,7 @@ public class Logs extends Titled {
 
         sv.addView(logs);
 
-        Button clear = new HomeButtonPlay(owner, "clear");
+        Button clear = new HomeButton(owner, "clear", 100);
 
         getPreTitle().addView(clear);
 

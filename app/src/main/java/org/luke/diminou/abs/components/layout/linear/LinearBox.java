@@ -2,12 +2,15 @@ package org.luke.diminou.abs.components.layout.linear;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Looper;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.core.content.res.ResourcesCompat;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.property.Property;
 
@@ -145,5 +148,33 @@ public class LinearBox extends LinearLayout {
 
     public void setBorderColor(int color) {
         background.setStroke(ViewUtils.dipToPx(1, owner), color);
+    }
+
+    @Override
+    public void addView(View child) {
+        if(Thread.currentThread() != Looper.getMainLooper().getThread() && isAttachedToWindow())
+            ErrorHandler.handle(new RuntimeException("modifying ui from the wrong thread"), "adding view to stackPane");
+        super.addView(child);
+    }
+
+    @Override
+    public void removeView(View view) {
+        if(Thread.currentThread() != Looper.getMainLooper().getThread() && isAttachedToWindow())
+            ErrorHandler.handle(new RuntimeException("modifying ui from the wrong thread"), "adding view to stackPane");
+        super.removeView(view);
+    }
+
+    @Override
+    public void removeAllViews() {
+        if(Thread.currentThread() != Looper.getMainLooper().getThread() && isAttachedToWindow())
+            ErrorHandler.handle(new RuntimeException("modifying ui from the wrong thread"), "adding view to stackPane");
+        super.removeAllViews();
+    }
+
+    @Override
+    public void addView(View child, int index) {
+        if(Thread.currentThread() != Looper.getMainLooper().getThread() && isAttachedToWindow())
+            ErrorHandler.handle(new RuntimeException("modifying ui from the wrong thread"), "adding view to stackPane");
+        super.addView(child, index);
     }
 }

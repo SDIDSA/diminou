@@ -15,7 +15,7 @@ public abstract class Animation {
 
     public static final float timeScale = 1f;
 
-    private float fps = 60f;
+    private float fps = 120f;
     private Interpolator interpolator = new Linear();
     private long duration;
     private long lastUpdate;

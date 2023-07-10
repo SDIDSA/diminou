@@ -2,7 +2,7 @@ package org.luke.diminou.app.avatar;
 
 import android.graphics.Color;
 import android.view.Gravity;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.ScrollView;
 
 import org.luke.diminou.R;
@@ -40,7 +40,7 @@ public class AvatarSelectOverlay extends PartialSlideOverlay {
         root.addView(category(Avatar.micahs(), true));
         root.addView(category(Avatar.smiles(), true));
         root.addView(category(Avatar.fulls(), true));
-        root.addView(category(Avatar.avatars(), true));
+        root.addView(category(Avatar.avatars(), false));
 
         ScrollView sv = new ScrollView(owner);
         sv.addView(root);
@@ -49,8 +49,8 @@ public class AvatarSelectOverlay extends PartialSlideOverlay {
         applyStyle(owner.getStyle());
     }
 
-    private FrameLayout category(Avatar[] avatars, boolean locked) {
-        FrameLayout fl = new FrameLayout(owner);
+    private StackPane category(Avatar[] avatars, boolean locked) {
+        StackPane fl = new StackPane(owner);
 
         VBox res = new VBox(owner);
         res.setSpacing(10);

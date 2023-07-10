@@ -1,7 +1,7 @@
 package org.luke.diminou.abs.components.controls.scratches;
 
 import android.view.Gravity;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
@@ -9,12 +9,11 @@ import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateXAnimation;
-import org.luke.diminou.abs.components.controls.abs.ColoredView;
 import org.luke.diminou.abs.components.controls.shape.Rectangle;
 import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.utils.ViewUtils;
 
-public class Loading extends HBox implements ColoredView {
+public class Loading extends HBox {
     private static final int count = 4;
     private final Rectangle[] rectangles;
     private final ParallelAnimation loader;
@@ -26,7 +25,7 @@ public class Loading extends HBox implements ColoredView {
         setLayoutDirection(LAYOUT_DIRECTION_LTR);
         rectangles = new Rectangle[count];
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        StackPane.LayoutParams params = new StackPane.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
         setLayoutParams(params);
 
@@ -95,12 +94,6 @@ public class Loading extends HBox implements ColoredView {
         }
     }
 
-    @Override
-    public int getFill() {
-        return rectangles[0].getFill();
-    }
-
-    @Override
     public void setFill(int fill) {
         setColor(fill);
     }

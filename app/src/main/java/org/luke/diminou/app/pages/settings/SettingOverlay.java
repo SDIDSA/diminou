@@ -4,6 +4,7 @@ import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.layout.overlay.MultipleOptionOverlay;
 import org.luke.diminou.abs.utils.ErrorHandler;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.functional.StringConsumer;
 import org.luke.diminou.abs.utils.functional.StringSupplier;
 
@@ -13,16 +14,13 @@ public class SettingOverlay extends MultipleOptionOverlay {
 
         for(String option : options) {
             addButton(option, () -> {
-                boolean success = false;
-                while(!success) {
-                    try {
-                        owner.playMenuSound(R.raw.select);
-                        set.accept(option);
-                        applyStyle(owner.getStyle());
-                        success = true;
-                    } catch (Exception e) {
-                        ErrorHandler.handle(e, "setting " + key + " to " + option);
-                    }
+                try {
+                    owner.playMenuSound(R.raw.select);
+                    set.accept(option);
+                    Platform.runLater(() ->
+                            applyStyle(owner.getStyle()));
+                } catch (Exception e) {
+                    ErrorHandler.handle(e, "setting " + key + " to " + option);
                 }
             });
         }

@@ -1,4 +1,4 @@
-package org.luke.diminou.abs.local;
+package org.luke.diminou.abs.net;
 
 import android.os.Build;
 

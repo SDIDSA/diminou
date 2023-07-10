@@ -13,7 +13,6 @@ import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.property.Property;
 
@@ -95,22 +94,9 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
             return true;
         });
 
-        applyStyle(owner.getStyle());
-    }
+        addOnShowing(() -> owner.playMenuSound(R.raw.swap));
 
-    @Override
-    public void show() {
-        owner.addOverlay(this);
-        Platform.runBack(() -> {
-            while(list.getHeight() < ViewUtils.dipToPx(50, owner)) {
-                Platform.sleep(10);
-            }
-            Platform.runLater(() -> {
-                owner.removeOverlay(this);
-                super.show();
-                owner.playMenuSound(R.raw.swap);
-            });
-        });
+        applyStyle(owner.getStyle());
     }
 
     protected void setHeight(int height) {
@@ -121,10 +107,6 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
 
     protected void setHeightFactor(double factor) {
         setHeight((int) (owner.getScreenHeight() * factor));
-    }
-
-    private int getMarginBottom() {
-        return ((MarginLayoutParams)list.getLayoutParams()).bottomMargin;
     }
 
     @Override

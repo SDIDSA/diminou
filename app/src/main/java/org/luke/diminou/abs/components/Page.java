@@ -1,19 +1,18 @@
 package org.luke.diminou.abs.components;
 
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.core.graphics.Insets;
 
 import org.luke.diminou.abs.App;
+import org.luke.diminou.abs.components.layout.StackPane;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class Page extends FrameLayout implements Styleable {
+public abstract class Page extends StackPane implements Styleable {
     private static final ConcurrentHashMap<Class<? extends Page>, Page> cache = new ConcurrentHashMap<>();
     protected final App owner;
 

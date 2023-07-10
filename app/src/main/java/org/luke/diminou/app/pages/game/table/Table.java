@@ -3,7 +3,7 @@ package org.luke.diminou.app.pages.game.table;
 import android.graphics.Rect;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Table extends FrameLayout {
+public class Table extends StackPane {
     private static final int SPACING = 2;
     private static final int CENTER_SIZE = 8;
     private final App owner;
@@ -322,27 +322,32 @@ public class Table extends FrameLayout {
 
         owner.playGameSound(PlaySound.random().getRes());
 
-        Platform.runAfter(() -> {
-            float oldX = target.getTranslationX();
-            float oldY = target.getTranslationY();
+        Platform.runBack(() -> {
+            while(!target.isLaidOut()) {
+                Platform.sleep(5);
+            }
+            Platform.runLater(() -> {
+                float oldX = target.getTranslationX();
+                float oldY = target.getTranslationY();
 
-            int thisX = getXInParent(target);
-            int thisY = getYInParent(target);
+                int thisX = getXInParent(target);
+                int thisY = getYInParent(target);
 
-            int otherX = getXInParent(source);
-            int otherY = getYInParent(source);
+                int otherX = getXInParent(source);
+                int otherY = getYInParent(source);
 
-            target.setTranslationX(otherX - thisX);
-            target.setTranslationY(otherY - thisY);
+                target.setTranslationX(otherX - thisX);
+                target.setTranslationY(otherY - thisY);
 
-            ParallelAnimation anim = new ParallelAnimation(400)
-                    .addAnimation(new TranslateXAnimation(target, oldX))
-                    .addAnimation(new TranslateYAnimation(target, oldY))
-                    .addAnimation(new AlphaAnimation(target, 1))
-                    .setInterpolator(Interpolator.EASE_OUT)
-                    .setOnFinished(this::adjustBoard);
-            anim.start();
-        }, 50);
+                ParallelAnimation anim = new ParallelAnimation(400)
+                        .addAnimation(new TranslateXAnimation(target, oldX))
+                        .addAnimation(new TranslateYAnimation(target, oldY))
+                        .addAnimation(new AlphaAnimation(target, 1))
+                        .setInterpolator(Interpolator.EASE_OUT)
+                        .setOnFinished(this::adjustBoard);
+                anim.start();
+            });
+        });
     }
 
     public int count() {
@@ -378,7 +383,7 @@ public class Table extends FrameLayout {
         int dcx = (bounds.centerX() - owner.getScreenWidth() / 2);
         int dcy = (bounds.centerY() - owner.getScreenHeight() / 2);
 
-        FrameLayout par = ((FrameLayout) getParent());
+        StackPane par = ((StackPane) getParent());
 
         int centerX = -pcenterX + dcx - par.getPaddingLeft() / 2 + par.getPaddingRight() / 2;
         int centerY = -pcenterY + dcy - par.getPaddingTop() / 2 + par.getPaddingBottom() / 2;

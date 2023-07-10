@@ -1,6 +1,7 @@
 package org.luke.diminou.abs.utils;
 
 import android.os.Build;
+import android.util.Log;
 
 import androidx.datastore.preferences.core.MutablePreferences;
 import androidx.datastore.preferences.core.Preferences;
@@ -14,6 +15,8 @@ import org.luke.diminou.abs.utils.functional.StringConsumer;
 import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Timer;
+
+import java.util.concurrent.Semaphore;
 
 import io.reactivex.rxjava3.core.Single;
 
@@ -41,30 +44,39 @@ public class Store {
         settings.dispose();
     }
 
+    private static final Semaphore mutex = new Semaphore(1);
     private static String getSetting(Preferences.Key<String> key, String def) {
+        mutex.acquireUninterruptibly();
+        String val;
         try {
-            return settings.data().map(prefs -> prefs.get(key)).first(def).blockingGet();
+            val = settings.data().map(prefs -> prefs.get(key)).first(def).blockingGet();
         }catch(Exception x) {
-            return def;
+            Platform.runBack(() -> setSetting(key, def, null));
+            val = def;
         }
+        mutex.release();
+        Log.i("val", val);
+        return val;
     }
 
     private static void setSetting(Preferences.Key<String> key, String value, StringConsumer onSuccess) {
-        boolean success = false;
-        while(!success) {
-            try {
-                String res = settings.updateDataAsync(prefsIn -> {
-                    MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
-                    mutablePreferences.set(key, value);
-                    return Single.just(mutablePreferences);
-                }).blockingGet().get(key);
-                if(onSuccess != null)
-                    onSuccess.accept(res);
-                success = true;
-            }catch (Exception x) {
-                ErrorHandler.handle(x, "storing data at " + key.getName() + ", retrying...");
-            }
-        }
+        Platform.runBack(() -> {
+            mutex.acquireUninterruptibly();
+            String res = settings.updateDataAsync(prefsIn -> {
+                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
+                mutablePreferences.set(key, value);
+                return Single.just(mutablePreferences);
+            }).blockingGet().get(key);
+            mutex.release();
+            if(onSuccess != null)
+                Platform.runLater(() -> {
+                    try {
+                        onSuccess.accept(res);
+                    } catch (Exception e) {
+                        ErrorHandler.handle(e, "storing data at " + key.getName());
+                    }
+                });
+        });
     }
 
     public static void setTheme(String value, StringConsumer onSuccess) {

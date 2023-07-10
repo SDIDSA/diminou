@@ -6,7 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
-import org.luke.diminou.abs.local.Local;
+import org.luke.diminou.abs.net.Local;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.app.pages.game.Game;
 
@@ -17,8 +17,10 @@ public class Player {
     private static final String NAME = "name";
     private static final String AVATAR = "avatar";
     private static final String IP = "ip";
-    private final PlayerType type;
-    private final String name, avatar, ip;
+    private PlayerType type;
+    private final String name;
+    private final String avatar;
+    private String ip;
 
     public Player(PlayerType type, String name, String avatar, String ip) {
         this.type = type;
@@ -105,5 +107,14 @@ public class Player {
         result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
         result = 31 * result + (ip != null ? ip.hashCode() : 0);
         return result;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void makeBot() {
+        type = PlayerType.BOT;
+        ip = "";
     }
 }

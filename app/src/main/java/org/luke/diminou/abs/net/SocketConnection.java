@@ -1,4 +1,4 @@
-package org.luke.diminou.abs.local;
+package org.luke.diminou.abs.net;
 
 import android.util.Log;
 
@@ -12,7 +12,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
@@ -30,6 +29,7 @@ public class SocketConnection {
     private Runnable onError;
 
     private final Semaphore readMutex = new Semaphore(1);
+
     public SocketConnection(Socket socket) {
         this.socket = socket;
         try {
@@ -80,13 +80,17 @@ public class SocketConnection {
     }
 
     public void stop() {
-        thread.interrupt();
-        try {
-            socket.close();
-            socket.setReuseAddress(true);
-        } catch (IOException e) {
-            ErrorHandler.handle(e, "stopping socket");
-        }
+        Platform.runBack(() -> {
+            emitMutex.acquireUninterruptibly();
+            thread.interrupt();
+            try {
+                socket.close();
+                socket.setReuseAddress(true);
+            } catch (IOException e) {
+                ErrorHandler.handle(e, "stopping socket");
+            }
+            emitMutex.release();
+        });
     }
 
     public void on(String action, StringConsumer listener) {

@@ -5,7 +5,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
 import org.luke.diminou.abs.App;
@@ -24,7 +24,7 @@ import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;
 
-public class InputField extends FrameLayout implements Styleable {
+public class InputField extends StackPane implements Styleable {
     protected final EditText input;
     protected final App owner;
     private final GradientDrawable background;
@@ -67,7 +67,7 @@ public class InputField extends FrameLayout implements Styleable {
         preInput.addView(input);
         ViewUtils.setPadding(preInput, 15, 0, 15, 0, owner);
 
-        FrameLayout prompts = new FrameLayout(owner);
+        StackPane prompts = new StackPane(owner);
         prompts.setAlpha(.5f);
         prompts.setClickable(false);
         prompts.setFocusable(false);

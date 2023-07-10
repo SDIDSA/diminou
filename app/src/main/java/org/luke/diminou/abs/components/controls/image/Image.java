@@ -4,7 +4,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import androidx.annotation.DrawableRes;
 
@@ -108,7 +108,7 @@ public class Image extends androidx.appcompat.widget.AppCompatImageView {
     }
 
     public void center() {
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(getLayoutParams().width,getLayoutParams().height);
+        StackPane.LayoutParams params = new StackPane.LayoutParams(getLayoutParams().width,getLayoutParams().height);
         params.gravity = Gravity.CENTER;
         setLayoutParams(params);
     }

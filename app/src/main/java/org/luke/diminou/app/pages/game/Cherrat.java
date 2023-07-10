@@ -25,6 +25,7 @@ public class Cherrat extends HBox {
 
         ColoredIcon khabt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.khabet_static);
         khabt.setSize(38);
+        ViewUtils.setPaddingUnified(khabt, 4, owner);
 
         ColoredIcon sakt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.saket_static);
         sakt.setSize(38);
@@ -50,7 +51,8 @@ public class Cherrat extends HBox {
 
     Animation show() {
         setTranslationY(ViewUtils.dipToPx(80, getOwner()));
-        return new ParallelAnimation().addAnimation(new AlphaAnimation(this, 1))
+        return new ParallelAnimation()
+                .addAnimation(new AlphaAnimation(this, 1))
                 .addAnimation(new TranslateYAnimation(this, 0));
     }
 

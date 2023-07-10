@@ -19,7 +19,8 @@ public class AnimatedColorIcon extends ColorIcon {
     }
 
     public void start(int count) {
-        owner.playGameSound(audio);
+        if(audio != Integer.MIN_VALUE)
+            owner.playGameSound(audio);
         Platform.runLater(() ->
         {
             if(count > 1) {

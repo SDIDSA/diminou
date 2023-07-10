@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.layout.linear.HBox;
-import org.luke.diminou.abs.local.SocketConnection;
+import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;

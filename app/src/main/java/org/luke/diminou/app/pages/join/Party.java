@@ -1,6 +1,6 @@
 package org.luke.diminou.app.pages.join;
 
-import org.luke.diminou.abs.local.SocketConnection;
+import org.luke.diminou.abs.net.SocketConnection;
 
 import java.util.Objects;
 

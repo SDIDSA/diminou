@@ -1,12 +1,10 @@
 package org.luke.diminou.data.property;
 
 import org.luke.diminou.abs.utils.ErrorHandler;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.data.ConcurrentArrayList;
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.observable.Observable;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Property<T> implements Observable<T> {

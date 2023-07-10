@@ -14,6 +14,10 @@ public class TranslateXAnimation extends ViewAnimation {
         super(view, from, to);
     }
 
+    public TranslateXAnimation(long duration, View view, float to) {
+        super(duration, view, to);
+    }
+
     @Override
     protected float getFrom(View view) {
         return view.getTranslationX();

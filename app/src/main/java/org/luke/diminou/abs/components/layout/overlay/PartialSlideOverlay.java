@@ -29,7 +29,13 @@ public abstract class PartialSlideOverlay extends SlideOverlay {
 
     @Override
     public final void applySystemInsets(Insets insets) {
-        //IGNORE
+        LayoutParams params = (LayoutParams) list.getLayoutParams();
+        int marg = ViewUtils.dipToPx(15, owner);
+        params.gravity = Gravity.BOTTOM;
+        params.bottomMargin = owner.getSystemInsets().bottom + marg;
+        params.rightMargin = marg;
+        params.leftMargin = marg;
+        requestLayout();
     }
 
     @Override
