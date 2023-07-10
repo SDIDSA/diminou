@@ -15,4 +15,8 @@ public class ErrorHandler {
 
         Store.setLogs(Store.getLogs() + "\n----------------\n" + trace, null);
     }
+
+    public static void log() {
+        handle(new RuntimeException(""), "");
+    }
 }

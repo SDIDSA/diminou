@@ -62,21 +62,15 @@ public class Setting extends Button implements Styleable {
 
     public SettingOverlay setOverlay() {
         return new SettingOverlay(owner, key, get, v -> {
-            boolean success = false;
-            while(!success) {
-                try {
-                    set.accept(v);
-                    success = true;
-                }catch(Exception x) {
-                    ErrorHandler.handle(x, "setting " + key + " to " + v);
-                }
+            try {
+                set.accept(v);
+            }catch(Exception x) {
+                ErrorHandler.handle(x, "setting " + key + " to " + v);
             }
             value.setKey(v);
             Page.clearCache();
             if(reset)
-                resetOverlay(() -> owner.loadPage(Settings.class, () -> {
-                    overlay.show();
-                }));
+                resetOverlay(() -> owner.loadPage(Settings.class, () -> overlay.show()));
         }, options);
     }
 
@@ -93,7 +87,6 @@ public class Setting extends Button implements Styleable {
     public void applyStyle(Style style) {
         setFill(style.getBackgroundPrimary());
         setTextFill(style.getTextNormal());
-
         value.setFill(style.getTextNormal());
     }
 

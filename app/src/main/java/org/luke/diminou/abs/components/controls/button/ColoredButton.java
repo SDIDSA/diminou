@@ -1,7 +1,5 @@
 package org.luke.diminou.abs.components.controls.button;
 
-import android.graphics.Color;
-
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
@@ -10,8 +8,8 @@ import org.luke.diminou.data.property.Property;
 import java.util.function.Function;
 
 public class ColoredButton extends Button implements Styleable {
-    private Function<Style, Integer> fill;
-    private Function<Style, Integer> textFill;
+    private final Function<Style, Integer> fill;
+    private final Function<Style, Integer> textFill;
     public ColoredButton(App owner,
                          Function<Style, Integer> fill,
                          Function<Style, Integer> textFill,

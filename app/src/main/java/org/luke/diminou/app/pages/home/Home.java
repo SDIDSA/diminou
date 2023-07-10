@@ -3,7 +3,7 @@ package org.luke.diminou.app.pages.home;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
@@ -33,7 +33,6 @@ import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.avatar.AvatarSelect;
-import org.luke.diminou.app.pages.game.pause.GamePause;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.host.Host;
 import org.luke.diminou.app.pages.join.Join;
@@ -55,12 +54,12 @@ public class Home extends Page {
 
     private final HBox play, profile;
 
-    private final FrameLayout effects;
+    private final StackPane effects;
 
     public Home(App owner) {
         super(owner);
 
-        effects = new FrameLayout(owner);
+        effects = new StackPane(owner);
         effects.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         addView(effects);
 

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.view.Gravity;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import org.json.JSONObject;
 import org.luke.diminou.abs.App;
@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PieceHolder extends FrameLayout implements Styleable {
+public class PieceHolder extends StackPane implements Styleable {
     private final App owner;
     private final ArrayList<Piece> pieces;
     private final ConcurrentHashMap<Piece, ColorIcon> piecesDisplay;
@@ -290,7 +290,9 @@ public class PieceHolder extends FrameLayout implements Styleable {
         gameTable.play(move, piecesDisplay.get(move.played().getPiece()), player);
         remove(move.played().getPiece());
         gameTable.removePossiblePlays();
-        if(player.isSelf(game.isHost()) && owner.getFourMode() == FourMode.TEAM_MODE && (pieces.size() <= 1 || game.getForPlayer(game.otherPlayer(player)).pieces.size() <= 1)) {
+        if(owner.getFourMode() == FourMode.TEAM_MODE &&
+                (player.isSelf(game.isHost()) || game.otherPlayer(player).isSelf(game.isHost())) &&
+                (pieces.size() <= 1 || game.getForPlayer(game.otherPlayer(player)).pieces.size() <= 1)) {
             game.getCherrat().hide().start();
         }
     }

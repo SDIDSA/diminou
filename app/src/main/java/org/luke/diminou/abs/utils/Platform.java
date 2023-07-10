@@ -6,11 +6,9 @@ import android.os.Looper;
 import org.luke.diminou.abs.utils.functional.BooleanSupplier;
 
 public class Platform {
-    private static Handler handler;
 
     public static void runLater(Runnable r) {
-        if (handler == null) handler = new Handler(Looper.getMainLooper());
-        handler.post(r);
+        new Handler(Looper.getMainLooper()).post(r);
     }
 
     public static void runAfter(Runnable r, long after) {

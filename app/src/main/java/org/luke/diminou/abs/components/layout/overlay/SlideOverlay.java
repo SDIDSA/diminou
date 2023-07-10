@@ -3,8 +3,6 @@ package org.luke.diminou.abs.components.layout.overlay;
 import android.view.Gravity;
 import android.view.MotionEvent;
 
-import androidx.core.view.ViewCompat;
-
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
@@ -15,7 +13,6 @@ import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
-import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.property.Property;
 

@@ -3,7 +3,7 @@ package org.luke.diminou.abs.components.controls.input;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
 import androidx.annotation.DrawableRes;
@@ -22,13 +22,12 @@ import org.luke.diminou.data.property.Property;
 
 import java.util.function.Consumer;
 
-public class Switch extends FrameLayout implements Styleable {
+public class Switch extends StackPane implements Styleable {
     private final App owner;
 
     private final GradientDrawable trackBack;
     private final GradientDrawable thumbBack;
-    private final View track;
-    private final FrameLayout thumb;
+    private final StackPane thumb;
 
     private final float sizeDp;
     private final int sizePx;
@@ -46,7 +45,7 @@ public class Switch extends FrameLayout implements Styleable {
 
         trackBack = new GradientDrawable();
         trackBack.setCornerRadius(sizePx / 4f);
-        track = new View(owner);
+        View track = new View(owner);
         track.setBackground(trackBack);
         track.setLayoutParams(new LayoutParams((int) (sizePx * 1.5f), sizePx / 2));
         ViewUtils.setMarginHorizontal(track, owner, sizeDp / 2);
@@ -54,7 +53,7 @@ public class Switch extends FrameLayout implements Styleable {
 
         thumbBack = new GradientDrawable();
         thumbBack.setCornerRadius(sizePx / 2f);
-        thumb = new FrameLayout(owner);
+        thumb = new StackPane(owner);
         thumb.setBackground(thumbBack);
         thumb.setElevation(sizeDp / 3);
         thumb.setLayoutParams(new LayoutParams(sizePx, sizePx));
@@ -100,8 +99,7 @@ public class Switch extends FrameLayout implements Styleable {
         }
     }
 
-    private void enable() {
-        if(state) return;
+    public void enable() {
         state = true;
 
         if(onChange != null) onChange.accept(true);
@@ -114,8 +112,7 @@ public class Switch extends FrameLayout implements Styleable {
                 .start();
     }
 
-    private void disable() {
-        if(!state) return;
+    public void disable() {
         state = false;
 
         if(onChange != null) onChange.accept(false);

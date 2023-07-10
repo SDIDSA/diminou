@@ -1,5 +1,8 @@
 package org.luke.diminou.abs.style;
 
+import android.os.Looper;
+import android.view.View;
+
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.data.ConcurrentArrayList;
@@ -42,6 +45,11 @@ public interface Styleable {
             public void changed(Observable<? extends Style> obs, Style ov, Style nv) {
                 if (weakNode.get() != null) {
                     if (nv != ov) {
+                        if(Thread.currentThread() != Looper.getMainLooper().getThread()
+                                && node instanceof View v
+                                && v.isAttachedToWindow()) {
+                            ErrorHandler.log();
+                        }
                         weakNode.get().applyStyle(nv);
                     }
                 } else {

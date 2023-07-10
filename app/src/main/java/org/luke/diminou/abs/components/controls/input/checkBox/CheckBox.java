@@ -3,17 +3,17 @@ package org.luke.diminou.abs.components.controls.input.checkBox;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
+import org.luke.diminou.abs.components.layout.StackPane;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.property.Property;
 
-public class CheckBox extends FrameLayout implements Styleable {
+public class CheckBox extends StackPane implements Styleable {
 
     private final App owner;
     private final GradientDrawable background;

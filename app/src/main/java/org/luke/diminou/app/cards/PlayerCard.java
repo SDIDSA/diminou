@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
@@ -41,7 +41,7 @@ public class PlayerCard extends VBox implements Styleable {
     private static final ConcurrentHashMap<Integer, PlayerCard> track = new ConcurrentHashMap<>();
     private final Loading loading;
     private final GradientDrawable avatarBack;
-    private final FrameLayout preAvatar;
+    private final StackPane preAvatar;
     private final AvatarDisplay avatarDisplay;
     private final Label name;
     private final Property<String> username = new Property<>(null);
@@ -74,7 +74,7 @@ public class PlayerCard extends VBox implements Styleable {
         avatarBack.setCornerRadius(ViewUtils.dipToPx(7, owner));
 
         int size = ViewUtils.dipToPx(AvatarDisplay.preSize, owner);
-        preAvatar = new FrameLayout(owner);
+        preAvatar = new StackPane(owner);
         preAvatar.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         preAvatar.setLayoutParams(new LayoutParams(size, size));
         preAvatar.setBackground(avatarBack);

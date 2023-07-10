@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
@@ -220,18 +219,10 @@ public class Join extends Titled {
         leave.setTranslationY(-30);
         leave.setAlpha(0);
 
-        boolean success = false;
-        while(!success) {
-            try {
-                parties.forEach(p -> {
-                    p.getData().getConnection().stop();
-                    found.removeView(p);
-                });
-                success = true;
-            }catch(ConcurrentModificationException x) {
-                ErrorHandler.handle(x, "joining party");
-            }
-        }
+        parties.forEach(p -> {
+            p.getData().getConnection().stop();
+            found.removeView(p);
+        });
         parties.clear();
 
         if(loader != null) loader.interrupt();

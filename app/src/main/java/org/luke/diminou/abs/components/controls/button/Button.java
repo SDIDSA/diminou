@@ -9,26 +9,21 @@ import android.text.method.TransformationMethod;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
-import androidx.annotation.ColorInt;
-
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.components.controls.abs.ColoredView;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.utils.ViewUtils;
 
-public class Button extends FrameLayout implements ColoredView {
+public class Button extends StackPane {
     private final App owner;
     private final GradientDrawable background;
     private final RippleDrawable ripple;
     private final Label label;
     private Runnable onClick;
-
-    private @ColorInt int color;
 
     protected final HBox content;
 
@@ -114,7 +109,6 @@ public class Button extends FrameLayout implements ColoredView {
     public void setBackgroundColor(int color) {
         background.setColor(color);
         setRippleColor(App.adjustAlpha(getComplementaryColor(owner.getStyle().get().getBackgroundPrimary()), .6f));
-        this.color = color;
     }
 
     public void setTransformationMethod(TransformationMethod method) {
@@ -135,12 +129,6 @@ public class Button extends FrameLayout implements ColoredView {
     }
 
 
-    @Override
-    public int getFill() {
-        return color;
-    }
-
-    @Override
     public void setFill(int fill) {
         setBackgroundColor(fill);
     }

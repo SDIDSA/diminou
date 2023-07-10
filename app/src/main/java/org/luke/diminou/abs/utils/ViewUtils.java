@@ -8,7 +8,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
 import androidx.annotation.GravityInt;
@@ -159,7 +159,7 @@ public class ViewUtils {
     public static void alignInFrame(View view, @GravityInt int gravity) {
         try {
             ViewGroup.LayoutParams old = view.getLayoutParams();
-            FrameLayout.LayoutParams n = new FrameLayout.LayoutParams(
+            StackPane.LayoutParams n = new StackPane.LayoutParams(
                     ViewGroup.MarginLayoutParams.WRAP_CONTENT,
                     ViewGroup.MarginLayoutParams.WRAP_CONTENT
             );
@@ -200,6 +200,6 @@ public class ViewUtils {
     }
 
     public static int dipToPx(Double aDouble, Context owner) {
-        return (int) dipToPx(aDouble.floatValue(), owner);
+        return dipToPx(aDouble.floatValue(), owner);
     }
 }

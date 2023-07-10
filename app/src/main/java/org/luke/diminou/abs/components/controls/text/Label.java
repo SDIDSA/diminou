@@ -1,10 +1,9 @@
 package org.luke.diminou.abs.components.controls.text;
 
 import android.util.TypedValue;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.components.controls.abs.ColoredView;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.locale.Localized;
@@ -13,7 +12,7 @@ import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 
-public class Label extends androidx.appcompat.widget.AppCompatTextView implements Localized, ColoredView {
+public class Label extends androidx.appcompat.widget.AppCompatTextView implements Localized {
     private final App owner;
     private String key;
     private final ArrayList<String> params = new ArrayList<>();
@@ -25,16 +24,12 @@ public class Label extends androidx.appcompat.widget.AppCompatTextView implement
 
         setFont(Font.DEFAULT);
 
-        setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+        setLayoutParams(new StackPane.LayoutParams(StackPane.LayoutParams.WRAP_CONTENT, StackPane.LayoutParams.WRAP_CONTENT));
         applyLocale(owner.getLocale());
     }
 
     public App getOwner() {
         return owner;
-    }
-
-    public void setLayoutGravity(int gravity) {
-        ((FrameLayout.LayoutParams) getLayoutParams()).gravity = gravity;
     }
 
     public void setFont(Font font) {
@@ -85,12 +80,6 @@ public class Label extends androidx.appcompat.widget.AppCompatTextView implement
         Localized.bindLocale(this, locale);
     }
 
-    @Override
-    public int getFill() {
-        return getCurrentTextColor();
-    }
-
-    @Override
     public void setFill(int fill) {
         setTextColor(fill);
     }

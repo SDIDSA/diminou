@@ -2,7 +2,6 @@ package org.luke.diminou.app.pages.settings;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
@@ -16,7 +15,7 @@ import org.luke.diminou.app.pages.home.Home;
 import java.util.ArrayList;
 
 public class Settings extends Titled {
-    private ArrayList<SettingsGroup> groups;
+    private final ArrayList<SettingsGroup> groups;
 
     public Settings(App owner) {
         super(owner, "settings");
@@ -34,10 +33,10 @@ public class Settings extends Titled {
                 v -> Store.setTimer(v, null), false, Timer.names()));
 
         display.addSetting(new Setting(owner, "app_theme", Store::getTheme,
-                v -> Store.setTheme(v, s -> {
-                    owner.reloadPage();
+                v -> Store.setTheme(v, s -> Platform.runAfter(() -> {
                     owner.applyTheme();
-                }), false,
+                    owner.reloadPage();
+                }, 300)), false,
                 Style.THEME_SYSTEM, Style.THEME_DARK, Style.THEME_LIGHT));
 
         display.addSetting(new Setting(owner, "ui_scale",

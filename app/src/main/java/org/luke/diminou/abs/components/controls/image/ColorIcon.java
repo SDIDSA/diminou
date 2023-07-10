@@ -6,10 +6,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.components.controls.abs.ColoredView;
 
-public class ColorIcon extends Image implements ColoredView {
-    private @ColorInt int color;
+public class ColorIcon extends Image {
 
     public ColorIcon(App owner, @DrawableRes int id) {
         super(owner);
@@ -23,15 +21,8 @@ public class ColorIcon extends Image implements ColoredView {
 
     public void setColor(@ColorInt int color) {
         setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-        this.color = color;
     }
 
-    @Override
-    public int getFill() {
-        return color;
-    }
-
-    @Override
     public void setFill(int fill) {
         setColor(fill);
     }

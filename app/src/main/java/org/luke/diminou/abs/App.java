@@ -3,18 +3,21 @@ package org.luke.diminou.abs;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
+import android.widget.ImageView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -28,7 +31,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.animation.base.Animation;
-import org.luke.diminou.abs.animation.base.ColorAnimation;
+import org.luke.diminou.abs.animation.base.ValueAnimation;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
@@ -42,7 +45,6 @@ import org.luke.diminou.abs.components.layout.overlay.Overlay;
 import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.style.Style;
-import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
@@ -64,7 +66,7 @@ public class App extends AppCompatActivity {
     public Style dark, light;
     public Locale ar_ar;
     Animation running = null;
-    private FrameLayout root;
+    private StackPane root;
     private Page loaded;
     private Property<Style> style;
     private Property<Locale> locale;
@@ -85,6 +87,10 @@ public class App extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i("main", Looper.getMainLooper().getThread().getName());
+        Platform.runLater(() ->
+                Log.i("real main", Thread.currentThread().getName()));
+
         Store.init(this);
 
         ViewUtils.scale = Float.parseFloat(Store.getScale());
@@ -100,7 +106,7 @@ public class App extends AppCompatActivity {
         style.addListener((obs, ov, nv) ->
                 Platform.runLater(() -> applyStyle(nv)));
 
-        root = new FrameLayout(this);
+        root = new StackPane(this);
         root.setClipChildren(false);
         setContentView(root);
 
@@ -147,15 +153,16 @@ public class App extends AppCompatActivity {
     }
 
     public Bitmap screenCap() {
-        root.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        root.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(root.getDrawingCache());
-        root.setDrawingCacheEnabled(false);
-        return bitmap;
+        return getBitmapFromView(root);
     }
 
-    public FrameLayout getRoot() {
-        return root;
+    private Bitmap getBitmapFromView(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(
+                view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888
+        );
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
     }
 
     private boolean paused = false;
@@ -180,7 +187,6 @@ public class App extends AppCompatActivity {
 
     public void startAmbient() {
         MediaPlayer mp = getSound(R.raw.ambient);
-        if(mp == null) return;
         mp.setLooping(true);
         mp.start();
         if(Store.getAmbient().equals("off")) muteAmbient();
@@ -222,7 +228,6 @@ public class App extends AppCompatActivity {
     private synchronized void playSound(@RawRes int res) {
         if(paused) return;
         MediaPlayer mp = getSound(res);
-        if(mp == null) return;
         try {
             mp.seekTo(0);
             mp.start();
@@ -235,7 +240,7 @@ public class App extends AppCompatActivity {
     public void reloadPage() {
         if (loaded != null) {
             Platform.runLater(() -> root.removeView(loaded));
-            Platform.runAfter(() -> root.addView(loaded), 100);
+            Platform.runAfter(() -> root.addView(loaded, 0), 100);
         }
     }
 
@@ -321,9 +326,9 @@ public class App extends AppCompatActivity {
         VBox toast = new VBox(this);
         toast.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT);
+        StackPane.LayoutParams params = new StackPane.LayoutParams(
+                StackPane.LayoutParams.MATCH_PARENT,
+                StackPane.LayoutParams.WRAP_CONTENT);
 
         int margins = ViewUtils.dipToPx(15, this);
         params.setMargins(margins, margins + systemInsets.top, margins, margins);
@@ -412,7 +417,7 @@ public class App extends AppCompatActivity {
         if (!loadedOverlay.isEmpty()) {
             loadedOverlay.get(0).back();
         } else if (loaded == null || !loaded.onBack()) {
-            moveTaskToBack(true);
+            moveTaskToBack(false);
             super.onBackPressed();
         }
     }
@@ -432,16 +437,9 @@ public class App extends AppCompatActivity {
     public void setBackgroundColor(int color) {
         int trans = adjustAlpha(color, 0.005f);
         Window win = getWindow();
-        int from = root.getBackground() instanceof ColorDrawable ? ((ColorDrawable) root.getBackground()).getColor() : Color.TRANSPARENT;
-        ColorAnimation anim = new ColorAnimation(300, from, color) {
-            @Override
-            public void updateValue(int color) {
-                root.setBackgroundColor(color);
-                win.setStatusBarColor(trans);
-                win.setNavigationBarColor(trans);
-            }
-        };
-        anim.start();
+        root.setBackgroundColor(color);
+        win.setStatusBarColor(trans);
+        win.setNavigationBarColor(trans);
     }
 
     public void applyTheme() {
@@ -449,6 +447,34 @@ public class App extends AppCompatActivity {
         Style s = theme.equals(Style.THEME_DARK) ? dark :
                 theme.equals(Style.THEME_LIGHT) ? light :
                         isDarkMode(getResources().getConfiguration()) ? dark : light;
+
+        if(s == style.get()) return;
+
+        if(style.get() != null) {
+            Bitmap shot = screenCap();
+            ImageView view = new ImageView(this);
+            view.setImageBitmap(shot);
+            view.setLayoutParams(new StackPane.LayoutParams(-1, -1));
+            view.setElevation(500);
+            root.addView(view);
+
+            Rect clip = new Rect(0, 0, getScreenWidth(), getScreenHeight());
+            view.setClipBounds(clip);
+
+            Animation a = new ValueAnimation(400, s.isDark() ? 0 : getScreenWidth(), s.isDark() ? getScreenWidth() : 0) {
+                @Override
+                public void updateValue(float v) {
+                    if(s.isDark()) clip.left = (int) v;
+                    else clip.right = (int) v;
+                    view.setClipBounds(clip);
+                }
+            }
+                    .setOnFinished(() -> root.removeView(view))
+                    .setInterpolator(Interpolator.EASE_OUT);
+            a.start();
+        }
+
+        Log.i("style", s.toString());
         style.set(s);
         setTheme(s.isDark() ? R.style.Theme_Diminou_Dark : R.style.Theme_Diminou_Light);
     }
@@ -460,6 +486,7 @@ public class App extends AppCompatActivity {
     }
 
     public void applyStyle(Style style) {
+        if(style == null) return;
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 

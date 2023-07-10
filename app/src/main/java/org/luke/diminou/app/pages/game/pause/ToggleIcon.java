@@ -1,7 +1,7 @@
 package org.luke.diminou.app.pages.game.pause;
 
 import android.view.Gravity;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import androidx.annotation.DrawableRes;
 
@@ -20,7 +20,7 @@ import org.luke.diminou.data.property.Property;
 
 import java.util.function.Consumer;
 
-public class ToggleIcon extends FrameLayout implements Styleable {
+public class ToggleIcon extends StackPane implements Styleable {
     private static final int SIZE = 38;
 
     private final ColorIcon icon;

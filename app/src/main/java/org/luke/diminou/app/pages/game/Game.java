@@ -2,7 +2,7 @@ package org.luke.diminou.app.pages.game;
 
 import android.graphics.Color;
 import android.view.Gravity;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 
 import androidx.core.graphics.Insets;
 
@@ -69,7 +69,7 @@ public class Game extends Page {
 
     private final Label leftInStock;
 
-    private final FrameLayout preRoot;
+    private final StackPane preRoot;
 
     private final Rectangle background;
 
@@ -114,7 +114,7 @@ public class Game extends Page {
         ViewUtils.setPaddingUnified(menu, 7, owner);
 
 
-        preRoot = new FrameLayout(owner);
+        preRoot = new StackPane(owner);
         background = new Rectangle(owner);
         background.setRadius(10);
         background.setLayoutParams(new LayoutParams(-1, -1));

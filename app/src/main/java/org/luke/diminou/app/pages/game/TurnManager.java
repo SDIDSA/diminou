@@ -5,7 +5,6 @@ import org.json.JSONObject;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.game.player.PieceHolder;
 import org.luke.diminou.app.pages.game.player.Player;

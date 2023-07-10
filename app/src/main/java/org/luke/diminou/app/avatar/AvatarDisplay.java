@@ -1,7 +1,7 @@
 package org.luke.diminou.app.avatar;
 
 import android.graphics.drawable.GradientDrawable;
-import android.widget.FrameLayout;
+import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
 
@@ -12,7 +12,7 @@ import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.property.Property;
 
-public class AvatarDisplay extends FrameLayout implements Styleable {
+public class AvatarDisplay extends StackPane implements Styleable {
     private final App owner;
     private final GradientDrawable background;
     private final GradientDrawable foreground;

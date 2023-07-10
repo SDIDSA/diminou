@@ -1,23 +1,22 @@
 package org.luke.diminou.abs.components.layout.overlay;
 
 import android.graphics.Color;
-import android.widget.FrameLayout;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 
-import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.base.ColorAnimation;
 import org.luke.diminou.abs.animation.base.ValueAnimation;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
+import org.luke.diminou.abs.components.layout.StackPane;
 import org.luke.diminou.abs.utils.Platform;
 
 import java.util.ArrayList;
 
-public abstract class Overlay extends FrameLayout {
+public abstract class Overlay extends StackPane {
     protected final App owner;
 
     private final ParallelAnimation show, hide;

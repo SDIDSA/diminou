@@ -1,17 +1,13 @@
 package org.luke.diminou.app.pages.game.pause;
 
-import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.view.Gravity;
-import android.widget.ImageView;
 
 import androidx.core.graphics.Insets;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
-import org.luke.diminou.abs.animation.base.ValueAnimation;
-import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
+import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.button.SecondaryButton;
@@ -71,34 +67,14 @@ public class GamePause extends Overlay implements Styleable {
 
         themeSwitch.setOnChange(b -> themeSwitch.setIcon(b ? R.drawable.moon : R.drawable.sun));
 
-        themeSwitch.setPostChange(b -> {
-            Bitmap shot = owner.screenCap();
-            ImageView view = new ImageView(owner);
-            view.setImageBitmap(shot);
-            view.setLayoutParams(new LayoutParams(owner.getScreenWidth(), owner.getScreenHeight()));
-            owner.getRoot().addView(view);
+        themeSwitch.setPostChange(b ->
+                Store.setTheme(b ? Style.THEME_DARK : Style.THEME_LIGHT, (s) ->
+                    owner.applyTheme()));
 
-
-            Rect clip = new Rect(0, 0, owner.getScreenWidth(), owner.getScreenHeight());
-            view.setClipBounds(clip);
-
-            new ValueAnimation(400, b ? 0 : owner.getScreenWidth(), b ? owner.getScreenWidth() : 0) {
-                @Override
-                public void updateValue(float v) {
-                    if(b) clip.left = (int) v;
-                    else clip.right = (int) v;
-                    view.setClipBounds(clip);
-                }
-            }
-                    .setOnFinished(() -> owner.getRoot().removeView(view))
-            .setInterpolator(Interpolator.EASE_BOTH).start();
-
-            Store.setTheme(b ? Style.THEME_DARK : Style.THEME_LIGHT, (s) ->
-                    owner.applyTheme());
-
-
+        addOnShowing(() -> {
+            if(owner.getStyle().get().isDark()) themeSwitch.enable();
+            else themeSwitch.setIcon(R.drawable.sun);
         });
-
 
         theme.addPostLabel(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         theme.addPostLabel(themeSwitch);
@@ -122,9 +98,13 @@ public class GamePause extends Overlay implements Styleable {
         root.setScaleY(.5f);
         root.setAlpha(0);
 
+        root.setTranslationY(ViewUtils.dipToPx(40, owner));
+
         addToShow(new ScaleXYAnimation(root, 1));
+        addToShow(new TranslateYAnimation(root, 0));
         addToShow(new AlphaAnimation(root, 1));
         addToHide(new ScaleXYAnimation(root, .5f));
+        addToHide(new TranslateYAnimation(root, ViewUtils.dipToPx(40, owner)));
         addToHide(new AlphaAnimation(root, 0));
 
         addOnShowing(() -> owner.playMenuSound(R.raw.swap));

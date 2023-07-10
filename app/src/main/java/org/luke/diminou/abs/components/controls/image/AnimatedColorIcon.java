@@ -14,10 +14,6 @@ public class AnimatedColorIcon extends ColorIcon {
         this.audio = audio;
     }
 
-    public AnimatedColorIcon(App owner, int id) {
-        this(owner, id, Integer.MIN_VALUE);
-    }
-
     public void start() {
         start(1);
     }
