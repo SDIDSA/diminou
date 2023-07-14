@@ -35,7 +35,7 @@ import org.luke.diminou.app.cards.PlayerCard;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
 import org.luke.diminou.app.pages.game.player.Player;
-import org.luke.diminou.app.pages.home.Home;
+import org.luke.diminou.app.pages.home.offline.OfflineHome;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -533,7 +533,7 @@ public class Join extends Titled {
     @Override
     public boolean onBack() {
         if(joined == null)
-            owner.loadPage(Home.class);
+            owner.loadPage(OfflineHome.class);
         else {
             joined.getData().getConnection().emit("leave", "");
             left();

@@ -98,13 +98,13 @@ public class GamePause extends Overlay implements Styleable {
         root.setScaleY(.5f);
         root.setAlpha(0);
 
-        root.setTranslationY(ViewUtils.dipToPx(40, owner));
+        root.setTranslationY(ViewUtils.by(owner));
 
         addToShow(new ScaleXYAnimation(root, 1));
         addToShow(new TranslateYAnimation(root, 0));
         addToShow(new AlphaAnimation(root, 1));
         addToHide(new ScaleXYAnimation(root, .5f));
-        addToHide(new TranslateYAnimation(root, ViewUtils.dipToPx(40, owner)));
+        addToHide(new TranslateYAnimation(root, ViewUtils.by(owner)));
         addToHide(new AlphaAnimation(root, 0));
 
         addOnShowing(() -> owner.playMenuSound(R.raw.swap));

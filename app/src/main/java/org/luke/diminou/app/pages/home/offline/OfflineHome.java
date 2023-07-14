@@ -1,9 +1,8 @@
-package org.luke.diminou.app.pages.home;
+package org.luke.diminou.app.pages.home.offline;
 
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
@@ -23,6 +22,7 @@ import org.luke.diminou.abs.components.controls.button.HomeButtonPlay;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
 import org.luke.diminou.abs.components.controls.input.InputField;
 import org.luke.diminou.abs.components.controls.text.font.Font;
+import org.luke.diminou.abs.components.layout.StackPane;
 import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
@@ -41,7 +41,7 @@ import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 
-public class Home extends Page {
+public class OfflineHome extends Page {
     private boolean destroyed = false;
     private final ColorIcon diminou;
     private final VBox root;
@@ -56,7 +56,7 @@ public class Home extends Page {
 
     private final StackPane effects;
 
-    public Home(App owner) {
+    public OfflineHome(App owner) {
         super(owner);
 
         effects = new StackPane(owner);
@@ -117,11 +117,9 @@ public class Home extends Page {
         ConfirmExit confirmExit = new ConfirmExit(owner);
 
         join.setOnClick(() -> owner.loadPage(Join.class));
-        //join.setOnClick(() -> owner.loadPage(Game.class));
         host.setOnClick(() -> owner.loadPage(Host.class));
         settings.setOnClick(() -> owner.loadPage(Settings.class));
         exit.setOnClick(confirmExit::show);
-        //exit.setOnClick(() -> new GamePause(owner).show());
 
         addView(root);
 
@@ -137,7 +135,7 @@ public class Home extends Page {
             effects.removeAllViews();
         }
 
-        int by = ViewUtils.dipToPx(30, owner);
+        int by = ViewUtils.by(owner);
 
         hide(diminou, -by);
         hide(profile, -by);
@@ -331,7 +329,6 @@ public class Home extends Page {
     public void applyStyle(Style style) {
         diminou.setFill(style.getTextNormal());
         username.setBorderColor(style.getTextMuted());
-        owner.setBackgroundColor(style.getBackgroundTertiary());
     }
 
     @Override

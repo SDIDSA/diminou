@@ -22,6 +22,10 @@ public class ViewUtils {
         setPadding(view, padding, padding, padding, padding, context);
     }
 
+    public static int by(Context owner) {
+        return dipToPx(40, owner);
+    }
+
     public static void setPadding(View view, float left, float top, float right, float bottom, Context context) {
         int dil = dipToPx(left, context);
         int dit = dipToPx(top, context);

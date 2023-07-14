@@ -31,7 +31,7 @@ import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
 import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.game.player.PlayerType;
-import org.luke.diminou.app.pages.home.Home;
+import org.luke.diminou.app.pages.home.offline.OfflineHome;
 import org.luke.diminou.app.pages.settings.FourMode;
 
 import java.util.ArrayList;
@@ -303,7 +303,7 @@ public class Host extends Titled {
 
     @Override
     public boolean onBack() {
-        owner.loadPage(Home.class);
+        owner.loadPage(OfflineHome.class);
         return true;
     }
 

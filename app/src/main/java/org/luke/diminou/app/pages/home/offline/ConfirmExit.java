@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.home;
+package org.luke.diminou.app.pages.home.offline;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
@@ -11,7 +11,7 @@ public class ConfirmExit extends MultipleOptionOverlay {
         super(owner, "exit_confirm", s -> s.equals("yes"));
         addButton("cancel", this::hide);
         addButton("yes", () -> {
-            Home.settingUp = true;
+            OfflineHome.settingUp = true;
             Page.clearCache();
             Store.destroy();
             owner.finishAndRemoveTask();

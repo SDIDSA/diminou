@@ -9,6 +9,8 @@ import android.text.method.TransformationMethod;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+
+import org.luke.diminou.abs.components.controls.scratches.Loading;
 import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
@@ -26,6 +28,8 @@ public class Button extends StackPane {
     private Runnable onClick;
 
     protected final HBox content;
+
+    private final Loading loading;
 
     public Button(App owner, String text) {
         super(owner);
@@ -48,6 +52,7 @@ public class Button extends StackPane {
 
         content.addView(label);
 
+        loading = new Loading(owner, 10);
         addView(content);
 
         setOnTouchListener((view, event) -> {
@@ -85,6 +90,21 @@ public class Button extends StackPane {
         setFocusable(false);
     }
 
+    public void startLoading() {
+        getLayoutParams().height = getHeight();
+        setClickable(false);
+        loading.startLoading();
+        removeAllViews();
+        addView(loading);
+    }
+
+    public void stopLoading() {
+        setClickable(true);
+        removeAllViews();
+        addView(content);
+        loading.stopLoading();
+    }
+
     public void setLetterSpacing(float spacing) {
         label.setLetterSpacing(spacing);
     }
@@ -117,6 +137,7 @@ public class Button extends StackPane {
 
     public void setTextFill(int color) {
         label.setTextColor(color);
+        loading.setFill(color);
     }
 
     public void setFont(Font font) {
@@ -140,5 +161,13 @@ public class Button extends StackPane {
 
     public String getKey() {
         return label.getKey();
+    }
+
+    public void setKey(String name) {
+        label.setKey(name);
+    }
+
+    public void setDisabled(boolean b) {
+        setEnabled(!b);
     }
 }

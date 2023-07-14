@@ -681,7 +681,7 @@ public class Table extends StackPane {
             int maxLeft = (leftHolder == null ? ViewUtils.dipToPx(5, owner) : getXInParent(leftHolder) + leftHolder.getWidth()) + ViewUtils.dipToPx(10, owner);
             int maxRight = (rightHolder == null ? owner.getScreenWidth() - ViewUtils.dipToPx(5, owner) : getXInParent(rightHolder)) - ViewUtils.dipToPx(10, owner);
             int maxTop = getYInParent(topHolder) + topHolder.getHeight() + ViewUtils.dipToPx(5, owner);
-            int maxBottom = getYInParent(bottomHolder) - ViewUtils.dipToPx(30, owner);
+            int maxBottom = getYInParent(bottomHolder) - ViewUtils.by(owner);
             bounds = new Rect(maxLeft, maxTop, maxRight, maxBottom);
         }
         return bounds;

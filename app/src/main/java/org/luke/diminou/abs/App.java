@@ -1,6 +1,7 @@
 package org.luke.diminou.abs;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,9 +17,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.ImageView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.RawRes;
@@ -28,6 +29,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.animation.base.Animation;
@@ -40,25 +43,36 @@ import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
+import org.luke.diminou.abs.components.layout.StackPane;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.components.layout.overlay.Overlay;
-import org.luke.diminou.abs.net.SocketConnection;
+import org.luke.diminou.abs.components.layout.overlay.media.MediaPickerOverlay;
 import org.luke.diminou.abs.locale.Locale;
+import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.style.Style;
+import org.luke.diminou.abs.utils.Permissions;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.account.google.GoogleAccountHandler;
+import org.luke.diminou.app.account.google.GoogleOauthContract;
 import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.player.Player;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Timer;
+import org.luke.diminou.data.beans.User;
+import org.luke.diminou.data.media.Media;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+
+import io.socket.client.Socket;
 
 public class App extends AppCompatActivity {
     private final ConcurrentHashMap<String, Object> data = new ConcurrentHashMap<>();
@@ -74,6 +88,12 @@ public class App extends AppCompatActivity {
     private final ConcurrentHashMap<Integer, MediaPlayer> sounds = new ConcurrentHashMap<>();
     private View old = null;
 
+    private GoogleAccountHandler googleHandler;
+    private ActivityResultLauncher<String> googleSignIn;
+
+    private final HashMap<Integer, Runnable> onPermission = new HashMap<>();
+    private MediaPickerOverlay mediaPicker;
+
     @ColorInt
     public static int adjustAlpha(@ColorInt int color, float factor) {
         int alpha = Math.round(Color.alpha(color) * factor);
@@ -87,9 +107,8 @@ public class App extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i("main", Looper.getMainLooper().getThread().getName());
-        Platform.runLater(() ->
-                Log.i("real main", Thread.currentThread().getName()));
+        googleSignIn = registerForActivityResult(new GoogleOauthContract(),
+                acc -> googleHandler.onAcc(acc));
 
         Store.init(this);
 
@@ -149,7 +168,57 @@ public class App extends AppCompatActivity {
                     Font.DEFAULT = new Font(nv.getFontFamily());
                 }
             });
+            Platform.runAfter(() -> {
+                mediaPicker = new MediaPickerOverlay(this);
+            }, 1000);
         }, "app_init_thread").start();
+    }
+
+    public void googleSignIn(ObjectConsumer<GoogleSignInAccount> onAcc, Runnable onFailure) {
+        googleHandler = new GoogleAccountHandler(onAcc, onFailure);
+        googleSignIn.launch("google sign in");
+    }
+
+    public void requirePermissions(Runnable onGranted, String...permissions) {
+        if (isGranted(permissions)) {
+            onGranted.run();
+        } else {
+            requestPermission(onGranted, permissions);
+        }
+    }
+
+    private void requestPermission(Runnable onGranted, String...permissions) {
+        int code = Permissions.permissionRequestCode();
+        onPermission.put(code, onGranted);
+        requestPermissions(permissions, code);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Runnable handler = onPermission.get(requestCode);
+        if (handler != null && isGranted(permissions)) {
+            handler.run();
+            onPermission.remove(requestCode);
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private boolean isGranted(String[] permissions) {
+        for (String permission : permissions) {
+            if (!isGranted(permission)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isGranted(String permission) {
+        return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public void pickImage(ObjectConsumer<Media> onRes) {
+        mediaPicker.setOnMedia(onRes);
+        mediaPicker.show();
     }
 
     public Bitmap screenCap() {
@@ -240,7 +309,7 @@ public class App extends AppCompatActivity {
     public void reloadPage() {
         if (loaded != null) {
             Platform.runLater(() -> root.removeView(loaded));
-            Platform.runAfter(() -> root.addView(loaded, 0), 100);
+            Platform.runAfter(() -> root.addView(loaded, 0), 30);
         }
     }
 
@@ -331,8 +400,8 @@ public class App extends AppCompatActivity {
                 StackPane.LayoutParams.WRAP_CONTENT);
 
         int margins = ViewUtils.dipToPx(15, this);
-        params.setMargins(margins, margins + systemInsets.top, margins, margins);
-        params.gravity = Gravity.TOP;
+        params.setMargins(margins, margins, margins, margins + systemInsets.bottom);
+        params.gravity = Gravity.BOTTOM;
 
         toast.setLayoutParams(params);
 
@@ -344,7 +413,7 @@ public class App extends AppCompatActivity {
         toast.setElevation(ViewUtils.dipToPx(15, this));
 
         toast.setAlpha(0);
-        toast.setTranslationY(-ViewUtils.dipToPx(30, this));
+        toast.setTranslationY(ViewUtils.dipToPx(30, this));
         toast.setScaleX(.7f);
         toast.setScaleY(.7f);
 
@@ -364,7 +433,7 @@ public class App extends AppCompatActivity {
             View finalOld = old;
             anim
                     .addAnimation(new AlphaAnimation(old, 0))
-                    .addAnimation(new TranslateYAnimation(old, ViewUtils.dipToPx(30, this)))
+                    .addAnimation(new TranslateYAnimation(old, -ViewUtils.dipToPx(30, this)))
                     .setOnFinished(() -> root.removeView(finalOld));
         }
 
@@ -375,7 +444,7 @@ public class App extends AppCompatActivity {
             old = null;
             new ParallelAnimation(400)
                     .addAnimation(new AlphaAnimation(toast, 0))
-                    .addAnimation(new TranslateYAnimation(toast, ViewUtils.dipToPx(30, this)))
+                    .addAnimation(new TranslateYAnimation(toast, -ViewUtils.dipToPx(30, this)))
                     .setInterpolator(Interpolator.EASE_IN)
                     .setOnFinished(() -> root.removeView(toast))
                     .start();
@@ -435,11 +504,13 @@ public class App extends AppCompatActivity {
     }
 
     public void setBackgroundColor(int color) {
-        int trans = adjustAlpha(color, 0.005f);
-        Window win = getWindow();
-        root.setBackgroundColor(color);
-        win.setStatusBarColor(trans);
-        win.setNavigationBarColor(trans);
+        Platform.runLater(() -> {
+            int trans = adjustAlpha(color, 0.005f);
+            Window win = getWindow();
+            root.setBackgroundColor(color);
+            win.setStatusBarColor(trans);
+            win.setNavigationBarColor(trans);
+        });
     }
 
     public void applyTheme() {
@@ -493,6 +564,8 @@ public class App extends AppCompatActivity {
         WindowInsetsControllerCompat controllerCompat = new WindowInsetsControllerCompat(window, root);
         controllerCompat.setAppearanceLightStatusBars(style.isLight());
         controllerCompat.setAppearanceLightNavigationBars(style.isLight());
+
+        setBackgroundColor(style.getBackgroundTertiary());
     }
 
     public boolean isDarkMode(Configuration newConfig) {
@@ -564,5 +637,29 @@ public class App extends AppCompatActivity {
 
     public boolean isHost() {
         return getTypedData("host");
+    }
+
+    public void putMainSocket(Socket socket) {
+        putData("main_socket", socket);
+    }
+
+    public Socket getMainSocket() {
+        return getTypedData("main_socket");
+    }
+
+    public void putUser(User user) {
+        putData("logged_in", user);
+    }
+
+    public User getUser() {
+        return getTypedData("logged_in");
+    }
+
+    public void putOnline(boolean online) {
+        putData("online", online);
+    }
+
+    public boolean isOnline() {
+        return getTypedData("online");
     }
 }

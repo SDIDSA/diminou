@@ -41,7 +41,7 @@ import org.luke.diminou.app.pages.game.player.PlayerType;
 import org.luke.diminou.app.pages.game.player.Side;
 import org.luke.diminou.app.pages.game.score.ScoreBoard;
 import org.luke.diminou.app.pages.game.table.Table;
-import org.luke.diminou.app.pages.home.Home;
+import org.luke.diminou.app.pages.home.offline.OfflineHome;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
@@ -437,7 +437,7 @@ public class Game extends Page {
                 })
                 .addAnimations(
                         holders.stream().map(PieceHolder::setup).toArray(Animation[]::new))
-                .addAnimation(new TranslateYAnimation(menu, -ViewUtils.dipToPx(30, owner), 0))
+                .addAnimation(new TranslateYAnimation(menu, -ViewUtils.by(owner), 0))
                 .addAnimation(new AlphaAnimation(menu, 0, 1))
                 .setOnUpdate(v -> {
                     leftInStock.setTranslationY(owner.getSystemInsets().top * v);
@@ -682,7 +682,7 @@ public class Game extends Page {
                         root.setBackground(color);
                     }
                 })
-                .addAnimation(new TranslateYAnimation(menu, 0, -ViewUtils.dipToPx(30, owner)))
+                .addAnimation(new TranslateYAnimation(menu, 0, -ViewUtils.by(owner)))
                 .addAnimation(new AlphaAnimation(menu, 1, 0))
                 .setOnUpdate(v -> {
                     leftInStock.setTranslationY(owner.getSystemInsets().top * (1 - v));
@@ -696,7 +696,7 @@ public class Game extends Page {
                     });
                     holders.clear();
                     owner.removeLoaded();
-                    owner.loadPage(Home.class);
+                    owner.loadPage(OfflineHome.class);
                     if(host) {
                         owner.getSockets().forEach(s -> s.setOnError(null));
                         owner.getSockets().forEach(SocketConnection::stop);

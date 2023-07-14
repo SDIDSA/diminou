@@ -3,7 +3,27 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/home/luke/diminou/android_key/debug.keystore')
+            keyAlias 'diminou_debug'
+            storePassword '123456'
+            keyPassword '123456'
+        }
+        release {
+        storeFile file('/home/luke/diminou/android_key/release.keystore')
+            storePassword '123456'
+            keyAlias 'diminou_release'
+            keyPassword '123456'
+        }
+    }
+    packagingOptions {
+        resources {
+            merges += ['META-INF/DEPENDENCIES']
+        }
+    }
     namespace 'org.luke.diminou'
+
     compileSdk 34
 
     defaultConfig {
@@ -11,7 +31,7 @@ android {
         minSdk 24
         targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -20,6 +40,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
         debug {
             minifyEnabled false
@@ -41,5 +62,13 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation "androidx.datastore:datastore-preferences-rxjava3:1.0.0"
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+
+    implementation 'com.google.android.gms:play-services-auth:20.6.0'
+    implementation 'com.facebook.android:facebook-android-sdk:[8,9)'
+    implementation 'com.github.ok2c.hc5.android:httpclient-android:0.2.0'
+    implementation 'org.apache.commons:commons-text:1.10.0'
+    implementation ('io.socket:socket.io-client:2.1.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 }

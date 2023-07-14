@@ -1,7 +1,6 @@
 package org.luke.diminou.abs.utils;
 
 import android.os.Build;
-import android.util.Log;
 
 import androidx.datastore.preferences.core.MutablePreferences;
 import androidx.datastore.preferences.core.Preferences;
@@ -22,6 +21,8 @@ import io.reactivex.rxjava3.core.Single;
 
 public class Store {
     private static RxDataStore<Preferences> settings;
+    private static final Preferences.Key<String> ACCESS_TOKEN = PreferencesKeys.stringKey("access_token");
+
     private static final Preferences.Key<String> USERNAME = PreferencesKeys.stringKey("username");
     private static final Preferences.Key<String> AVATAR = PreferencesKeys.stringKey("avatar");
     private static final Preferences.Key<String> THEME = PreferencesKeys.stringKey("theme");
@@ -55,7 +56,6 @@ public class Store {
             val = def;
         }
         mutex.release();
-        Log.i("val", val);
         return val;
     }
 
@@ -77,6 +77,38 @@ public class Store {
                     }
                 });
         });
+    }
+
+    private static void removeSetting(Preferences.Key<String> key, StringConsumer onSuccess) {
+        Platform.runBack(() -> {
+            mutex.acquireUninterruptibly();
+            String res = settings.updateDataAsync(prefsIn -> {
+                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
+                mutablePreferences.remove(key);
+                return Single.just(mutablePreferences);
+            }).blockingGet().get(key);
+            mutex.release();
+            if(onSuccess != null)
+                Platform.runLater(() -> {
+                    try {
+                        onSuccess.accept(res);
+                    } catch (Exception e) {
+                        ErrorHandler.handle(e, "storing data at " + key.getName());
+                    }
+                });
+        });
+    }
+
+    public static String getAccessToken() {
+        return getSetting(ACCESS_TOKEN, null);
+    }
+
+    public static void setAccessToken(String token, StringConsumer onSuccess) {
+        setSetting(ACCESS_TOKEN, token, onSuccess);
+    }
+
+    public static void removeAccessToken(StringConsumer onSuccess) {
+        removeSetting(ACCESS_TOKEN, onSuccess);
     }
 
     public static void setTheme(String value, StringConsumer onSuccess) {

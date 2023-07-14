@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.home;
+package org.luke.diminou.app.pages.home.offline;
 
 import android.view.View;
 
