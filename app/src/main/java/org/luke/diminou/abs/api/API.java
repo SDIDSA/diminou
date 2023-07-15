@@ -113,25 +113,9 @@ public class API {
 
         public static final String GET_USER_FOR_ID = PREFIX + "getUserForId";
 
-        public static final String CREATE_SERVER = PREFIX + "createServer";
+        public static final String CHANGE_AVATAR = PREFIX + "changeAvatar";
 
-        public static final String GET_SERVERS = PREFIX + "getServers";
 
-        public static final String GET_SERVER = PREFIX + "getServer";
-
-        public static final String CREATE_INVITE = PREFIX + "createInvite";
-
-        public static final String JOIN_WITH_INVITE = PREFIX + "joinWithInvite";
-
-        public static final String SEND_MESSAGE = PREFIX + "sendMessage";
-
-        public static final String GET_MESSAGES = PREFIX + "getMessages";
-
-        public static final String SEEN = PREFIX + "seen";
-
-        public static final String DELETE_CHANNEL = PREFIX + "deleteChannel";
-
-        public static final String CREATE_CHANNEL = PREFIX + "createChannel";
 
         private Session() {
 

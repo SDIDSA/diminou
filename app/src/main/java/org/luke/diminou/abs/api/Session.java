@@ -2,9 +2,12 @@ package org.luke.diminou.abs.api;
 
 import org.json.JSONObject;
 import org.luke.diminou.abs.api.json.Param;
+import org.luke.diminou.abs.api.multipart.FilePart;
 import org.luke.diminou.abs.api.multipart.Part;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.data.SessionManager;
+
+import java.io.File;
 
 public class Session {
 
@@ -22,5 +25,15 @@ public class Session {
 
 	public static void logout(ObjectConsumer<JSONObject> onResult) {
 		call(API.Session.LOGOUT, "logout", onResult);
+	}
+
+	public static void getUser(ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.GET_USER, "get user data", onResult);
+	}
+
+	public static void changeAvatar(File avatar,
+									 ObjectConsumer<JSONObject> onResult) {
+		callMulti(API.Session.CHANGE_AVATAR, "create server", onResult,
+				new FilePart("avatar", avatar));
 	}
 }

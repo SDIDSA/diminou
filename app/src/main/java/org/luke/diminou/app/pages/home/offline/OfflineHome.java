@@ -129,6 +129,7 @@ public class OfflineHome extends Page {
     @Override
     public void setup() {
         super.setup();
+        owner.putOnline(false);
         destroyed = false;
 
         if(!settingUp) {

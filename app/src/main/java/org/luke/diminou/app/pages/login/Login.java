@@ -99,7 +99,6 @@ public class Login extends Page {
             SessionManager.storeSession(token, owner, String.valueOf(user.getId()));
             owner.putUser(user);
 
-            owner.putOnline(true);
             owner.loadPage(Home.class);
         } catch (URISyntaxException e) {
             ErrorHandler.handle(e, "storing access token");

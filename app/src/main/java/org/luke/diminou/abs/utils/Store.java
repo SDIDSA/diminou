@@ -52,6 +52,7 @@ public class Store {
         try {
             val = settings.data().map(prefs -> prefs.get(key)).first(def).blockingGet();
         }catch(Exception x) {
+            ErrorHandler.handle(x, "reading setting " + key.getName());
             Platform.runBack(() -> setSetting(key, def, null));
             val = def;
         }
@@ -100,7 +101,7 @@ public class Store {
     }
 
     public static String getAccessToken() {
-        return getSetting(ACCESS_TOKEN, null);
+        return getSetting(ACCESS_TOKEN, "");
     }
 
     public static void setAccessToken(String token, StringConsumer onSuccess) {

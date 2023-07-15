@@ -1,16 +1,19 @@
 package org.luke.diminou.app.pages.home.online;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
 
+import org.json.JSONObject;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
+import org.luke.diminou.abs.api.Session;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.components.controls.image.Image;
@@ -22,10 +25,17 @@ import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
+import org.luke.diminou.abs.utils.ErrorHandler;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.app.pages.settings.Settings;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Home extends Page {
     private final VBox root;
@@ -51,7 +61,10 @@ public class Home extends Page {
 
         pfp.setOnClick(() -> {
             owner.pickImage(media -> {
-                owner.toast(media.getName());
+                File f = ImageProxy.mediaToFile(owner, media);
+                Session.changeAvatar(f, res -> {
+                    //IGNORE
+                });
             });
         });
 
@@ -92,10 +105,18 @@ public class Home extends Page {
     @Override
     public void setup() {
         super.setup();
+        owner.putOnline(true);
 
         User user = owner.getUser();
-        ImageProxy.getImage(user.getAvatar(), pfp::setImageBitmap);
-        username.setText(user.getUsername());
+
+        user.avatarProperty().addListener((obs, ov, nv) -> {
+            ImageProxy.getImage(nv, pfp::setImageBitmap);
+        });
+
+        user.usernameProperty().addListener((obs, ov, nv) -> {
+            username.setText(nv);
+        });
+
         coins.setValue(user.getCoins());
 
         root.setAlpha(0f);
@@ -106,6 +127,33 @@ public class Home extends Page {
                 .addAnimation(new TranslateYAnimation(root, 0))
                 .setInterpolator(Interpolator.EASE_OUT)
                 .start();
+
+        registerSocket();
+    }
+
+    private void registerSocket() {
+        User user = owner.getUser();
+        addSocketEventHandler("user_sync", obj -> {
+            Log.i("update", obj.toString());
+            for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
+                String key = it.next();
+                user.set(key, obj.get(key));
+            }
+        });
+    }
+
+    private ArrayList<String> registeredListeners = new ArrayList<>();
+    private void addSocketEventHandler(String event, ObjectConsumer<JSONObject> handler) {
+        registeredListeners.add(event);
+        owner.getMainSocket().on(event,
+                data -> Platform.runLater(() -> {
+//					System.out.println(event + " : " + data[0].toString());
+                    try {
+                        handler.accept(new JSONObject(data[0].toString()));
+                    } catch (Exception e) {
+                        ErrorHandler.handle(e, "handling socket event " + event);
+                    }
+                }));
     }
 
     @Override
