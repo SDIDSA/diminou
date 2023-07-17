@@ -5,8 +5,17 @@ import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.data.property.Property;
 
 public class User extends Bean {
+
+    public static void refresh(int id) {
+        Bean.refresh(User.class, id);
+    }
+
     public static void getForId(int id, ObjectConsumer<User> onUser) {
         Bean.getForId(User.class, id, onUser);
+    }
+
+    public static User getForIdSync(int id) {
+        return Bean.getForIdSync(User.class, id);
     }
 
     private final Property<Integer> points;
@@ -17,6 +26,8 @@ public class User extends Bean {
     private final Property<String> username;
     private final Property<String> email;
 
+    private final Property<String> friend;
+
     private User(JSONObject obj) {
         points = new Property<>();
         id = new Property<>();
@@ -25,6 +36,7 @@ public class User extends Bean {
         avatar = new Property<>();
         username = new Property<>();
         email = new Property<>();
+        friend = new Property<>();
         init(obj);
     }
 
@@ -110,6 +122,18 @@ public class User extends Bean {
 
     public void setEmail(String val) {
         email.set(val);
+    }
+
+    public Property<String> friendProperty() {
+        return friend;
+    }
+
+    public String getFriend() {
+        return friend.get();
+    }
+
+    public void setFriend(String val) {
+        friend.set(val);
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.pages.home.online.friends.Friends;
 import org.luke.diminou.app.pages.home.online.global.Bottom;
 import org.luke.diminou.app.pages.home.online.global.HomeFragment;
 import org.luke.diminou.app.pages.home.online.global.Top;
@@ -107,6 +108,48 @@ public class Home extends Page {
                 String key = it.next();
                 user.set(key, obj.get(key));
             }
+        });
+        addSocketEventHandler("request_sent", obj -> {
+            int sender = obj.getInt("sender");
+            int receiver = obj.getInt("receiver");
+
+            if(sender == owner.getUser().getId()) {
+                User.getForId(receiver, u -> u.setFriend("pending_sent"));
+            }else {
+                User.getForId(sender, u -> u.setFriend("pending_received"));
+            }
+
+            Friends instance = (Friends) HomeFragment.getInstance(owner, Friends.class);
+            if(instance != null)
+                instance.displayFriends();
+        });
+
+        addSocketEventHandler("request_canceled", obj -> {
+            int sender = obj.getInt("sender");
+            int receiver = obj.getInt("receiver");
+
+            if(sender == owner.getUser().getId()) {
+                User.getForId(receiver, u -> u.setFriend("none"));
+            }else {
+                User.getForId(sender, u -> u.setFriend("none"));
+            }
+
+            Friends instance = (Friends) HomeFragment.getInstance(owner, Friends.class);
+            if(instance != null)
+                instance.displayFriends();
+        });
+
+        addSocketEventHandler("request_accepted", obj -> {
+            int sender = obj.getInt("sender");
+            int receiver = obj.getInt("receiver");
+
+            int other_id = sender == owner.getUser().getId() ? receiver : sender;
+
+            User.getForId(other_id, u -> u.setFriend("friend"));
+
+            Friends instance = (Friends) HomeFragment.getInstance(owner, Friends.class);
+            if(instance != null)
+                instance.displayFriends();
         });
     }
 

@@ -5,8 +5,13 @@ import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.data.property.Property;
 
 public class Friend extends Bean {
+
     public static void getForId(int id, ObjectConsumer<Friend> onFriend) {
         Bean.getForId(Friend.class, id, onFriend);
+    }
+
+    public static Friend getForIdSync(int id) {
+        return Bean.getForIdSync(Friend.class, id);
     }
 
     private final Property<Integer> id;

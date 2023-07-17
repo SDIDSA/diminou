@@ -43,7 +43,7 @@ public class Diminou extends App {
                 startAmbient();
                 initializeSocket();
 
-                String token = Store.getAccessToken();
+                String token = SessionManager.getSession();
                 if(token.isBlank()) {
                     loadPage(Login.class);
                 } else {

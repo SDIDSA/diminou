@@ -28,6 +28,7 @@ import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.home.offline.OfflineHome;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.data.SessionManager;
+import org.luke.diminou.data.beans.Bean;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
@@ -76,6 +77,8 @@ public class Login extends Page {
                         if(res.has("token")) {
                             String token = res.getString("token");
                             int userId = res.getInt("user");
+                            Bean.clearCache();
+                            SessionManager.storeSession(token, owner, String.valueOf(userId));
                             User.getForId(userId, user -> {
                                 handleUser(user, token);
                                 google.stopLoading();
@@ -84,6 +87,8 @@ public class Login extends Page {
                             Auth.googleSignUp(acc.getEmail(), acc.getGivenName(), upres -> {
                                 String token = upres.getString("token");
                                 int userId = upres.getInt("user");
+                                Bean.clearCache();
+                                SessionManager.storeSession(token, owner, String.valueOf(userId));
                                 User.getForId(userId, user -> {
                                     handleUser(user, token);
                                     google.stopLoading();
@@ -103,14 +108,8 @@ public class Login extends Page {
     }
 
     private void handleUser(User user, String token) {
-        try {
-            SessionManager.storeSession(token, owner, String.valueOf(user.getId()));
-            owner.putUser(user);
-
-            owner.loadPage(Home.class);
-        } catch (URISyntaxException e) {
-            ErrorHandler.handle(e, "storing access token");
-        }
+        owner.putUser(user);
+        owner.loadPage(Home.class);
     }
 
     @Override

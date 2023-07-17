@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.host;
+package org.luke.diminou.app.pages.host.offline;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;

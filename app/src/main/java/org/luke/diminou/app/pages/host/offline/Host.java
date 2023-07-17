@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.host;
+package org.luke.diminou.app.pages.host.offline;
 
 import android.widget.LinearLayout;
 

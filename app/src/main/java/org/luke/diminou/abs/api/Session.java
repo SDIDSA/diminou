@@ -52,4 +52,28 @@ public class Session {
 	public static void getFriends(ObjectConsumer<JSONObject> onResult) {
 		call(API.Session.GET_FRIENDS, "get friends", onResult);
 	}
+
+	public static void getRequests(ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.GET_REQUESTS, "get friends", onResult);
+	}
+
+	public static void getForUsername(String searchFor, ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.GET_FOR_USERNAME, "search by username", onResult,
+				new Param("username", searchFor));
+	}
+
+	public static void sendRequest(int otherId, ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.SEND_REQUEST, "send friend request", onResult,
+				new Param("user_id", otherId));
+	}
+
+	public static void cancelRequest(int otherId, ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.CANCEL_REQUEST, "cancel friend request", onResult,
+				new Param("user_id", otherId));
+	}
+
+	public static void acceptRequest(int otherId, ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.ACCEPT_REQUEST, "accept friend request", onResult,
+				new Param("user_id", otherId));
+	}
 }

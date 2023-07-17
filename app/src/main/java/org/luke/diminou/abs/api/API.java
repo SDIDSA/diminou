@@ -20,8 +20,6 @@ public class API {
     public static final String TEST_BASE = "http://192.168.201.161:4000/";
     public static final String REL_BASE = "https://mesa69.herokuapp.com/";
     public static final String BASE = TEST_BASE;
-    public static final String INVITE_BASE = "https://mesa-invite.tk/";
-    public static final String INVITE_CODE = "hTKzmak";
     public static JSONObject netErr;
 
     static {
@@ -113,11 +111,21 @@ public class API {
 
         public static final String GET_FOR_ID = PREFIX + "getForId";
 
+        public static final String GET_FOR_USERNAME = PREFIX + "getForUsername";
+
         public static final String CHANGE_AVATAR = PREFIX + "changeAvatar";
 
         public static final String CHANGE_USERNAME = PREFIX + "changeUsername";
 
         public static final String GET_FRIENDS = PREFIX + "getFriends";
+
+        public static final String SEND_REQUEST = PREFIX + "sendRequest";
+
+        public static final String CANCEL_REQUEST = PREFIX + "cancelRequest";
+
+        public static final String ACCEPT_REQUEST = PREFIX + "acceptRequest";
+
+        public static final String GET_REQUESTS = PREFIX + "getRequests";
 
         private Session() {
 

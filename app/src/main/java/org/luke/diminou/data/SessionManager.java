@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
+import org.luke.diminou.data.beans.Bean;
 import org.luke.diminou.data.beans.User;
 
 import java.net.URISyntaxException;
@@ -28,6 +29,7 @@ public class SessionManager {
             Platform.waitWhile(() -> socket.id() == null);
             System.out.println("reconnecting");
             register.run();
+            Bean.refresh();
         }).start());
         register.run();
     }

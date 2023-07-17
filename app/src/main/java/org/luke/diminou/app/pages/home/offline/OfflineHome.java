@@ -34,7 +34,7 @@ import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.avatar.AvatarSelect;
 import org.luke.diminou.app.pages.game.piece.Piece;
-import org.luke.diminou.app.pages.host.Host;
+import org.luke.diminou.app.pages.host.offline.Host;
 import org.luke.diminou.app.pages.join.Join;
 import org.luke.diminou.app.pages.settings.Settings;
 import org.luke.diminou.data.property.Property;
