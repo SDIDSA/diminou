@@ -540,6 +540,7 @@ public class PieceHolder extends StackPane implements Styleable {
         });
 
         res.addAnimation(new AlphaAnimation(name, 0));
+        res.addAnimation(new AlphaAnimation(score, 0));
         return res;
     }
 

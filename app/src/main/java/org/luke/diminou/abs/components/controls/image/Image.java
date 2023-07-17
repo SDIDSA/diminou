@@ -18,6 +18,7 @@ public class Image extends androidx.appcompat.widget.AppCompatImageView {
     private Runnable onDoubleClick;
 
     private final GradientDrawable clip;
+    private final GradientDrawable fore;
 
     public Image(App owner, @DrawableRes int res) {
         super(owner);
@@ -30,7 +31,9 @@ public class Image extends androidx.appcompat.widget.AppCompatImageView {
                         ViewGroup.LayoutParams.WRAP_CONTENT));
 
         clip = new GradientDrawable();
+        fore = new GradientDrawable();
         setBackground(clip);
+        setForeground(fore);
         setOutlineProvider(ViewOutlineProvider.BACKGROUND);
         setClipToOutline(true);
 
@@ -60,7 +63,7 @@ public class Image extends androidx.appcompat.widget.AppCompatImageView {
     }
 
     public void setBorder(int color) {
-        clip.setStroke(ViewUtils.dipToPx(1, owner), color);
+        fore.setStroke(ViewUtils.dipToPx(1, owner), color);
     }
 
     public Image(App owner) {
@@ -69,6 +72,7 @@ public class Image extends androidx.appcompat.widget.AppCompatImageView {
 
     public void setCornerRadius(float radius) {
         clip.setCornerRadius(ViewUtils.dipToPx(radius, owner));
+        fore.setCornerRadius(ViewUtils.dipToPx(radius, owner));
     }
 
     private long lastClick = 0;
@@ -126,6 +130,7 @@ public class Image extends androidx.appcompat.widget.AppCompatImageView {
     public void fireDouble() {
         if (onDoubleClick != null)
             onDoubleClick.run();
+        else fire();
     }
 
     public App getOwner() {

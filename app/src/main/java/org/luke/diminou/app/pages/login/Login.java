@@ -71,21 +71,29 @@ public class Login extends Page {
 
         google.setOnClick(() -> {
             google.startLoading();
-            owner.googleSignIn(acc -> {
-                Auth.googleLogIn(acc.getEmail(), res -> {
-                    if(res.has("empty")) {
-                        Auth.googleSignUp(acc.getEmail(), upres -> {
-                            String token = upres.getString("token");
-                            handleUser(new User(upres.getJSONObject("user")), token);
+            owner.googleSignIn(acc ->
+                    Auth.googleLogIn(acc.getEmail(), res -> {
+                        if(res.has("token")) {
+                            String token = res.getString("token");
+                            int userId = res.getInt("user");
+                            User.getForId(userId, user -> {
+                                handleUser(user, token);
+                                google.stopLoading();
+                            });
+                        }else if(res.has("empty")) {
+                            Auth.googleSignUp(acc.getEmail(), acc.getGivenName(), upres -> {
+                                String token = upres.getString("token");
+                                int userId = upres.getInt("user");
+                                User.getForId(userId, user -> {
+                                    handleUser(user, token);
+                                    google.stopLoading();
+                                });
+                            });
+                        } else {
                             google.stopLoading();
-                        });
-                    } else {
-                        String token = res.getString("token");
-                        handleUser(new User(res.getJSONObject("user")), token);
-                        google.stopLoading();
-                    }
-                });
-            }, () -> {
+                            owner.toast("google sign in failed...");
+                        }
+            }), () -> {
                 google.stopLoading();
                 owner.toast("google sign in failed...");
             });

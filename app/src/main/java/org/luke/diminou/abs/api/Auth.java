@@ -31,10 +31,11 @@ public class Auth {
 				new Param("email", email));
 	}
 
-	public static void googleSignUp(String email,
+	public static void googleSignUp(String email, String name,
 									ObjectConsumer<JSONObject> onResult){
 		API.asyncJsonPost(API.Auth.GOOGLE_SIGN_UP, "signing up with google account", onResult,
-				new Param("email", email)
+				new Param("email", email),
+				new Param("name", name)
 		);
 	}
 

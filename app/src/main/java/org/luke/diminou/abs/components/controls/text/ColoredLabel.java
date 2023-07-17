@@ -3,14 +3,13 @@ package org.luke.diminou.abs.components.controls.text;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
+import org.luke.diminou.abs.utils.functional.StyleToColor;
 import org.luke.diminou.data.property.Property;
 
-import java.util.function.Function;
-
 public class ColoredLabel extends Label implements Styleable {
-    private final Function<Style, Integer> fill;
+    private final StyleToColor fill;
 
-    public ColoredLabel(App owner, String key, Function<Style, Integer> fill) {
+    public ColoredLabel(App owner, String key, StyleToColor fill) {
         super(owner, key);
 
         this.fill = fill;
@@ -20,7 +19,7 @@ public class ColoredLabel extends Label implements Styleable {
 
     @Override
     public void applyStyle(Style style) {
-        setFill(fill.apply(style));
+        setFill(fill.get(style));
     }
 
     @Override

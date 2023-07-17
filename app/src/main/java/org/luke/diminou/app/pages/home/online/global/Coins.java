@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.home.online;
+package org.luke.diminou.app.pages.home.online.global;
 
 import android.view.Gravity;
 
@@ -25,7 +25,7 @@ public class Coins extends HBox implements Styleable {
 
         setGravity(Gravity.CENTER_VERTICAL);
 
-        setLayoutParams(new LayoutParams(ViewUtils.dipToPx(100, owner), -2));
+        setLayoutParams(new LayoutParams(ViewUtils.dipToPx(120, owner), -2));
 
         value = new ColoredLabel(owner, "", Style::getTextNormal);
 

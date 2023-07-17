@@ -158,7 +158,6 @@ public class OfflineHome extends Page {
                     .setDelay(-300)
                     .setInterpolator(Interpolator.OVERSHOOT);
             show.start();
-            owner.startAmbient();
             Platform.runAfter(this::setupFloatingPieces, 400);
         });
 

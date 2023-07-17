@@ -21,7 +21,7 @@ public class SessionManager {
 
     public static void registerSocket(Socket socket, String token, String uid) {
         Runnable register = () -> socket.emit("register",
-                JsonUtils.make("socket", socket.id(), "token", token, User.USER_ID, uid));
+                JsonUtils.make("socket", socket.id(), "token", token, "user_id", uid));
 
         System.out.println("listening for reconnect...");
         socket.io().on("reconnect", data -> new Thread(() -> {

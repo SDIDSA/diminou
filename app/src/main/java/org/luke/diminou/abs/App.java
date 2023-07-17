@@ -113,8 +113,6 @@ public class App extends AppCompatActivity {
 
         ViewUtils.scale = Float.parseFloat(Store.getScale());
 
-        Log.i("4px", String.valueOf(ViewUtils.pxToDip(4, this)));
-
         dark = new Style(this, "dark", true);
         light = new Style(this, "light", false);
 
@@ -167,9 +165,6 @@ public class App extends AppCompatActivity {
                     Font.DEFAULT = new Font(nv.getFontFamily());
                 }
             });
-            Platform.runAfter(() -> {
-                mediaPicker = new MediaPickerOverlay(this);
-            }, 1000);
         }, "app_init_thread").start();
     }
 
@@ -216,6 +211,9 @@ public class App extends AppCompatActivity {
     }
 
     public void pickImage(ObjectConsumer<Media> onRes) {
+        if(mediaPicker == null) {
+            mediaPicker = new MediaPickerOverlay(this);
+        }
         mediaPicker.setOnMedia(onRes);
         mediaPicker.show();
     }
@@ -544,7 +542,6 @@ public class App extends AppCompatActivity {
             a.start();
         }
 
-        Log.i("style", s.toString());
         style.set(s);
         setTheme(s.isDark() ? R.style.Theme_Diminou_Dark : R.style.Theme_Diminou_Light);
     }

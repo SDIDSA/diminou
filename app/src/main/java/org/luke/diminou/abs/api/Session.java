@@ -23,6 +23,12 @@ public class Session {
 		API.asyncMultiPost(path, action, onResult, SessionManager.getSession(), parts);
 	}
 
+	public static void getForId(String type, int id, ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.GET_FOR_ID, "getting [" + type + "] for id=" + id, onResult,
+				new Param("type", type),
+				new Param("id", id));
+	}
+
 	public static void logout(ObjectConsumer<JSONObject> onResult) {
 		call(API.Session.LOGOUT, "logout", onResult);
 	}
@@ -33,7 +39,17 @@ public class Session {
 
 	public static void changeAvatar(File avatar,
 									 ObjectConsumer<JSONObject> onResult) {
-		callMulti(API.Session.CHANGE_AVATAR, "create server", onResult,
+		callMulti(API.Session.CHANGE_AVATAR, "change avatar", onResult,
 				new FilePart("avatar", avatar));
+	}
+
+	public static void changeUsername(String username,
+									  ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.CHANGE_USERNAME, "change username", onResult,
+				new Param("username", username));
+	}
+
+	public static void getFriends(ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.GET_FRIENDS, "get friends", onResult);
 	}
 }

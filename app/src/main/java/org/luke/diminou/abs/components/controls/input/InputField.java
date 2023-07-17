@@ -33,13 +33,15 @@ public class InputField extends StackPane implements Styleable {
     private final Label prompt;
     private final ParallelAnimation focus, unfocus;
 
+    private Runnable onFocus, onFocusLost;
+
     public InputField(App owner, String promptText) {
         super(owner);
         this.owner = owner;
         background = new GradientDrawable();
         setRadius(7);
 
-        value = new Property<>();
+        value = new Property<>("");
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -47,7 +49,6 @@ public class InputField extends StackPane implements Styleable {
         params.weight = 1;
 
         prompt = new Label(owner, promptText);
-        prompt.setFont(new Font(14f, FontWeight.MEDIUM));
         prompt.setMaxLines(1);
         prompt.setLines(1);
 
@@ -71,7 +72,7 @@ public class InputField extends StackPane implements Styleable {
         prompts.setAlpha(.5f);
         prompts.setClickable(false);
         prompts.setFocusable(false);
-        ViewUtils.setPadding(prompts, 15, 20, 15, 20, owner);
+        ViewUtils.setPadding(prompts, 15, 18, 15, 22, owner);
 
         prompts.addView(prompt);
 
@@ -95,9 +96,15 @@ public class InputField extends StackPane implements Styleable {
                 return;
 
             if (focused) {
+                if(onFocus != null) {
+                    onFocus.run();
+                }
                 unfocus.stop();
                 focus.start();
             } else {
+                if(onFocusLost != null) {
+                    onFocusLost.run();
+                }
                 focus.stop();
                 unfocus.start();
             }
@@ -114,6 +121,14 @@ public class InputField extends StackPane implements Styleable {
 
         setBackground(background);
         applyStyle(owner.getStyle());
+    }
+
+    public void setOnFocus(Runnable onFocus) {
+        this.onFocus = onFocus;
+    }
+
+    public void setOnFocusLost(Runnable onFocusLost) {
+        this.onFocusLost = onFocusLost;
     }
 
     public void setFont(Font font) {
@@ -146,6 +161,11 @@ public class InputField extends StackPane implements Styleable {
 
     public void setBackgroundColor(int color) {
         background.setColor(color);
+    }
+
+    @Override
+    public void setBackground(int color) {
+        setBackgroundColor(color);
     }
 
     public void setBorderColor(int color) {

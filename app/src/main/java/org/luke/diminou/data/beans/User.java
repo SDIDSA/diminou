@@ -1,40 +1,31 @@
 package org.luke.diminou.data.beans;
 
 import org.json.JSONObject;
+import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.data.property.Property;
 
 public class User extends Bean {
-    public static final String USER_ID = "user_id";
+    public static void getForId(int id, ObjectConsumer<User> onUser) {
+        Bean.getForId(User.class, id, onUser);
+    }
 
-    private final Property<Integer> id;
     private final Property<Integer> points;
+    private final Property<Integer> id;
     private final Property<Integer> coins;
-    private final Property<String> username;
-    private final Property<String> email;
     private final Property<String> password;
     private final Property<String> avatar;
+    private final Property<String> username;
+    private final Property<String> email;
 
-    public User(JSONObject obj) {
-        id = new Property<>();
+    private User(JSONObject obj) {
         points = new Property<>();
+        id = new Property<>();
         coins = new Property<>();
-        username = new Property<>();
-        email = new Property<>();
         password = new Property<>();
         avatar = new Property<>();
+        username = new Property<>();
+        email = new Property<>();
         init(obj);
-    }
-
-    public Property<Integer> idProperty() {
-        return id;
-    }
-
-    public Integer getId() {
-        return id.get();
-    }
-
-    public void setId(Integer val) {
-        id.set(val);
     }
 
     public Property<Integer> pointsProperty() {
@@ -49,6 +40,18 @@ public class User extends Bean {
         points.set(val);
     }
 
+    public Property<Integer> idProperty() {
+        return id;
+    }
+
+    public Integer getId() {
+        return id.get();
+    }
+
+    public void setId(Integer val) {
+        id.set(val);
+    }
+
     public Property<Integer> coinsProperty() {
         return coins;
     }
@@ -59,30 +62,6 @@ public class User extends Bean {
 
     public void setCoins(Integer val) {
         coins.set(val);
-    }
-
-    public Property<String> usernameProperty() {
-        return username;
-    }
-
-    public String getUsername() {
-        return username.get();
-    }
-
-    public void setUsername(String val) {
-        username.set(val);
-    }
-
-    public Property<String> emailProperty() {
-        return email;
-    }
-
-    public String getEmail() {
-        return email.get();
-    }
-
-    public void setEmail(String val) {
-        email.set(val);
     }
 
     public Property<String> passwordProperty() {
@@ -109,13 +88,40 @@ public class User extends Bean {
         avatar.set(val);
     }
 
+    public Property<String> usernameProperty() {
+        return username;
+    }
+
+    public String getUsername() {
+        return username.get();
+    }
+
+    public void setUsername(String val) {
+        username.set(val);
+    }
+
+    public Property<String> emailProperty() {
+        return email;
+    }
+
+    public String getEmail() {
+        return email.get();
+    }
+
+    public void setEmail(String val) {
+        email.set(val);
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + " {"
-                + "\tusername : " + username.get()
-                + "\temail : " + email.get()
+                + "\tpoints : " + points.get()
+                + "\tid : " + id.get()
+                + "\tcoins : " + coins.get()
                 + "\tpassword : " + password.get()
                 + "\tavatar : " + avatar.get()
+                + "\tusername : " + username.get()
+                + "\temail : " + email.get()
                 + "}";
     }
 }

@@ -1,5 +1,7 @@
 package org.luke.diminou.abs.api.json;
 
+import androidx.annotation.NonNull;
+
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 
@@ -26,5 +28,11 @@ public class Param {
 
 	public NameValuePair norm() {
 		return new BasicNameValuePair(key, value);
+	}
+
+	@NonNull
+	@Override
+	public String toString() {
+		return key + "=" + value;
 	}
 }

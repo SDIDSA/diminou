@@ -56,6 +56,22 @@ public class MultipleOptionOverlay extends PartialSlideOverlay {
         applyStyle(owner.getStyle());
     }
 
+    protected void startLoading(String option) {
+        for(Button b : buttons) {
+            if(b.getKey().equals(option)) {
+                b.startLoading();
+            }
+        }
+    }
+
+    protected void stopLoading(String option) {
+        for(Button b : buttons) {
+            if(b.getKey().equals(option)) {
+                b.stopLoading();
+            }
+        }
+    }
+
     @Override
     public void applyStyle(Style style) {
         if(text == null) return;

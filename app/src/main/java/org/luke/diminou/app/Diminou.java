@@ -16,6 +16,7 @@ import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.login.Login;
 import org.luke.diminou.data.SessionManager;
+import org.luke.diminou.data.beans.Bean;
 import org.luke.diminou.data.beans.User;
 
 import java.net.URISyntaxException;
@@ -39,22 +40,23 @@ public class Diminou extends App {
             ImageProxy.init(this);
             Piece.initAll(this);
             Platform.runAfter(() -> {
+                startAmbient();
                 initializeSocket();
 
                 String token = Store.getAccessToken();
-                toast(String.valueOf(token));
                 if(token.isBlank()) {
                     loadPage(Login.class);
                 } else {
                     Session.getUser(result -> {
                         if (result.has("user")) {
-                            JSONObject userJson = result.getJSONObject("user");
-                            User user = new User(userJson);
-                            putUser(user);
+                            int userId = result.getInt("user");
+                            User.getForId(userId, user -> {
+                                putUser(user);
+                                SessionManager.registerSocket(getMainSocket(), token, String.valueOf(user.getId()));
+                                loadPage(Home.class);
+                            });
 
-                            SessionManager.registerSocket(getMainSocket(), token, String.valueOf(user.getId()));
 
-                            loadPage(Home.class);
                         } else {
                             SessionManager.clearSession();
                             loadPage(Login.class);
@@ -73,22 +75,14 @@ public class Diminou extends App {
         try {
             Socket mSocket = IO.socket(API.BASE);
             mSocket.on(Socket.EVENT_CONNECT, d -> {
-                Log.i("socket", "connected");
                 putMainSocket(mSocket);
             });
             mSocket.on(Socket.EVENT_CONNECT_ERROR, d -> {
-                Log.i("socket", "error");
                 for (Object o : d) {
                     if(o instanceof Throwable t) {
                         t.printStackTrace();
                     }else
                         Log.i("error", String.valueOf(o));
-                }
-            });
-            mSocket.on(Socket.EVENT_DISCONNECT, d -> {
-                Log.i("socket", "disconnect");
-                for (Object o : d) {
-                    Log.i("disconnect", String.valueOf(o));
                 }
             });
             if(!mSocket.connected()){

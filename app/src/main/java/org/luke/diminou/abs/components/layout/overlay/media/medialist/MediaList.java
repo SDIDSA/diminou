@@ -34,7 +34,6 @@ public class MediaList extends RecyclerView {
         setLayoutManager(lm);
 
         int size = owner.getScreenWidth() - ViewUtils.dipToPx(50, owner);
-        Log.i("size", size + "");
         adapter = new MediaAdapter(owner, size);
         adapter.setOnAction(media -> {
             if(onAction != null) {

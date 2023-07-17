@@ -3,16 +3,15 @@ package org.luke.diminou.abs.components.controls.button;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
+import org.luke.diminou.abs.utils.functional.StyleToColor;
 import org.luke.diminou.data.property.Property;
 
-import java.util.function.Function;
-
 public class ColoredButton extends Button implements Styleable {
-    private final Function<Style, Integer> fill;
-    private final Function<Style, Integer> textFill;
+    private final StyleToColor fill;
+    private final StyleToColor textFill;
     public ColoredButton(App owner,
-                         Function<Style, Integer> fill,
-                         Function<Style, Integer> textFill,
+                         StyleToColor fill,
+                         StyleToColor textFill,
                          String text) {
         super(owner, text);
 
@@ -24,8 +23,8 @@ public class ColoredButton extends Button implements Styleable {
 
     @Override
     public void applyStyle(Style style) {
-        setFill(fill.apply(style));
-        setTextFill(textFill.apply(style));
+        setFill(fill.get(style));
+        setTextFill(textFill.get(style));
     }
 
     @Override

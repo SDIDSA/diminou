@@ -30,7 +30,7 @@ public class ImageProxy {
     private static DiskImageCache diskCache;
 
     public static void init(App owner) {
-        diskCache = new DiskImageCache(owner, "bitmaps", Bitmap.CompressFormat.JPEG, 80);
+        diskCache = new DiskImageCache(owner, "bitmaps", Bitmap.CompressFormat.PNG, 80);
     }
 
     private static String makeKey(String url) {
