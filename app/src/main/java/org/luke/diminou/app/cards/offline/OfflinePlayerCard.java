@@ -1,4 +1,4 @@
-package org.luke.diminou.app.cards;
+package org.luke.diminou.app.cards.offline;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -31,14 +31,14 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.pages.host.offline.ConfirmKick;
-import org.luke.diminou.app.pages.host.offline.Host;
+import org.luke.diminou.app.pages.host.offline.OfflineHost;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlayerCard extends VBox implements Styleable {
-    private static final ConcurrentHashMap<Integer, PlayerCard> track = new ConcurrentHashMap<>();
+public class OfflinePlayerCard extends VBox implements Styleable {
+    private static final ConcurrentHashMap<Integer, OfflinePlayerCard> track = new ConcurrentHashMap<>();
     private final Loading loading;
     private final GradientDrawable avatarBack;
     private final StackPane preAvatar;
@@ -52,14 +52,14 @@ public class PlayerCard extends VBox implements Styleable {
     private boolean loaded = false;
     private boolean isBeingDragged = false;
 
-    private PlayerCard boundTo;
+    private OfflinePlayerCard boundTo;
 
     private View holder;
 
     private final int index;
 
     private final boolean host;
-    public PlayerCard(App owner, boolean host, int index) {
+    public OfflinePlayerCard(App owner, boolean host, int index) {
         super(owner);
 
         this.host = host;
@@ -100,7 +100,7 @@ public class PlayerCard extends VBox implements Styleable {
             unloadPlayer();
             owner.playMenuSound(R.raw.left);
 
-            Host hp = (Host) Page.getInstance(owner, Host.class);
+            OfflineHost hp = (OfflineHost) Page.getInstance(owner, OfflineHost.class);
             assert hp != null;
             hp.updateCards();
         });
@@ -164,7 +164,7 @@ public class PlayerCard extends VBox implements Styleable {
                         new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN},
                         item);
 
-                View.DragShadowBuilder myShadow = new CardDrag(getOwner(), this);
+                View.DragShadowBuilder myShadow = new OfflineCardDrag(getOwner(), this);
 
                 getOwner().putData("holder", holder);
                 v.startDragAndDrop(dragData,
@@ -216,19 +216,19 @@ public class PlayerCard extends VBox implements Styleable {
                     case DragEvent.ACTION_DROP:
                         try {
                             int otherId = Integer.parseInt(e.getClipData().getItemAt(0).getText().toString());
-                            PlayerCard other = track.get(otherId);
+                            OfflinePlayerCard other = track.get(otherId);
 
                             assert other != null;
                             if(host) {
                                 swap(other);
 
-                                Host hp = (Host) Page.getInstance(getOwner(), Host.class);
+                                OfflineHost hp = (OfflineHost) Page.getInstance(getOwner(), OfflineHost.class);
                                 assert hp != null;
                                 hp.swap(index, other.index);
                             }else {
                                 boundTo.swap(other.boundTo);
 
-                                Host hp = (Host) Page.getInstance(getOwner(), Host.class);
+                                OfflineHost hp = (OfflineHost) Page.getInstance(getOwner(), OfflineHost.class);
                                 assert hp != null;
                                 hp.swap(boundTo.index, other.boundTo.index);
                             }
@@ -263,7 +263,7 @@ public class PlayerCard extends VBox implements Styleable {
         this.holder = holder;
     }
 
-    public void swap(PlayerCard other) {
+    public void swap(OfflinePlayerCard other) {
         if (other == this) return;
         getOwner().playMenuSound(R.raw.swap);
         String otherUsername = other.getUsername();
@@ -297,12 +297,12 @@ public class PlayerCard extends VBox implements Styleable {
         anim.start();
 
         if(boundTo != null) {
-            PlayerCard boundToThis = boundTo;
+            OfflinePlayerCard boundToThis = boundTo;
 
             int boundToThisX = boundToThis.getXInParent();
             int boundToThisY = boundToThis.getYInParent();
 
-            PlayerCard boundToOther = other.boundTo;
+            OfflinePlayerCard boundToOther = other.boundTo;
 
             int boundToOtherX = boundToOther.getXInParent();
             int boundToOtherY = boundToOther.getYInParent();
@@ -369,7 +369,7 @@ public class PlayerCard extends VBox implements Styleable {
         return type;
     }
 
-    public void bind(PlayerCard other) {
+    public void bind(OfflinePlayerCard other) {
         unbind();
         username.bind(other.usernameProperty());
         avatar.bind(other.avatarProperty());

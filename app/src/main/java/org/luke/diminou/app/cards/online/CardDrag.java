@@ -1,4 +1,4 @@
-package org.luke.diminou.app.cards;
+package org.luke.diminou.app.cards.online;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,30 +7,30 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.core.content.res.ResourcesCompat;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.ViewUtils;
-import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 
 public class CardDrag extends View.DragShadowBuilder {
 
     private final App owner;
-    private static int avatar;
+    private static Bitmap avatar;
 
-    public CardDrag(App owner, PlayerCard card) {
-        super(card);
+    public CardDrag(App owner, ImageView iv) {
+        super(iv);
         this.owner = owner;
 
-        avatar = Avatar.valueOf(card.getAvatar()).getRes();
+        iv.buildDrawingCache();
+        avatar = iv.getDrawingCache();
     }
 
-    // Define a callback that sends the drag shadow dimensions and touch point
-// back to the system.
     @Override
     public void onProvideShadowMetrics (Point size, Point touch) {
         int pxsize = ViewUtils.dipToPx(AvatarDisplay.preSize, owner);
@@ -58,7 +58,7 @@ public class CardDrag extends View.DragShadowBuilder {
         canvas.drawRoundRect(offset,offset,size,size, radius, radius, p);
 
         p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-        canvas.drawBitmap(getBitmap(avatar, size), offset, offset, p);
+        canvas.drawBitmap(avatar, offset, offset, p);
 
         p.setStyle(Paint.Style.STROKE);
         p.setColor(owner.getStyle().get().getTextMuted());

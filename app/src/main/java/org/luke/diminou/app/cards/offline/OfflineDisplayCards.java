@@ -1,4 +1,4 @@
-package org.luke.diminou.app.cards;
+package org.luke.diminou.app.cards.offline;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DisplayCards extends HBox {
-    private final PlayerCard[] cards = new PlayerCard[4];
+public class OfflineDisplayCards extends HBox {
+    private final OfflinePlayerCard[] cards = new OfflinePlayerCard[4];
 
-    public DisplayCards(App owner, boolean host) {
+    public OfflineDisplayCards(App owner, boolean host) {
         super(owner);
 
         setClipChildren(false);
@@ -27,7 +27,7 @@ public class DisplayCards extends HBox {
         setClipToOutline(false);
 
         for(int i = 0; i < 4; i++) {
-            cards[i] = new PlayerCard(owner, host, i);
+            cards[i] = new OfflinePlayerCard(owner, host, i);
             cards[i].setHolder(this);
             addView(cards[i]);
             if(i < 3) {
@@ -36,8 +36,8 @@ public class DisplayCards extends HBox {
         }
     }
 
-    public PlayerCard getLast() {
-        for(PlayerCard card : cards) {
+    public OfflinePlayerCard getLast() {
+        for(OfflinePlayerCard card : cards) {
             if(!card.isLoaded()) {
                 return card;
             }
@@ -51,10 +51,10 @@ public class DisplayCards extends HBox {
 
     public void fix() {
         for(int i = 0; i < 4; i++) {
-            PlayerCard card1 = cards[i];
+            OfflinePlayerCard card1 = cards[i];
             if(!card1.isLoaded()) {
                 for(int j = i + 1; j < 4; j++) {
-                    PlayerCard card2 = cards[j];
+                    OfflinePlayerCard card2 = cards[j];
                     if(card2.isLoaded()) {
                         card1.loadPlayer(
                                 card2.getUsername(),
@@ -71,13 +71,13 @@ public class DisplayCards extends HBox {
     }
 
     public void unloadAll() {
-        for(PlayerCard card : cards) {
+        for(OfflinePlayerCard card : cards) {
             card.unloadPlayer();
         }
     }
 
     public void unloadPlayer(SocketConnection connection) {
-        for(PlayerCard card : cards) {
+        for(OfflinePlayerCard card : cards) {
             SocketConnection con = card.getConnection();
             if(con != null &&
                     Objects.equals(
@@ -89,7 +89,7 @@ public class DisplayCards extends HBox {
     }
 
     public boolean unloadExact(SocketConnection connection) {
-        for(PlayerCard card : cards) {
+        for(OfflinePlayerCard card : cards) {
             SocketConnection con = card.getConnection();
             if(con == connection) {
                 card.unloadPlayer();
@@ -102,7 +102,7 @@ public class DisplayCards extends HBox {
 
     public int size() {
         int size = 0;
-        for(PlayerCard card : cards) {
+        for(OfflinePlayerCard card : cards) {
             if(card.isLoaded()) {
                 size++;
             }
@@ -112,7 +112,7 @@ public class DisplayCards extends HBox {
 
     public List<SocketConnection> broadcast() {
         ArrayList<SocketConnection> res = new ArrayList<>();
-        for(PlayerCard card : cards) {
+        for(OfflinePlayerCard card : cards) {
             if(card.isLoaded()) {
                 if(card.getConnection() != null)
                     res.add(card.getConnection());
@@ -123,7 +123,7 @@ public class DisplayCards extends HBox {
         return res;
     }
 
-    public PlayerCard getAt(int i) {
+    public OfflinePlayerCard getAt(int i) {
         return cards[i];
     }
 
@@ -162,9 +162,9 @@ public class DisplayCards extends HBox {
     }
 
     private boolean botNameUsed(String name) {
-        for(PlayerCard card : cards) {
+        for(OfflinePlayerCard card : cards) {
             if(card.isLoaded() &&
-                    card.getType() == PlayerCard.Type.BOT &&
+                    card.getType() == OfflinePlayerCard.Type.BOT &&
                     card.getUsername().equals(name)) {
                 return true;
             }
@@ -172,8 +172,8 @@ public class DisplayCards extends HBox {
         return false;
     }
 
-    public void forEach(ObjectConsumer<PlayerCard> o) {
-        for(PlayerCard card : cards) {
+    public void forEach(ObjectConsumer<OfflinePlayerCard> o) {
+        for(OfflinePlayerCard card : cards) {
             try {
                 o.accept(card);
             } catch (Exception e) {

@@ -30,6 +30,9 @@ public class PrivatePlay extends PlayIcon {
         ic3.setSize(PlayIcon.SIZE / 3 - 15);
         ViewUtils.setPadding(ic3, 4, 4, 4, 4, owner);
 
+        pieces.add(ic1);
+        pieces.add(ic2);
+
         lab = new ColoredLabel(owner, "Private", Style::getTextNormal);
         lab.setLineSpacing(4);
         lab.setFont(new Font(17));

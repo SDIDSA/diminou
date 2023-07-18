@@ -15,7 +15,6 @@ import org.luke.diminou.abs.components.controls.input.MinimalInputField;
 import org.luke.diminou.abs.components.controls.scratches.Loading;
 import org.luke.diminou.abs.components.controls.text.ColoredLabel;
 import org.luke.diminou.abs.components.controls.text.font.Font;
-import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
@@ -31,7 +30,6 @@ import java.util.stream.IntStream;
 public class Friends extends HomeFragment implements Styleable {
     private final int MIN_SEARCH = 2;
     private final MinimalInputField search;
-    private final ColoredIcon requests;
 
     private final VBox display;
     private final ColoredLabel hint;
@@ -44,31 +42,16 @@ public class Friends extends HomeFragment implements Styleable {
     public Friends(App owner) {
         super(owner);
 
-        HBox top = new HBox(owner);
-        top.setGravity(Gravity.CENTER_VERTICAL);
-
         setClipChildren(false);
 
         search = new MinimalInputField(owner, "Search by username...");
         search.setRadius(15);
-        LayoutParams lp = new LayoutParams(-2, ViewUtils.dipToPx(50, owner));
-        lp.weight = 1;
-        search.setLayoutParams(lp);
+        search.setLayoutParams(new LayoutParams(-1, ViewUtils.dipToPx(50, owner)));
 
         ColoredIcon sicon = new ColoredIcon(owner, Style::getTextNormal, R.drawable.search);
-        ViewUtils.setPaddingUnified(sicon, 13, owner);
+        sicon.setSize(50);
+        ViewUtils.setPaddingUnified(sicon, 14, owner);
         search.addPostInput(sicon);
-
-        requests = new ColoredIcon(owner, Style::getTextNormal, R.drawable.friend_request);
-        requests.setSize(50);
-        requests.setCornerRadius(15);
-        ViewUtils.setPaddingUnified(requests, 15, owner);
-        ViewUtils.setMarginRight(search, owner, 10);
-
-        requests.setOnClick(() -> owner.loadPage(FriendRequests.class));
-
-        top.addView(search);
-        top.addView(requests);
 
         hint = new ColoredLabel(owner, "", Style::getTextMuted);
         hint.setLineSpacing(6);
@@ -100,7 +83,7 @@ public class Friends extends HomeFragment implements Styleable {
         setClipChildren(true);
         dScroll.addView(display);
 
-        addView(top);
+        addView(search);
         addView(dScroll);
 
         search.valueProperty().addListener((obs, ov, nv) -> {
@@ -134,7 +117,7 @@ public class Friends extends HomeFragment implements Styleable {
                     View[] views = IntStream.range(0,matches.length()).mapToObj(i-> {
                         try {
                             int id = matches.getInt(i);
-                            return UserDisplay.get(getOwner(), id);
+                            return idToDisp(id);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
@@ -158,7 +141,7 @@ public class Friends extends HomeFragment implements Styleable {
                 List<View> friendViews = IntStream.range(0,friends.length()).mapToObj(i-> {
                     try {
                         int id = friends.getInt(i);
-                        return UserDisplay.get(getOwner(), id);
+                        return idToDisp(id);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -172,7 +155,7 @@ public class Friends extends HomeFragment implements Styleable {
                     List<View> reqViews = IntStream.range(0,requests.length()).mapToObj(i-> {
                         try {
                             int id = requests.getInt(i);
-                            return UserDisplay.get(getOwner(), id);
+                            return idToDisp(id);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
@@ -183,6 +166,12 @@ public class Friends extends HomeFragment implements Styleable {
                 display(toDisplay.toArray(new View[0]));
             });
         });
+    }
+
+    private UserDisplay idToDisp(int uid) {
+        UserDisplay disp = UserDisplay.get(getOwner(), uid);
+        disp.setOnClickListener(null);
+        return disp;
     }
 
     private void displayLoading() {
@@ -218,8 +207,6 @@ public class Friends extends HomeFragment implements Styleable {
 
         search.setBackground(style.getBackgroundPrimary());
         search.setBorderColor(Color.TRANSPARENT);
-
-        requests.setBackgroundColor(style.getBackgroundPrimary());
 
         loading.setFill(style.getTextMuted());
     }

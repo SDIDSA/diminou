@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -388,7 +387,7 @@ public class App extends AppCompatActivity {
         loadedOverlay.add(0, overlay);
     }
 
-    public void toast(View... views) {
+    public void toast(long duration, View... views) {
         VBox toast = new VBox(this);
         toast.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
 
@@ -445,7 +444,7 @@ public class App extends AppCompatActivity {
                     .setInterpolator(Interpolator.EASE_IN)
                     .setOnFinished(() -> root.removeView(toast))
                     .start();
-        }, 2000);
+        }, duration);
 
         old = toast;
     }
@@ -459,7 +458,7 @@ public class App extends AppCompatActivity {
         for(int i = 0; i < params.length; i++) {
             lab.addParam(i, params[i]);
         }
-        toast(lab);
+        toast(2000, lab);
     }
 
     public Insets getSystemInsets() {
@@ -657,5 +656,13 @@ public class App extends AppCompatActivity {
 
     public boolean isOnline() {
         return getTypedData("online");
+    }
+
+    public void putRoomId(String roomId) {
+        putData("room_id", roomId);
+    }
+
+    public String getRoomId() {
+        return getString("room_id");
     }
 }

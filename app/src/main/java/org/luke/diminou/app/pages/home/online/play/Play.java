@@ -10,6 +10,7 @@ import org.luke.diminou.app.pages.home.online.play.playIcons.FourPlayers;
 import org.luke.diminou.app.pages.home.online.play.playIcons.OneVOne;
 import org.luke.diminou.app.pages.home.online.play.playIcons.PlayIcon;
 import org.luke.diminou.app.pages.home.online.play.playIcons.PrivatePlay;
+import org.luke.diminou.app.pages.host.online.Host;
 
 public class Play extends HomeFragment {
     public Play(App owner) {
@@ -28,6 +29,8 @@ public class Play extends HomeFragment {
 
         addView(row1);
 
-        addView(new PrivatePlay(owner));
+        PrivatePlay priv = new PrivatePlay(owner);
+        priv.setOnClickListener(v -> owner.loadPage(Host.class));
+        addView(priv);
     }
 }

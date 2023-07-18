@@ -1,5 +1,7 @@
 package org.luke.diminou.abs.api;
 
+import android.util.Log;
+
 import org.json.JSONObject;
 import org.luke.diminou.abs.api.json.Param;
 import org.luke.diminou.abs.api.multipart.FilePart;
@@ -16,7 +18,9 @@ public class Session {
 	}
 
 	private static void call(String path, String action, ObjectConsumer<JSONObject> onResult, Param... params) {
-		API.asyncJsonPost(path, action, onResult, SessionManager.getSession(), params);
+		String session = SessionManager.getSession();
+		Log.i("session", session);
+		API.asyncJsonPost(path, action, onResult, session, params);
 	}
 
 	private static void callMulti(String path, String action, ObjectConsumer<JSONObject> onResult, Part... parts) {
@@ -75,5 +79,15 @@ public class Session {
 	public static void acceptRequest(int otherId, ObjectConsumer<JSONObject> onResult) {
 		call(API.Session.ACCEPT_REQUEST, "accept friend request", onResult,
 				new Param("user_id", otherId));
+	}
+
+	public static void createGame(ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.CREATE_GAME, "create game", onResult);
+	}
+
+	public static void invite(int who, String roomId,ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.INVITE, "invite player", onResult,
+				new Param("who", who),
+				new Param("room_id", roomId));
 	}
 }

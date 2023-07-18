@@ -25,6 +25,7 @@ public class SessionManager {
                 JsonUtils.make("socket", socket.id(), "token", token, "user_id", uid));
 
         System.out.println("listening for reconnect...");
+        socket.io().off("reconnect");
         socket.io().on("reconnect", data -> new Thread(() -> {
             Platform.waitWhile(() -> socket.id() == null);
             System.out.println("reconnecting");

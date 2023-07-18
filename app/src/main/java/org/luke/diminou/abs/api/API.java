@@ -113,9 +113,13 @@ public class API {
 
         public static final String GET_FOR_USERNAME = PREFIX + "getForUsername";
 
+        //PROFILE SETTINGS
+
         public static final String CHANGE_AVATAR = PREFIX + "changeAvatar";
 
         public static final String CHANGE_USERNAME = PREFIX + "changeUsername";
+
+        //FRIEND MANAGEMENT
 
         public static final String GET_FRIENDS = PREFIX + "getFriends";
 
@@ -126,6 +130,12 @@ public class API {
         public static final String ACCEPT_REQUEST = PREFIX + "acceptRequest";
 
         public static final String GET_REQUESTS = PREFIX + "getRequests";
+
+        //GAME
+
+        public static final String CREATE_GAME = PREFIX + "createGame";
+
+        public static final String INVITE = PREFIX + "invite";
 
         private Session() {
 

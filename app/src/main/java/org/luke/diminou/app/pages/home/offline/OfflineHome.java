@@ -34,7 +34,7 @@ import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.avatar.AvatarSelect;
 import org.luke.diminou.app.pages.game.piece.Piece;
-import org.luke.diminou.app.pages.host.offline.Host;
+import org.luke.diminou.app.pages.host.offline.OfflineHost;
 import org.luke.diminou.app.pages.join.Join;
 import org.luke.diminou.app.pages.settings.Settings;
 import org.luke.diminou.data.property.Property;
@@ -117,7 +117,7 @@ public class OfflineHome extends Page {
         ConfirmExit confirmExit = new ConfirmExit(owner);
 
         join.setOnClick(() -> owner.loadPage(Join.class));
-        host.setOnClick(() -> owner.loadPage(Host.class));
+        host.setOnClick(() -> owner.loadPage(OfflineHost.class));
         settings.setOnClick(() -> owner.loadPage(Settings.class));
         exit.setOnClick(confirmExit::show);
 

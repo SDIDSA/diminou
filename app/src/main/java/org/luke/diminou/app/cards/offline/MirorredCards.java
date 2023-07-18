@@ -1,4 +1,4 @@
-package org.luke.diminou.app.cards;
+package org.luke.diminou.app.cards.offline;
 
 import android.view.Gravity;
 
@@ -9,7 +9,7 @@ import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.utils.ViewUtils;
 
 public class MirorredCards extends VBox {
-    private final PlayerCard[] cards = new PlayerCard[4];
+    private final OfflinePlayerCard[] cards = new OfflinePlayerCard[4];
 
     public MirorredCards(App owner) {
         super(owner);
@@ -28,7 +28,7 @@ public class MirorredCards extends VBox {
         int[] order = new int[] {0,1,3,2};
         for(int i = 0; i < 4; i++) {
             int oi = order[i];
-            cards[oi] = new PlayerCard(owner, false, oi);
+            cards[oi] = new OfflinePlayerCard(owner, false, oi);
             cards[oi].setHolder(this);
             switch (i) {
                 case 0, 3 -> addView(cards[oi]);
@@ -44,14 +44,14 @@ public class MirorredCards extends VBox {
         }
     }
 
-    public void bind(DisplayCards other) {
+    public void bind(OfflineDisplayCards other) {
         for(int i = 0; i < 4; i++) {
             cards[i].bind(other.getAt(i));
         }
     }
 
     public void unbind() {
-        for(PlayerCard card : cards) {
+        for(OfflinePlayerCard card : cards) {
             card.unbind();
         }
     }

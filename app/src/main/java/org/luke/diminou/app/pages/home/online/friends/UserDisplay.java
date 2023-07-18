@@ -2,12 +2,11 @@ package org.luke.diminou.app.pages.home.online.friends;
 
 import android.util.Log;
 import android.view.Gravity;
+import android.view.ViewGroup;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.api.Session;
-import org.luke.diminou.abs.components.controls.image.Image;
-import org.luke.diminou.abs.components.controls.image.ImageProxy;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.ColoredLabel;
 import org.luke.diminou.abs.components.controls.text.font.Font;
@@ -16,6 +15,7 @@ import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
@@ -37,11 +37,14 @@ public class UserDisplay extends StackPane implements Styleable {
         }else {
             Log.i("found in cache", String.valueOf(userId));
         }
+        if(found.getParent() != null) {
+            ((ViewGroup) found.getParent()).removeView(found);
+        }
         return found;
     }
 
     private final HBox root;
-    private final Image img;
+    private final AvatarDisplay img;
     private UserDisplay(App owner, int userId) {
         super(owner);
         setCornerRadius(12);
@@ -52,9 +55,7 @@ public class UserDisplay extends StackPane implements Styleable {
         root.setPadding(10);
         ViewUtils.setMarginBottom(root, owner, 4);
 
-        img = new Image(owner);
-        img.setCornerRadius(7);
-        img.setSize(48);
+        img = new AvatarDisplay(owner, 48);
 
         ViewUtils.setMarginRight(img, owner, 15);
 
@@ -78,7 +79,7 @@ public class UserDisplay extends StackPane implements Styleable {
             user.usernameProperty().addListener((obs, ov, nv) ->
                     name.setText(nv));
             user.avatarProperty().addListener((obs, ov, nv) ->
-                    ImageProxy.getImage(nv, img::setImageBitmap));
+                    img.setUrl(nv));
             user.friendProperty().addListener((obs, ov, nv) -> {
                 root.removeView(decline);
                 root.removeView(accept);
@@ -134,7 +135,6 @@ public class UserDisplay extends StackPane implements Styleable {
         root.setBackground(style.getBackgroundTertiary());
         root.setBorderColor(style.getTextMuted());
         setBackground(style.getTextMuted());
-        img.setBackgroundColor(style.getTextMuted());
     }
 
     @Override

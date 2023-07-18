@@ -1,6 +1,8 @@
 package org.luke.diminou.app.avatar;
 
 import android.graphics.drawable.GradientDrawable;
+
+import org.luke.diminou.abs.components.controls.image.ImageProxy;
 import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
@@ -21,11 +23,11 @@ public class AvatarDisplay extends StackPane implements Styleable {
 
     public static final int preSize = 64;
 
-    public AvatarDisplay(App owner) {
+    public AvatarDisplay(App owner, float sizeDp) {
         super(owner);
         this.owner = owner;
 
-        int size = ViewUtils.dipToPx(preSize, owner);
+        int size = ViewUtils.dipToPx(sizeDp, owner);
         setLayoutParams(new LinearLayout.LayoutParams(size, size));
 
         background = new GradientDrawable();
@@ -38,12 +40,20 @@ public class AvatarDisplay extends StackPane implements Styleable {
         setForeground(foreground);
 
         img = new Image(owner);
-        img.setSize(preSize);
+        img.setSize(sizeDp);
         img.setCornerRadius(7);
 
         addView(img);
 
         applyStyle(owner.getStyle());
+    }
+
+    public AvatarDisplay(App owner) {
+        this(owner, preSize);
+    }
+
+    public Image getImg() {
+        return img;
     }
 
     public void setOnClick(Runnable onClick) {
@@ -52,6 +62,10 @@ public class AvatarDisplay extends StackPane implements Styleable {
 
     public void setValue(Avatar value) {
         img.setImageResource(value.getRes());
+    }
+
+    public void setUrl(String url) {
+        ImageProxy.getImage(url, img::setImageBitmap);
     }
 
     public void setValue(String val) {

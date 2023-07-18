@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ImageProxy {
     private static final LruCache<String, Bitmap> memoryCache = new LruCache<>((int) (Runtime.getRuntime().maxMemory() / 1024) / 8) {
@@ -47,27 +48,32 @@ public class ImageProxy {
     }
 
     public static void getImage(String url, ObjectConsumer<Bitmap> onResult) {
-        new Thread(() -> {
-            String key = makeKey(url);
-            Bitmap found = get(key);
-            if (found == null) {
+        String key = makeKey(url);
+        AtomicReference<Bitmap> found = new AtomicReference<>(get(key));
+        if (found.get() == null) {
+            new Thread(() -> {
                 try {
-                    found = download(url);
-                    put(key, found);
+                    found.set(download(url));
+                    put(key, found.get());
                 } catch (Exception x) {
                     ErrorHandler.handle(x, "downloading image at " + url);
                 }
+                Bitmap finalFound = found.get();
+                Platform.runLater(() -> {
+                    try {
+                        onResult.accept(finalFound);
+                    } catch (Exception e) {
+                        ErrorHandler.handle(e, "downloading image at " + url);
+                    }
+                });
+            }).start();
+        }else {
+            try {
+                onResult.accept(found.get());
+            } catch (Exception e) {
+                ErrorHandler.handle(e, "downloading image at " + url);
             }
-            Bitmap finalFound = found;
-            Platform.runLater(() -> {
-                try {
-                    onResult.accept(finalFound);
-                } catch (Exception e) {
-                    ErrorHandler.handle(e, "downloading image at " + url);
-                }
-            });
-
-        }).start();
+        }
     }
     public static void getThumbnail(App owner, Uri uri, int size, ObjectConsumer<Bitmap> onResult, Runnable onFail) {
         new Thread(() -> {

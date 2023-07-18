@@ -24,9 +24,9 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.app.avatar.Avatar;
-import org.luke.diminou.app.cards.DisplayCards;
-import org.luke.diminou.app.cards.MirorredCards;
-import org.luke.diminou.app.cards.PlayerCard;
+import org.luke.diminou.app.cards.offline.OfflineDisplayCards;
+import org.luke.diminou.app.cards.offline.MirorredCards;
+import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
 import org.luke.diminou.app.pages.game.player.Player;
@@ -37,23 +37,23 @@ import org.luke.diminou.app.pages.settings.FourMode;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Host extends Titled {
-    private final DisplayCards cards;
+public class OfflineHost extends Titled {
+    private final OfflineDisplayCards cards;
     private final MirorredCards mirorredCards;
 
     private final Button start;
 
     private final Animation showStart, hideStart;
 
-    public Host(App owner) {
+    public OfflineHost(App owner) {
         super(owner, "create_party");
 
-        cards = new DisplayCards(owner, true);
+        cards = new OfflineDisplayCards(owner, true);
 
         cards.forEach(card -> card.setOnClickListener(e -> {
             if(!card.isLoaded()) {
                 owner.playMenuSound(R.raw.joined);
-                card.loadPlayer(cards.botName(), Avatar.randomBot().name(), PlayerCard.Type.BOT);
+                card.loadPlayer(cards.botName(), Avatar.randomBot().name(), OfflinePlayerCard.Type.BOT);
                 updateCards();
             }
         }));
@@ -73,7 +73,7 @@ public class Host extends Titled {
                 if(pc.isLoaded())
                     players.add(
                             new Player(
-                                    pc.getType() == PlayerCard.Type.BOT ?
+                                    pc.getType() == OfflinePlayerCard.Type.BOT ?
                                             PlayerType.BOT : PlayerType.PLAYER,
                                     pc.getUsername(),
                                     pc.getAvatar(),
@@ -158,7 +158,7 @@ public class Host extends Titled {
         start.setScaleX(.7f);
         start.setScaleY(.7f);
 
-        loadPlayer(Store.getUsername(), Store.getAvatar(), PlayerCard.Type.SELF);
+        loadPlayer(Store.getUsername(), Store.getAvatar(), OfflinePlayerCard.Type.SELF);
 
         LocalHost.host();
 
@@ -207,14 +207,14 @@ public class Host extends Titled {
         Platform.runAfter(this::updateCards, 100);
     }
 
-    private synchronized void loadPlayer(String username, String avatar, SocketConnection connection, PlayerCard.Type type) {
+    private synchronized void loadPlayer(String username, String avatar, SocketConnection connection, OfflinePlayerCard.Type type) {
         if(isPresent(connection)) {
             connection.emit("already_in", "");
             updateCards();
             return;
         }
 
-        PlayerCard card = cards.getLast();
+        OfflinePlayerCard card = cards.getLast();
 
         if(card == null) {
             connection.emit("full", "");
@@ -230,10 +230,10 @@ public class Host extends Titled {
     }
 
     public void loadPlayer(String name, String avatar, SocketConnection connection) {
-        loadPlayer(name, avatar, connection, PlayerCard.Type.PLAYER);
+        loadPlayer(name, avatar, connection, OfflinePlayerCard.Type.PLAYER);
     }
 
-    public void loadPlayer(String name, String avatar, PlayerCard.Type type) {
+    public void loadPlayer(String name, String avatar, OfflinePlayerCard.Type type) {
         loadPlayer(name, avatar, null, type);
     }
 

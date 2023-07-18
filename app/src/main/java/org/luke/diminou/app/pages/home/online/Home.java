@@ -1,5 +1,6 @@
 package org.luke.diminou.app.pages.home.online;
 
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
@@ -29,10 +30,10 @@ import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Home extends Page {
-    private final VBox root;
     private final Top top;
     private final Bottom bottom;
     private final FragmentPane content;
@@ -55,7 +56,7 @@ public class Home extends Page {
         bottom = new Bottom(owner, content);
         bottom.setZ(5);
 
-        root = new VBox(owner);
+        VBox root = new VBox(owner);
         root.setClipChildren(false);
 
         root.addView(top);
@@ -150,6 +151,13 @@ public class Home extends Page {
             Friends instance = (Friends) HomeFragment.getInstance(owner, Friends.class);
             if(instance != null)
                 instance.displayFriends();
+        });
+
+        addSocketEventHandler("invite", data -> {
+            int from = data.getInt("from");
+            String roomId = data.getString("room");
+
+            owner.toast(from + " invited you to " + roomId);
         });
     }
 

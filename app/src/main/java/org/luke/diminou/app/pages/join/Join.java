@@ -30,8 +30,8 @@ import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.Avatar;
-import org.luke.diminou.app.cards.DisplayCards;
-import org.luke.diminou.app.cards.PlayerCard;
+import org.luke.diminou.app.cards.offline.OfflineDisplayCards;
+import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
 import org.luke.diminou.app.pages.game.player.Player;
@@ -58,7 +58,7 @@ public class Join extends Titled {
 
     private final Loading loading;
 
-    private final DisplayCards cards;
+    private final OfflineDisplayCards cards;
 
     private volatile static boolean destroyed = false;
 
@@ -125,7 +125,7 @@ public class Join extends Titled {
                         ViewUtils.dipToPx(36, owner)));
         getPreTitle().addView(leave);
 
-        cards = new DisplayCards(owner, false);
+        cards = new OfflineDisplayCards(owner, false);
         ViewUtils.setPadding(cards,0, 30, 0, 0, owner);
         content.addView(cards);
 
@@ -386,7 +386,7 @@ public class Join extends Titled {
                                                 cards.getAt(order).loadPlayer(
                                                         po.getString("username"),
                                                         po.getString("avatar"),
-                                                        PlayerCard.Type.DISPLAY);
+                                                        OfflinePlayerCard.Type.DISPLAY);
                                                 count++;
                                             }
                                         }

@@ -16,7 +16,6 @@ import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.api.Session;
 import org.luke.diminou.abs.components.controls.button.SecondaryButton;
 import org.luke.diminou.abs.components.controls.image.ColoredIcon;
-import org.luke.diminou.abs.components.controls.image.Image;
 import org.luke.diminou.abs.components.controls.image.ImageProxy;
 import org.luke.diminou.abs.components.controls.input.InputField;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
@@ -27,6 +26,7 @@ import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.pages.settings.Settings;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
@@ -38,7 +38,7 @@ public class Top extends VBox implements Styleable {
 
     private final ColoredLabel username;
 
-    private final Image pfp;
+    private final AvatarDisplay pfp;
     private final Coins coins;
 
     private final Animation showEditUn, hideEditUn;
@@ -67,9 +67,7 @@ public class Top extends VBox implements Styleable {
         HBox top = new HomePanel(owner);
 
 
-        pfp = new Image(owner);
-        pfp.setSize(64);
-        pfp.setCornerRadius(7);
+        pfp = new AvatarDisplay(owner, 64);
 
         ViewUtils.setMarginRight(pfp, owner, 10);
 
@@ -133,7 +131,7 @@ public class Top extends VBox implements Styleable {
 
         AvatarViewChange avatarViewChange = new AvatarViewChange(owner,
                 () -> new AvatarOverlay(owner,
-                        ((BitmapDrawable)pfp.getDrawable()).getBitmap()).show(),
+                        ((BitmapDrawable)pfp.getImg().getDrawable()).getBitmap()).show(),
                 () -> owner.pickImage(media -> {
                     File f = ImageProxy.mediaToFile(owner, media);
                     Session.changeAvatar(f, res -> {
@@ -180,7 +178,7 @@ public class Top extends VBox implements Styleable {
 
     public void setup(User user) {
         user.avatarProperty().addListener((obs, ov, nv) ->
-                ImageProxy.getImage(nv, pfp::setImageBitmap));
+                pfp.setUrl(nv));
 
         user.usernameProperty().addListener((obs, ov, nv) -> username.setText(nv));
 
@@ -189,7 +187,6 @@ public class Top extends VBox implements Styleable {
 
     @Override
     public void applyStyle(Style style) {
-        pfp.setBackgroundColor(style.getBackgroundTertiary());
         newUn.setBackgroundColor(style.getBackgroundTertiary());
         newUn.setBorderColor(Color.TRANSPARENT);
     }

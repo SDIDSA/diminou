@@ -136,6 +136,10 @@ public class User extends Bean {
         friend.set(val);
     }
 
+    public boolean isSelf() {
+        return friend.get().equals("self");
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + " {"

@@ -29,6 +29,9 @@ public class BasicPlayIcon extends PlayIcon {
         ic3.setSize(PlayIcon.SIZE / 3 - 12);
         ViewUtils.setPadding(ic3, 4, 4, 4, 4, owner);
 
+        pieces.add(ic1);
+        pieces.add(ic2);
+
         lab = new ColoredLabel(owner, text, Style::getTextNormal);
         lab.setLineSpacing(4);
         lab.setFont(new Font(18));
