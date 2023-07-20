@@ -46,7 +46,7 @@ public class MultipleOptionOverlay extends PartialSlideOverlay {
         applyStyle(owner.getStyle());
     }
 
-    public void addButton(String text, Runnable onClick) {
+    public MultipleOptionOverlay addButton(String text, Runnable onClick) {
         Button button = new Button(owner, text);
         button.setTransformationMethod(new Capitalize());
         root.addView(button);
@@ -54,6 +54,23 @@ public class MultipleOptionOverlay extends PartialSlideOverlay {
         button.setOnClick(onClick);
 
         applyStyle(owner.getStyle());
+        return this;
+    }
+
+    protected void startLoading(String option) {
+        for(Button b : buttons) {
+            if(b.getKey().equals(option)) {
+                b.startLoading();
+            }
+        }
+    }
+
+    protected void stopLoading(String option) {
+        for(Button b : buttons) {
+            if(b.getKey().equals(option)) {
+                b.stopLoading();
+            }
+        }
     }
 
     @Override

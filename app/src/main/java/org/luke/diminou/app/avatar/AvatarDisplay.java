@@ -1,6 +1,8 @@
 package org.luke.diminou.app.avatar;
 
 import android.graphics.drawable.GradientDrawable;
+
+import org.luke.diminou.abs.components.controls.image.ImageProxy;
 import org.luke.diminou.abs.components.layout.StackPane;
 import android.widget.LinearLayout;
 
@@ -10,6 +12,8 @@ import org.luke.diminou.abs.components.controls.image.Image;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.data.beans.User;
+import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.property.Property;
 
 public class AvatarDisplay extends StackPane implements Styleable {
@@ -21,11 +25,15 @@ public class AvatarDisplay extends StackPane implements Styleable {
 
     public static final int preSize = 64;
 
-    public AvatarDisplay(App owner) {
+    private final ChangeListener<String> onUrl;
+
+    private User old;
+
+    public AvatarDisplay(App owner, float sizeDp) {
         super(owner);
         this.owner = owner;
 
-        int size = ViewUtils.dipToPx(preSize, owner);
+        int size = ViewUtils.dipToPx(sizeDp, owner);
         setLayoutParams(new LinearLayout.LayoutParams(size, size));
 
         background = new GradientDrawable();
@@ -38,12 +46,22 @@ public class AvatarDisplay extends StackPane implements Styleable {
         setForeground(foreground);
 
         img = new Image(owner);
-        img.setSize(preSize);
+        img.setSize(sizeDp);
         img.setCornerRadius(7);
+
+        onUrl = (obs, ov, nv) -> ImageProxy.getImage(nv, img::setImageBitmap);
 
         addView(img);
 
         applyStyle(owner.getStyle());
+    }
+
+    public AvatarDisplay(App owner) {
+        this(owner, preSize);
+    }
+
+    public Image getImg() {
+        return img;
     }
 
     public void setOnClick(Runnable onClick) {
@@ -52,6 +70,14 @@ public class AvatarDisplay extends StackPane implements Styleable {
 
     public void setValue(Avatar value) {
         img.setImageResource(value.getRes());
+    }
+    public void setUser(User user) {
+        if(old != null) {
+            old.avatarProperty().removeListener(onUrl);
+        }
+
+        old = user;
+        user.avatarProperty().addListener(onUrl);
     }
 
     public void setValue(String val) {

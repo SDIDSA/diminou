@@ -10,19 +10,21 @@ import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.Logs;
 import org.luke.diminou.app.pages.Titled;
-import org.luke.diminou.app.pages.home.Home;
+import org.luke.diminou.app.pages.home.offline.OfflineHome;
+import org.luke.diminou.app.pages.home.online.Home;
 
 import java.util.ArrayList;
 
 public class Settings extends Titled {
     private final ArrayList<SettingsGroup> groups;
 
+    private final SettingsGroup game;
     public Settings(App owner) {
         super(owner, "settings");
 
         groups = new ArrayList<>();
 
-        SettingsGroup game = new SettingsGroup(owner, "game_settings");
+        game = new SettingsGroup(owner, "game_settings");
         SettingsGroup display = new SettingsGroup(owner, "display_settings");
         SettingsGroup sound = new SettingsGroup(owner, "sound_settings");
 
@@ -62,7 +64,6 @@ public class Settings extends Titled {
         sound.addSetting(new Setting(owner, "other_sounds", Store::getMenuSounds,
                 v -> Store.setMenuSounds(v, null), false, "on", "off"));
 
-        addGroup(game);
         addGroup(display);
         addGroup(sound);
 
@@ -77,6 +78,11 @@ public class Settings extends Titled {
         groups.add(group);
     }
 
+    private void removeGroup(SettingsGroup group) {
+        content.removeView(group);
+        groups.remove(group);
+    }
+
     private SettingsGroup getForKey(String key) {
         for(SettingsGroup group : groups) {
             if(group.getKey().equals(key)) return group;
@@ -88,6 +94,10 @@ public class Settings extends Titled {
     @Override
     public void setup() {
         super.setup();
+        removeGroup(game);
+        if(!owner.isOnline()) {
+            addGroup(game);
+        }
         SettingsGroup open = getForKey((String) owner.getData("open_cat"));
         if(open != null) Platform.runBack(() -> {
             while(!open.isLaidOut()) {
@@ -103,7 +113,7 @@ public class Settings extends Titled {
         SettingsGroup open = SettingsGroup.openGroup;
         if(SettingsGroup.openGroup != null)
             SettingsGroup.openGroup.close();
-        owner.loadPage(Home.class);
+        owner.loadPage(owner.isOnline() ? Home.class : OfflineHome.class);
         if(open != null)
             owner.putData("open_cat", open.getKey());
         return true;

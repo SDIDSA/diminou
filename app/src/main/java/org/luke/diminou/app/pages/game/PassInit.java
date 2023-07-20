@@ -46,7 +46,7 @@ public class PassInit extends VBox implements Styleable {
         addView(passInitButtons);
 
         setAlpha(0);
-        setTranslationY(ViewUtils.dipToPx(40, owner));
+        setTranslationY(ViewUtils.by(owner));
         setScaleX(.5f);
         setScaleY(.5f);
 

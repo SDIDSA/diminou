@@ -12,8 +12,7 @@ public class ErrorHandler {
         throwable.printStackTrace(pw);
         String trace = throwable.getClass().getSimpleName() + " happend in thread [" + Thread.currentThread().getName() + "] while " + action + "\n" + sw;
         Log.e(throwable.getClass().getSimpleName(), trace);
-
-        Store.setLogs(Store.getLogs() + "\n----------------\n" + trace, null);
+        Store.setLogs(trace, null);
     }
 
     public static void log() {

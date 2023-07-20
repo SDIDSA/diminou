@@ -22,6 +22,10 @@ public class ViewUtils {
         setPadding(view, padding, padding, padding, padding, context);
     }
 
+    public static int by(Context owner) {
+        return dipToPx(40, owner);
+    }
+
     public static void setPadding(View view, float left, float top, float right, float bottom, Context context) {
         int dil = dipToPx(left, context);
         int dit = dipToPx(top, context);
@@ -74,6 +78,10 @@ public class ViewUtils {
         setMargin(view, context, 0, val, 0, 0);
     }
 
+    public static void setMarginTop(View view, int val) {
+        setMargin(view, 0, val, 0, 0);
+    }
+
     public static void setMarginRight(View view, Context context, float val) {
         setMargin(view, context, 0, 0, val, 0);
     }
@@ -88,6 +96,10 @@ public class ViewUtils {
 
     public static void setMarginBottom(View view, Context context, float val) {
         setMargin(view, context, 0, 0, 0, val);
+    }
+
+    public static void setMarginBottom(View view, int val) {
+        setMargin(view, 0, 0, 0, val);
     }
 
     public static void setMargin(View view, Context context, float left, float top, float right, float bottom) {
@@ -107,6 +119,31 @@ public class ViewUtils {
 
                 marginLayoutParams.setMarginStart(dipToPx(left, context));
                 marginLayoutParams.setMarginEnd(dipToPx(right, context));
+
+                view.setLayoutParams(marginLayoutParams);
+            }
+        }catch(Exception x) {
+            ErrorHandler.handle(x, "setting margin");
+        }
+    }
+
+    public static void setMargin(View view, int left, int top, int right, int bottom) {
+        try {
+            ViewGroup.LayoutParams old = view.getLayoutParams();
+            if (old instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams marginLayoutParams = duplicateLinearLayoutParams((LinearLayout.LayoutParams) old);
+                marginLayoutParams.setMargins(left, top, right, bottom);
+
+                marginLayoutParams.setMarginStart(left);
+                marginLayoutParams.setMarginEnd(left);
+
+                view.setLayoutParams(marginLayoutParams);
+            } else {
+                ViewGroup.MarginLayoutParams marginLayoutParams = duplicateViewGroupParams(old);
+                marginLayoutParams.setMargins(left, top, right, bottom);
+
+                marginLayoutParams.setMarginStart(left);
+                marginLayoutParams.setMarginEnd(left);
 
                 view.setLayoutParams(marginLayoutParams);
             }

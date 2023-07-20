@@ -35,7 +35,7 @@ public abstract class SlideOverlay extends Overlay implements Styleable {
 
         addView(list);
 
-        list.setElevation(ViewUtils.dipToPx(40, owner));
+        list.setElevation(ViewUtils.by(owner));
 
         addToShow(new TranslateYAnimation(list, 0)
                 .setLateFrom(() -> (float) (list.getHeight() / 2)));

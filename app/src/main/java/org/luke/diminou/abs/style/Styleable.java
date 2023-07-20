@@ -45,11 +45,6 @@ public interface Styleable {
             public void changed(Observable<? extends Style> obs, Style ov, Style nv) {
                 if (weakNode.get() != null) {
                     if (nv != ov) {
-                        if(Thread.currentThread() != Looper.getMainLooper().getThread()
-                                && node instanceof View v
-                                && v.isAttachedToWindow()) {
-                            ErrorHandler.log();
-                        }
                         weakNode.get().applyStyle(nv);
                     }
                 } else {

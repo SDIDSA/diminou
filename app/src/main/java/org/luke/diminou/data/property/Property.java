@@ -61,7 +61,7 @@ public class Property<T> implements Observable<T> {
 
     @Override
     public void addListener(ChangeListener<? super T> listener) {
-        listener.changed(this, null, value);
+        listener.changed(this, value, value);
         listeners.add(listener);
     }
 

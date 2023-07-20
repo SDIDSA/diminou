@@ -76,6 +76,7 @@ public abstract class Overlay extends StackPane {
 
     public void show() {
         if(shown) return;
+        owner.hideKeyboard();
         shown = true;
         hide.stop();
         show.stop();

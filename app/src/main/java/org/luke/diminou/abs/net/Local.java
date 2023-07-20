@@ -2,6 +2,7 @@ package org.luke.diminou.abs.net;
 
 import android.os.Build;
 
+import org.luke.diminou.abs.api.API;
 import org.luke.diminou.abs.utils.ErrorHandler;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class Local {
     public static ArrayList<String> getMyIp() {
         ArrayList<String> res = new ArrayList<>();
         if(Build.PRODUCT.toLowerCase().contains("sdk"))
-            res.add("192.168.22.161");
+            res.add(API.BASE);
         try {
             Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface
                     .getNetworkInterfaces();

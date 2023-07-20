@@ -21,7 +21,7 @@ public class Separator extends View {
         setAlpha(.4f);
 
         this.orientation = orientation;
-        this.margin = margin;
+            this.margin = margin;
         apply();
     }
 

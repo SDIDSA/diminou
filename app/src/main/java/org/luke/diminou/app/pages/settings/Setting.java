@@ -11,6 +11,7 @@ import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.controls.text.transformationMethods.Capitalize;
+import org.luke.diminou.abs.components.layout.fragment.Fragment;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
@@ -69,6 +70,7 @@ public class Setting extends Button implements Styleable {
             }
             value.setKey(v);
             Page.clearCache();
+            Fragment.clearCache();
             if(reset)
                 resetOverlay(() -> owner.loadPage(Settings.class, () -> overlay.show()));
         }, options);
