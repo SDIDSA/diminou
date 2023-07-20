@@ -1,12 +1,8 @@
 package org.luke.diminou.abs.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
-
-import androidx.datastore.preferences.core.MutablePreferences;
-import androidx.datastore.preferences.core.Preferences;
-import androidx.datastore.preferences.core.PreferencesKeys;
-import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
-import androidx.datastore.rxjava3.RxDataStore;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.style.Style;
@@ -17,84 +13,66 @@ import org.luke.diminou.app.pages.settings.Timer;
 
 import java.util.concurrent.Semaphore;
 
-import io.reactivex.rxjava3.core.Single;
-
 public class Store {
-    private static RxDataStore<Preferences> settings;
-    private static final Preferences.Key<String> ACCESS_TOKEN = PreferencesKeys.stringKey("access_token");
-
-    private static final Preferences.Key<String> USERNAME = PreferencesKeys.stringKey("username");
-    private static final Preferences.Key<String> AVATAR = PreferencesKeys.stringKey("avatar");
-    private static final Preferences.Key<String> THEME = PreferencesKeys.stringKey("theme");
-    private static final Preferences.Key<String> SCALE = PreferencesKeys.stringKey("scale");
-    private static final Preferences.Key<String> LANGUAGE = PreferencesKeys.stringKey("language");
-    private static final Preferences.Key<String> FOUR_MODE = PreferencesKeys.stringKey("four_mode");
-    private static final Preferences.Key<String> TIMER = PreferencesKeys.stringKey("timer");
-    private static final Preferences.Key<String> LOGS = PreferencesKeys.stringKey("logs");
-    private static final Preferences.Key<String> AMBIENT = PreferencesKeys.stringKey("ambient");
-    private static final Preferences.Key<String> MENU_SOUNDS = PreferencesKeys.stringKey("menu_sounds");
-    private static final Preferences.Key<String> GAME_SOUNDS = PreferencesKeys.stringKey("game_sounds");
+    private static SharedPreferences settingsD;
+    private static final String ACCESS_TOKEN = "access_token";
+    private static final String USERNAME = "username";
+    private static final String AVATAR = "avatar";
+    private static final String THEME = "theme";
+    private static final String SCALE = "scale";
+    private static final String LANGUAGE = "language";
+    private static final String FOUR_MODE = "four_mode";
+    private static final String TIMER = "timer";
+    private static final String LOGS = "logs";
+    private static final String AMBIENT = "ambient";
+    private static final String MENU_SOUNDS = "menu_sounds";
+    private static final String GAME_SOUNDS = "game_sounds";
 
 
     public static void init(App owner) {
-        if(settings != null) settings.dispose();
-        settings = new RxPreferenceDataStoreBuilder(owner, "settings").build();
-    }
-
-    public static void destroy() {
-        settings.dispose();
+        if(settingsD == null)
+            settingsD = owner.getPreferences(Context.MODE_PRIVATE);
     }
 
     private static final Semaphore mutex = new Semaphore(1);
-    private static String getSetting(Preferences.Key<String> key, String def) {
+    private static String getSetting(String key, String def) {
         mutex.acquireUninterruptibly();
-        String val;
-        try {
-            val = settings.data().map(prefs -> prefs.get(key)).first(def).blockingGet();
-        }catch(Exception x) {
-            ErrorHandler.handle(x, "reading setting " + key.getName());
-            Platform.runBack(() -> setSetting(key, def, null));
-            val = def;
-        }
+        String val = settingsD.getString(key, def);
         mutex.release();
         return val;
     }
 
-    private static void setSetting(Preferences.Key<String> key, String value, StringConsumer onSuccess) {
+    private static void setSetting(String key, String value, StringConsumer onSuccess) {
         Platform.runBack(() -> {
             mutex.acquireUninterruptibly();
-            String res = settings.updateDataAsync(prefsIn -> {
-                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
-                mutablePreferences.set(key, value);
-                return Single.just(mutablePreferences);
-            }).blockingGet().get(key);
+            SharedPreferences.Editor editor = settingsD.edit();
+            editor.putString(key, value);
+            boolean success = editor.commit();
             mutex.release();
-            if(onSuccess != null)
+            if(success && onSuccess != null)
                 Platform.runLater(() -> {
                     try {
-                        onSuccess.accept(res);
+                        onSuccess.accept(value);
                     } catch (Exception e) {
-                        ErrorHandler.handle(e, "storing data at " + key.getName());
+                        ErrorHandler.handle(e, "storing data at " + key);
                     }
                 });
         });
     }
 
-    private static void removeSetting(Preferences.Key<String> key, StringConsumer onSuccess) {
+    private static void removeSetting(String key, Runnable onSuccess) {
         Platform.runBack(() -> {
             mutex.acquireUninterruptibly();
-            String res = settings.updateDataAsync(prefsIn -> {
-                MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
-                mutablePreferences.remove(key);
-                return Single.just(mutablePreferences);
-            }).blockingGet().get(key);
+            SharedPreferences.Editor editor = settingsD.edit();
+            editor.remove(key);
+            boolean success = editor.commit();
             mutex.release();
-            if(onSuccess != null)
+            if(success && onSuccess != null)
                 Platform.runLater(() -> {
                     try {
-                        onSuccess.accept(res);
+                        onSuccess.run();
                     } catch (Exception e) {
-                        ErrorHandler.handle(e, "storing data at " + key.getName());
+                        ErrorHandler.handle(e, "storing data at " + key);
                     }
                 });
         });
@@ -108,7 +86,7 @@ public class Store {
         setSetting(ACCESS_TOKEN, token, onSuccess);
     }
 
-    public static void removeAccessToken(StringConsumer onSuccess) {
+    public static void removeAccessToken(Runnable onSuccess) {
         removeSetting(ACCESS_TOKEN, onSuccess);
     }
 

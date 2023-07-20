@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
+import org.luke.diminou.abs.utils.functional.StringConsumer;
 import org.luke.diminou.data.beans.Bean;
 import org.luke.diminou.data.beans.User;
 
@@ -35,8 +36,8 @@ public class SessionManager {
         register.run();
     }
 
-    public static void storeSession(String token, App owner, String uid) throws URISyntaxException {
-        Store.setAccessToken(token, null);
+    public static void storeSession(String token, App owner, String uid, StringConsumer onSuccess) {
+        Store.setAccessToken(token, onSuccess);
         Socket socket = owner.getMainSocket();
         registerSocket(socket, token, uid);
     }
@@ -45,7 +46,11 @@ public class SessionManager {
         return Store.getAccessToken();
     }
 
-    public static void clearSession() {
+    public static void clearSession(App owner) {
+        Socket socket = owner.getMainSocket();
+        if(socket != null) {
+            socket.offAnyIncoming();
+        }
         Store.removeAccessToken(null);
     }
 }

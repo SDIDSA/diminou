@@ -30,7 +30,7 @@ import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
-import org.luke.diminou.app.pages.host.offline.ConfirmKick;
+import org.luke.diminou.app.pages.host.ConfirmKick;
 import org.luke.diminou.app.pages.host.offline.OfflineHost;
 import org.luke.diminou.data.observable.Observable;
 import org.luke.diminou.data.property.Property;

@@ -30,6 +30,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
+import org.json.JSONObject;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.base.ValueAnimation;
@@ -57,8 +58,10 @@ import org.luke.diminou.app.account.google.GoogleAccountHandler;
 import org.luke.diminou.app.account.google.GoogleOauthContract;
 import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.home.online.global.RoomId;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Timer;
+import org.luke.diminou.data.beans.Room;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.media.Media;
 import org.luke.diminou.data.property.Property;
@@ -221,7 +224,7 @@ public class App extends AppCompatActivity {
         return getBitmapFromView(root);
     }
 
-    private Bitmap getBitmapFromView(View view) {
+    public Bitmap getBitmapFromView(View view) {
         Bitmap bitmap = Bitmap.createBitmap(
                 view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888
         );
@@ -318,7 +321,10 @@ public class App extends AppCompatActivity {
         Thread init = new Thread(() -> {
             if (running != null && running.isRunning()) return;
 
-            if (loaded != null && pageType.isInstance(loaded) && Page.hasInstance(pageType)) return;
+            if (loaded != null && pageType.isInstance(loaded) && Page.hasInstance(pageType)) {
+                Platform.runLater(loaded::setup);
+                return;
+            }
 
             AtomicReference<Page> page = new AtomicReference<>();
             Page old = loaded;
@@ -658,11 +664,11 @@ public class App extends AppCompatActivity {
         return getTypedData("online");
     }
 
-    public void putRoomId(String roomId) {
-        putData("room_id", roomId);
+    public void putRoom(Room room) {
+        putData("room", room);
     }
 
-    public String getRoomId() {
-        return getString("room_id");
+    public Room getRoom() {
+        return getTypedData("room");
     }
 }

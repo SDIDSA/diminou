@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.join;
+package org.luke.diminou.app.pages.join.offline;
 
 import android.view.Gravity;
 import android.widget.LinearLayout;
@@ -46,7 +46,7 @@ import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Join extends Titled {
+public class OfflineJoin extends Titled {
 
     private final Button leave;
     private final Label searching;
@@ -72,7 +72,7 @@ public class Join extends Titled {
     private final Animation hideLeave;
     private final Animation hideCards;
 
-    public Join(App owner) {
+    public OfflineJoin(App owner) {
         super(owner, "join_party");
 
         searching = new Label(owner, "scanning_network");

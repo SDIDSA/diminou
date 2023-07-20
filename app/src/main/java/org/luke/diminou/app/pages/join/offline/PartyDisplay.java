@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.join;
+package org.luke.diminou.app.pages.join.offline;
 
 import android.view.Gravity;
 import android.widget.LinearLayout;

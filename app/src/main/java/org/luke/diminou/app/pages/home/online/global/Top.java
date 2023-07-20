@@ -177,8 +177,7 @@ public class Top extends VBox implements Styleable {
     }
 
     public void setup(User user) {
-        user.avatarProperty().addListener((obs, ov, nv) ->
-                pfp.setUrl(nv));
+        pfp.setUser(user);
 
         user.usernameProperty().addListener((obs, ov, nv) -> username.setText(nv));
 

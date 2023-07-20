@@ -25,7 +25,7 @@ import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.cards.offline.OfflineDisplayCards;
-import org.luke.diminou.app.cards.offline.MirorredCards;
+import org.luke.diminou.app.cards.offline.OfflineMirorredCards;
 import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 import org.luke.diminou.app.pages.Titled;
 import org.luke.diminou.app.pages.game.Game;
@@ -39,7 +39,7 @@ import java.util.Objects;
 
 public class OfflineHost extends Titled {
     private final OfflineDisplayCards cards;
-    private final MirorredCards mirorredCards;
+    private final OfflineMirorredCards offlineMirorredCards;
 
     private final Button start;
 
@@ -58,7 +58,7 @@ public class OfflineHost extends Titled {
             }
         }));
 
-        mirorredCards = new MirorredCards(owner);
+        offlineMirorredCards = new OfflineMirorredCards(owner);
 
         start = new Button(owner, "start_game");
         start.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
@@ -126,7 +126,7 @@ public class OfflineHost extends Titled {
 
         content.addView(cards);
         content.addView(new ColoredSeparator(owner, Orientation.HORIZONTAL, 0, Style::getTextMuted));
-        content.addView(mirorredCards);
+        content.addView(offlineMirorredCards);
         content.addView(start);
 
         hideStart = new ParallelAnimation(300)
@@ -151,7 +151,7 @@ public class OfflineHost extends Titled {
         super.setup();
 
         cards.unloadAll();
-        mirorredCards.bind(cards);
+        offlineMirorredCards.bind(cards);
 
         start.setAlpha(0);
         start.setTranslationY(40);
@@ -288,7 +288,7 @@ public class OfflineHost extends Titled {
     public void destroy() {
         super.destroy();
 
-        mirorredCards.unbind();
+        offlineMirorredCards.unbind();
 
         Object pToGame = owner.getData("to_game");
         boolean toGame = pToGame != null && (boolean) pToGame;

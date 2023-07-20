@@ -1,6 +1,5 @@
 package org.luke.diminou.app.pages.home.online;
 
-import android.util.Log;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
@@ -26,11 +25,14 @@ import org.luke.diminou.app.pages.home.online.global.Bottom;
 import org.luke.diminou.app.pages.home.online.global.HomeFragment;
 import org.luke.diminou.app.pages.home.online.global.Top;
 import org.luke.diminou.app.pages.home.online.play.Play;
+import org.luke.diminou.app.pages.host.online.Host;
+import org.luke.diminou.app.pages.join.online.Invited;
+import org.luke.diminou.app.pages.join.online.Join;
+import org.luke.diminou.data.beans.Room;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class Home extends Page {
@@ -50,8 +52,6 @@ public class Home extends Page {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
         params.weight = 1;
         content.setLayoutParams(params);
-
-        content.nextInto(Play.class);
 
         bottom = new Bottom(owner, content);
         bottom.setZ(5);
@@ -85,6 +85,8 @@ public class Home extends Page {
         content.setAlpha(0);
         content.setScaleX(.7f);
         content.setScaleY(.7f);
+
+        content.nextInto(Play.class);
 
 
         new ParallelAnimation(400)
@@ -153,17 +155,76 @@ public class Home extends Page {
                 instance.displayFriends();
         });
 
+        addSocketEventHandler("end", data -> {
+            Room room = new Room(data.getJSONObject("game"));
+            if(owner.getLoaded() instanceof Join join &&
+                    room.getId().equals(join.getRoomId())) {
+                owner.loadPage(Home.class);
+                owner.toast("room_ended");
+            }
+        });
+
         addSocketEventHandler("invite", data -> {
             int from = data.getInt("from");
-            String roomId = data.getString("room");
+            Room room = new Room(data.getJSONObject("game"));
 
-            owner.toast(from + " invited you to " + roomId);
+            User.getForId(from, u ->
+                    new Invited(owner, u.getUsername(), room).show());
+        });
+
+        addSocketEventHandler("join", data -> {
+            int userId = data.getInt("user_id");
+            Room room = new Room(data.getJSONObject("game"));
+
+            if(userId == owner.getUser().getId()) {
+                owner.putRoom(room);
+                owner.loadPage(Join.class);
+            } else {
+                Page loaded = owner.getLoaded();
+                if(loaded instanceof Host host) {
+                    host.joined(userId);
+                } else if(loaded instanceof Join join) {
+                    join.joined(userId);
+                }
+            }
+        });
+
+        addSocketEventHandler("leave", data -> {
+            int userId = data.getInt("user_id");
+            Room room = new Room(data.getJSONObject("game"));
+
+            if(userId != owner.getUser().getId()) {
+                Page loaded = owner.getLoaded();
+                if(loaded instanceof Host host) {
+                    host.left(userId);
+                } else if(loaded instanceof Join join) {
+                    join.left(userId);
+                }
+            }
+        });
+
+        addSocketEventHandler("kicked", data -> {
+            if(owner.getLoaded() instanceof Join) {
+                owner.loadPage(Home.class);
+                owner.toast("host kicked you");
+            }
+        });
+
+        addSocketEventHandler("swap", data -> {
+            int i1 = data.getInt("i1");
+            int i2 = data.getInt("i2");
+
+            Page loaded = owner.getLoaded();
+            if(loaded instanceof Join join) {
+                join.swap(i1, i2);
+            }
         });
     }
 
     private final ArrayList<String> registeredListeners = new ArrayList<>();
     private void addSocketEventHandler(String event, ObjectConsumer<JSONObject> handler) {
         registeredListeners.add(event);
+        owner.getMainSocket().off(event);
         owner.getMainSocket().on(event,
                 data -> Platform.runLater(() -> {
                     try {

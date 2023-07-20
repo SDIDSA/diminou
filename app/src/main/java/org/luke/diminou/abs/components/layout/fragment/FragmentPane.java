@@ -45,7 +45,7 @@ public class FragmentPane extends FrameLayout {
             loaded = nw;
 
             Platform.runLater(() -> {
-                float fromX = (owner.getScreenWidth() * direction) / (direction == 1 ? 1f : 2f);
+                float fromX = old == null ? 0 : (owner.getScreenWidth() * direction) / (direction == 1 ? 1f : 2f);
                 float toX = -(owner.getScreenWidth() * direction) / (direction == 1 ? 2f : 1f);
                 loaded.setTranslationX(fromX);
                 removeView(loaded);

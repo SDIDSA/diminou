@@ -8,7 +8,6 @@ import android.text.TextUtils;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewParent;
 
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
@@ -18,7 +17,7 @@ import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateXAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
-import org.luke.diminou.abs.components.Page;
+import org.luke.diminou.abs.api.Session;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
 import org.luke.diminou.abs.components.controls.scratches.Loading;
 import org.luke.diminou.abs.components.controls.text.Label;
@@ -30,8 +29,8 @@ import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
-import org.luke.diminou.app.pages.host.offline.ConfirmKick;
-import org.luke.diminou.app.pages.host.offline.OfflineHost;
+import org.luke.diminou.app.pages.home.online.friends.Username;
+import org.luke.diminou.app.pages.host.ConfirmKick;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
@@ -43,9 +42,8 @@ public class PlayerCard extends VBox implements Styleable {
     private final GradientDrawable avatarBack;
     private final StackPane preAvatar;
     private final AvatarDisplay avatarDisplay;
-    private final Label name;
+    private final Username name;
     private final ColorIcon remove;
-    private boolean loaded = false;
     private boolean isBeingDragged = false;
 
     private PlayerCard boundTo;
@@ -57,6 +55,8 @@ public class PlayerCard extends VBox implements Styleable {
     private final int index;
 
     private final boolean host;
+
+    private final int removeBy;
     public PlayerCard(App owner, boolean host, int index) {
         super(owner);
 
@@ -82,7 +82,7 @@ public class PlayerCard extends VBox implements Styleable {
 
         preAvatar.addView(loading);
 
-        name = new Label(owner, "");
+        name = new Username(owner);
         name.setFont(new Font(13));
         name.setMaxWidth(size);
         name.setMaxLines(1);
@@ -95,18 +95,19 @@ public class PlayerCard extends VBox implements Styleable {
         confirmKick.setOnYes(() -> {
             //KICK
 
-            unloadPlayer();
-            owner.playMenuSound(R.raw.left);
+            Session.leave(user.get().getId(), getOwner().getRoom().getId(), res -> {
+                if(res.has("err")) owner.toast(res.getString("err"));
+            });
 
             //UPDATE CARDS
         });
 
-        int by = ViewUtils.dipToPx(6, owner);
+        removeBy = ViewUtils.dipToPx(6, owner);
         remove = new ColorIcon(owner, R.drawable.close);
         remove.setSize(32);
         remove.setCornerRadius(7);
-        remove.setTranslationY(-by);
-        remove.setTranslationX(by);
+        remove.setTranslationY(-removeBy);
+        remove.setTranslationX(removeBy);
         remove.setOnClick(() -> {
             if(user.get() != null && !user.get().isSelf()) {
                 confirmKick.show();
@@ -122,6 +123,7 @@ public class PlayerCard extends VBox implements Styleable {
             if (nv == null) {
                 preAvatar.removeAllViews();
                 preAvatar.addView(loading, 0);
+                name.setUser(null);
                 name.setKey("empty");
                 setAlpha(.5f);
             }else {
@@ -132,8 +134,8 @@ public class PlayerCard extends VBox implements Styleable {
                     else remove.setImageResource(R.drawable.close);
                     preAvatar.addView(remove);
                 }
-                avatarDisplay.setUrl(nv.getAvatar());
-                name.setText(nv.getUsername());
+                avatarDisplay.setUser(nv);
+                name.setUser(nv);
                 setAlpha(1f);
             }
         });
@@ -179,7 +181,12 @@ public class PlayerCard extends VBox implements Styleable {
                 switch (e.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
                         if (e.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) && !user.isNull()) {
-                            new AlphaAnimation(300, remove, 0).setInterpolator(Interpolator.EASE_OUT).start();
+                            new ParallelAnimation(300)
+                                    .addAnimations(new AlphaAnimation(remove, 0))
+                                    .addAnimation(new TranslateXAnimation(remove, removeBy * 2))
+                                    .addAnimation(new TranslateYAnimation(remove, -removeBy * 2))
+                                    .setInterpolator(Interpolator.EASE_OUT)
+                                    .start();
                             if (isBeingDragged) {
                                 new ScaleXYAnimation(300, preAvatar, 1.15f)
                                         .setInterpolator(Interpolator.EASE_OUT)
@@ -214,23 +221,19 @@ public class PlayerCard extends VBox implements Styleable {
                         try {
                             int otherId = Integer.parseInt(e.getClipData().getItemAt(0).getText().toString());
                             PlayerCard other = track.get(otherId);
-
                             assert other != null;
-                            if(host) {
-                                swap(other);
 
-                                OfflineHost hp = (OfflineHost) Page.getInstance(getOwner(), OfflineHost.class);
-                                assert hp != null;
-                                hp.swap(index, other.index);
-                            }else {
-                                boundTo.swap(other.boundTo);
+                            if(index != other.index) {
+                                if(host) {
+                                    swap(other);
+                                }else {
+                                    boundTo.swap(other.boundTo);
+                                }
 
-                                OfflineHost hp = (OfflineHost) Page.getInstance(getOwner(), OfflineHost.class);
-                                assert hp != null;
-                                hp.swap(boundTo.index, other.boundTo.index);
+                                Session.swap(getOwner().getRoom().getId(), index, other.index, res -> {
+                                    if(res.has("err")) getOwner().toast(res.getString("err"));
+                                });
                             }
-
-
                         } catch (Exception x) {
                             ErrorHandler.handle(x, "swapping cards");
                         }
@@ -240,6 +243,8 @@ public class PlayerCard extends VBox implements Styleable {
                         new ParallelAnimation(300)
                                 .addAnimation(new ScaleXYAnimation(preAvatar, 1f))
                                 .addAnimation(new AlphaAnimation(remove, 1f))
+                                .addAnimation(new TranslateXAnimation(remove, removeBy))
+                                .addAnimation(new TranslateYAnimation(remove, -removeBy))
                                 .setInterpolator(Interpolator.EASE_OUT)
                                 .start();
                         track.values().forEach(x -> x.isBeingDragged = false);
@@ -368,20 +373,20 @@ public class PlayerCard extends VBox implements Styleable {
     }
 
     public void loadPlayer(User user) {
-        unloadPlayer();
+        unloadPlayer(false);
         this.user.set(user);
-        loaded = true;
     }
 
     public User getUser() {
         return user.get();
     }
 
-    public void unloadPlayer() {
-        if (!loaded) return;
+    public void unloadPlayer(boolean fix) {
+        if (user.isNull()) return;
         user.set(null);
-        loaded = false;
-        fixParent(this);
+        if(fix) {
+            fixParent(this);
+        }
     }
 
     private void fixParent(View view) {
@@ -393,7 +398,7 @@ public class PlayerCard extends VBox implements Styleable {
     }
 
     public boolean isLoaded() {
-        return loaded;
+        return !user.isNull();
     }
 
     @Override
@@ -406,8 +411,6 @@ public class PlayerCard extends VBox implements Styleable {
         remove.setBackgroundColor(style.getBackgroundTertiary());
         remove.setFill(style.getTextMuted());
         remove.setBorder(style.getTextMuted());
-
-        name.setFill(style.getTextNormal());
     }
 
     @Override

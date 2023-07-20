@@ -4,7 +4,6 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.layout.overlay.MultipleOptionOverlay;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.abs.utils.Store;
 
 public class ConfirmExit extends MultipleOptionOverlay {
     public ConfirmExit(App owner) {
@@ -13,7 +12,6 @@ public class ConfirmExit extends MultipleOptionOverlay {
         addButton("yes", () -> {
             OfflineHome.settingUp = true;
             Page.clearCache();
-            Store.destroy();
             owner.finishAndRemoveTask();
             Platform.runAfter(() ->
                     System.exit(0), 1000);

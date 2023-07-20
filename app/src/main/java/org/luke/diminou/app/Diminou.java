@@ -1,7 +1,6 @@
 package org.luke.diminou.app;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.api.API;
@@ -10,6 +9,7 @@ import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.image.ImageProxy;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
+import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.login.Login;
@@ -31,6 +31,7 @@ public class Diminou extends App {
 
     protected void postCreate() {
         new Thread(() -> {
+            putOnline(false);
             Page.clearCache();
             ImageProxy.init(this);
             Piece.initAll(this);
@@ -50,29 +51,30 @@ public class Diminou extends App {
                                     loadPage(Home.class);
                                 });
                             } else {
-                                SessionManager.clearSession();
+                                SessionManager.clearSession(this);
                                 loadPage(Login.class);
                             }
                         });
+                    }
+                }, () -> {
+                    if(isOnline() || getLoaded() instanceof SplashScreen) {
+                        Platform.runLater(() ->
+                                toast("Server unreachable.."));
                     }
                 });
             }, 2000);
         }, "post_create_thread").start();
     }
-    private void initializeSocket(Runnable onConnect) {
+    private void initializeSocket(Runnable onConnect, Runnable onError) {
         try {
             Socket mSocket = IO.socket(API.BASE);
             mSocket.on(Socket.EVENT_CONNECT, d -> {
                 putMainSocket(mSocket);
                 onConnect.run();
+                mSocket.off(Socket.EVENT_CONNECT);
             });
             mSocket.on(Socket.EVENT_CONNECT_ERROR, d -> {
-                for (Object o : d) {
-                    if(o instanceof Throwable t) {
-                        t.printStackTrace();
-                    }else
-                        Log.i("error", String.valueOf(o));
-                }
+                onError.run();
             });
             if(!mSocket.connected()){
                 mSocket.connect();

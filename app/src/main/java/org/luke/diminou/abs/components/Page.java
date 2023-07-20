@@ -29,7 +29,7 @@ public abstract class Page extends StackPane implements Styleable {
         return cache.containsKey(type);
     }
 
-    public static Page getInstance(App owner, Class<? extends Page> type) {
+    public static <T extends Page> T getInstance(App owner, Class<T> type) {
         Page found = cache.get(type);
         if (found == null) {
             try {

@@ -78,17 +78,24 @@ public class Login extends Page {
                             String token = res.getString("token");
                             int userId = res.getInt("user");
                             Bean.clearCache();
-                            SessionManager.storeSession(token, owner, String.valueOf(userId));
-                            User.getForId(userId, user -> {
-                                handleUser(user, token);
-                                google.stopLoading();
-                            });
+                            SessionManager.storeSession(token,
+                                    owner, String.valueOf(userId), t ->
+                                            User.getForId(userId, user -> {
+                                                handleUser(user, token);
+                                                google.stopLoading();
+                                            }));
                         }else if(res.has("empty")) {
                             Auth.googleSignUp(acc.getEmail(), acc.getGivenName(), upres -> {
                                 String token = upres.getString("token");
                                 int userId = upres.getInt("user");
                                 Bean.clearCache();
-                                SessionManager.storeSession(token, owner, String.valueOf(userId));
+                                SessionManager.storeSession(token,
+                                        owner, String.valueOf(userId), t ->
+                                                User.getForId(userId, user -> {
+                                                    handleUser(user, token);
+                                                    google.stopLoading();
+                                                })
+                                        );
                                 User.getForId(userId, user -> {
                                     handleUser(user, token);
                                     google.stopLoading();

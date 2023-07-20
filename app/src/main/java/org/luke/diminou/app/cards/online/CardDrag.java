@@ -7,12 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
-
-import androidx.core.content.res.ResourcesCompat;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.ViewUtils;
@@ -27,8 +23,7 @@ public class CardDrag extends View.DragShadowBuilder {
         super(iv);
         this.owner = owner;
 
-        iv.buildDrawingCache();
-        avatar = iv.getDrawingCache();
+        avatar = owner.getBitmapFromView(iv);
     }
 
     @Override
@@ -65,19 +60,5 @@ public class CardDrag extends View.DragShadowBuilder {
         p.setAlpha(alpha);
         p.setStrokeWidth(ViewUtils.dipToPx(2, owner));
         canvas.drawRoundRect(offset,offset,size,size, radius, radius, p);
-
-
-    }
-
-    private Bitmap getBitmap(int drawableRes, int size) {
-        Drawable drawable = ResourcesCompat.getDrawable(owner.getResources(), drawableRes, null);
-        Canvas canvas = new Canvas();
-        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-        canvas.setBitmap(bitmap);
-        assert drawable != null;
-        drawable.setBounds(0, 0, size, size);
-        drawable.draw(canvas);
-
-        return bitmap;
     }
 }

@@ -85,9 +85,32 @@ public class Session {
 		call(API.Session.CREATE_GAME, "create game", onResult);
 	}
 
+	public static void endGame(String roomId, ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.END_GAME, "create game", onResult,
+				new Param("room_id", roomId));
+	}
+
 	public static void invite(int who, String roomId,ObjectConsumer<JSONObject> onResult) {
 		call(API.Session.INVITE, "invite player", onResult,
 				new Param("who", who),
 				new Param("room_id", roomId));
+	}
+
+	public static void join(String roomId,ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.JOIN, "join room", onResult,
+				new Param("room_id", roomId));
+	}
+
+	public static void leave(int user, String roomId,ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.LEAVE, "leave room", onResult,
+				new Param("user_id", user),
+				new Param("room_id", roomId));
+	}
+
+	public static void swap(String roomId, int i1, int i2,ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.SWAP, "swap players", onResult,
+				new Param("room_id", roomId),
+				new Param("i1", i1),
+				new Param("i2", i2));
 	}
 }

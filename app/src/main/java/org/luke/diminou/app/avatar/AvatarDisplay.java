@@ -12,6 +12,8 @@ import org.luke.diminou.abs.components.controls.image.Image;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.data.beans.User;
+import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.property.Property;
 
 public class AvatarDisplay extends StackPane implements Styleable {
@@ -22,6 +24,10 @@ public class AvatarDisplay extends StackPane implements Styleable {
     private final Image img;
 
     public static final int preSize = 64;
+
+    private final ChangeListener<String> onUrl;
+
+    private User old;
 
     public AvatarDisplay(App owner, float sizeDp) {
         super(owner);
@@ -43,6 +49,8 @@ public class AvatarDisplay extends StackPane implements Styleable {
         img.setSize(sizeDp);
         img.setCornerRadius(7);
 
+        onUrl = (obs, ov, nv) -> ImageProxy.getImage(nv, img::setImageBitmap);
+
         addView(img);
 
         applyStyle(owner.getStyle());
@@ -63,9 +71,13 @@ public class AvatarDisplay extends StackPane implements Styleable {
     public void setValue(Avatar value) {
         img.setImageResource(value.getRes());
     }
+    public void setUser(User user) {
+        if(old != null) {
+            old.avatarProperty().removeListener(onUrl);
+        }
 
-    public void setUrl(String url) {
-        ImageProxy.getImage(url, img::setImageBitmap);
+        old = user;
+        user.avatarProperty().addListener(onUrl);
     }
 
     public void setValue(String val) {

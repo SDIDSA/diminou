@@ -46,6 +46,7 @@ public class Friends extends HomeFragment implements Styleable {
 
         search = new MinimalInputField(owner, "Search by username...");
         search.setRadius(15);
+        search.setFont(new Font(16));
         search.setLayoutParams(new LayoutParams(-1, ViewUtils.dipToPx(50, owner)));
 
         ColoredIcon sicon = new ColoredIcon(owner, Style::getTextNormal, R.drawable.search);
@@ -54,6 +55,7 @@ public class Friends extends HomeFragment implements Styleable {
         search.addPostInput(sicon);
 
         hint = new ColoredLabel(owner, "", Style::getTextMuted);
+        hint.setFont(new Font(16));
         hint.setLineSpacing(6);
         hint.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         ViewUtils.setMarginTop(hint, owner, 30);

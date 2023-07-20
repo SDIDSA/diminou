@@ -8,10 +8,10 @@ import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.utils.ViewUtils;
 
-public class MirorredCards extends VBox {
+public class OfflineMirorredCards extends VBox {
     private final OfflinePlayerCard[] cards = new OfflinePlayerCard[4];
 
-    public MirorredCards(App owner) {
+    public OfflineMirorredCards(App owner) {
         super(owner);
 
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));

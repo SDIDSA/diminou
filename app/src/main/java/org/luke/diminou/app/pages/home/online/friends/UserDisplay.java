@@ -73,20 +73,17 @@ public class UserDisplay extends StackPane implements Styleable {
         FriendAction send = new FriendAction(owner, R.drawable.add);
         FriendAction pending = new FriendAction(owner, R.drawable.pending);
         FriendAction cancel = new FriendAction(owner, R.drawable.cancel);
-        FriendAction play = new FriendAction(owner, R.drawable.play);
 
         User.getForId(userId, user -> {
             user.usernameProperty().addListener((obs, ov, nv) ->
                     name.setText(nv));
-            user.avatarProperty().addListener((obs, ov, nv) ->
-                    img.setUrl(nv));
+            img.setUser(user);
             user.friendProperty().addListener((obs, ov, nv) -> {
                 root.removeView(decline);
                 root.removeView(accept);
                 root.removeView(send);
                 root.removeView(pending);
                 root.removeView(cancel);
-                root.removeView(play);
                 switch (nv) {
                     case "none" -> root.addView(send);
                     case "pending_received" -> {
@@ -97,7 +94,6 @@ public class UserDisplay extends StackPane implements Styleable {
                         root.addView(cancel);
                         root.addView(pending);
                     }
-                    case "friend" -> root.addView(play);
                 }
             });
 

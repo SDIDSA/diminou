@@ -45,6 +45,10 @@ public class Fragment extends VBox {
         concerned.forEach(cache::remove);
     }
 
+    public static void clearCache() {
+        cache.clear();
+    }
+
     protected FragmentPane parent() {
         if (parent == null) parent = (FragmentPane) getParent();
 

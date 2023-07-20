@@ -17,7 +17,7 @@ import org.luke.diminou.abs.utils.functional.StringConsumer;
 public class API {
     public static final String VERSION = "1.0.0";
     public static final String DEV_BASE = "http://10.0.2.2:4000/";
-    public static final String TEST_BASE = "http://192.168.201.161:4000/";
+    public static final String TEST_BASE = "http://192.168.221.161:4000/";
     public static final String REL_BASE = "https://mesa69.herokuapp.com/";
     public static final String BASE = TEST_BASE;
     public static JSONObject netErr;
@@ -135,7 +135,15 @@ public class API {
 
         public static final String CREATE_GAME = PREFIX + "createGame";
 
+        public static final String END_GAME = PREFIX + "endGame";
+
         public static final String INVITE = PREFIX + "invite";
+
+        public static final String JOIN = PREFIX + "join";
+
+        public static final String LEAVE = PREFIX + "leave";
+
+        public static final String SWAP = PREFIX + "swap";
 
         private Session() {
 

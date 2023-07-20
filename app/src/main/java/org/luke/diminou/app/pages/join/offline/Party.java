@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.join;
+package org.luke.diminou.app.pages.join.offline;
 
 import org.luke.diminou.abs.net.SocketConnection;
 

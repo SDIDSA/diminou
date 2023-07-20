@@ -49,9 +49,7 @@ public class PlayIcon extends StackPane implements Styleable {
 
         setElevation(ViewUtils.dipToPx(10, owner));
 
-        if(sizePx == -1) {
-            sizePx = ViewUtils.dipToPx(SIZE, owner);
-        }
+        sizePx = ViewUtils.dipToPx(SIZE, owner);
         setLayoutParams(new LinearLayout.LayoutParams(sizePx, sizePx));
 
         setOnTouchListener((v, e) -> {

@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.host.offline;
+package org.luke.diminou.app.pages.host;
 
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.layout.overlay.MultipleOptionOverlay;

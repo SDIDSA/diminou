@@ -7,7 +7,6 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
-import org.luke.diminou.data.beans.User;
 
 public class DisplayCards extends HBox {
     private final PlayerCard[] cards = new PlayerCard[4];
@@ -52,7 +51,7 @@ public class DisplayCards extends HBox {
                         card1.loadPlayer(
                                 card2.getUser()
                         );
-                        card2.unloadPlayer();
+                        card2.unloadPlayer(false);
                         break;
                     }
                 }
@@ -62,14 +61,14 @@ public class DisplayCards extends HBox {
 
     public void unloadAll() {
         for(PlayerCard card : cards) {
-            card.unloadPlayer();
+            card.unloadPlayer(false);
         }
     }
 
-    public void unloadPlayer(User user) {
+    public void unloadPlayer(int user_id) {
         for(PlayerCard card : cards) {
-            if(card.getUser() == user) {
-                Platform.runLater(card::unloadPlayer);
+            if(card.isLoaded() && card.getUser().getId() == user_id) {
+                Platform.runLater(() -> card.unloadPlayer(true));
             }
         }
     }
