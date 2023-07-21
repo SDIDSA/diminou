@@ -5,13 +5,13 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('/home/luke/diminou/android_key/debug.keystore')
+            storeFile file('debug.keystore')
             keyAlias 'diminou_debug'
             storePassword '123456'
             keyPassword '123456'
         }
         release {
-        storeFile file('/home/luke/diminou/android_key/release.keystore')
+        storeFile file('release.keystore')
             storePassword '123456'
             keyAlias 'diminou_release'
             keyPassword '123456'
