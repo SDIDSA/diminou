@@ -16,6 +16,9 @@ jobs:
     runs-on: "ubuntu-latest"
     
     steps:
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
     - name : Build Apk
       run : ./gradlew assembleRelease
     
