@@ -104,7 +104,7 @@ public class PlayerCard extends VBox implements Styleable {
 
         removeBy = ViewUtils.dipToPx(6, owner);
         remove = new ColorIcon(owner, R.drawable.close);
-        remove.setSize(32);
+        remove.setSize(28);
         remove.setCornerRadius(7);
         remove.setTranslationY(-removeBy);
         remove.setTranslationX(removeBy);
@@ -113,7 +113,7 @@ public class PlayerCard extends VBox implements Styleable {
                 confirmKick.show();
             }
         });
-        ViewUtils.setPaddingUnified(remove, 5, owner);
+        ViewUtils.setPaddingUnified(remove, 4, owner);
         ViewUtils.alignInFrame(remove, Gravity.TOP | Gravity.END);
 
         addView(preAvatar);
@@ -405,6 +405,8 @@ public class PlayerCard extends VBox implements Styleable {
     public void applyStyle(Style style) {
         avatarBack.setColor(style.getBackgroundTertiary());
         avatarBack.setStroke(ViewUtils.dipToPx(1, getOwner()), style.getTextMuted());
+
+        avatarDisplay.setOnlineBackground(style.getBackgroundTertiary());
 
         loading.setFill(style.getTextMuted());
 
