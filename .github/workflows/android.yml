@@ -37,7 +37,7 @@ jobs:
         echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
  
     - run: |
-          gh release create ${{env.version_name}} ${{github.workspace}}/app/release/app-release.apk
+          gh release create ${{env.version_name}} ${{github.workspace}}/app/build/outputs/apk/release/app-release.apk
       env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
       shell: bash
