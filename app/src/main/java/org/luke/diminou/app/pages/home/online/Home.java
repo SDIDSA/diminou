@@ -1,5 +1,6 @@
 package org.luke.diminou.app.pages.home.online;
 
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
@@ -33,6 +34,7 @@ import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Home extends Page {
@@ -86,7 +88,9 @@ public class Home extends Page {
         content.setScaleX(.7f);
         content.setScaleY(.7f);
 
-        content.nextInto(Play.class);
+        if(content.isEmpty()) {
+            content.nextInto(Play.class);
+        }
 
 
         new ParallelAnimation(400)
@@ -106,12 +110,25 @@ public class Home extends Page {
         User user = owner.getUser();
         registeredListeners.forEach(owner.getMainSocket()::off);
         registeredListeners.clear();
+
+        owner.getMainSocket().onAnyIncoming(e -> {
+            Log.i("received" ,Arrays.toString(e));
+        });
+
         addSocketEventHandler("user_sync", obj -> {
             for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
                 String key = it.next();
                 user.set(key, obj.get(key));
             }
         });
+        addSocketEventHandler("user_change", obj ->
+                User.getForId(obj.getInt("user_id"), u -> {
+                    for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
+                        String key = it.next();
+                        if(!key.equals("user_id"))
+                            u.set(key, obj.get(key));
+                    }
+        }));
         addSocketEventHandler("request_sent", obj -> {
             int sender = obj.getInt("sender");
             int receiver = obj.getInt("receiver");
@@ -191,7 +208,6 @@ public class Home extends Page {
 
         addSocketEventHandler("leave", data -> {
             int userId = data.getInt("user_id");
-            Room room = new Room(data.getJSONObject("game"));
 
             if(userId != owner.getUser().getId()) {
                 Page loaded = owner.getLoaded();

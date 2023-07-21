@@ -47,7 +47,7 @@ public class Diminou extends App {
                                 int userId = result.getInt("user");
                                 User.getForId(userId, user -> {
                                     putUser(user);
-                                    SessionManager.registerSocket(getMainSocket(), token, String.valueOf(user.getId()));
+                                    SessionManager.registerSocket(getMainSocket(), token, user.getId());
                                     loadPage(Home.class);
                                 });
                             } else {

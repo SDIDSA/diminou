@@ -130,6 +130,7 @@ public class UserDisplay extends StackPane implements Styleable {
     public void applyStyle(Style style) {
         root.setBackground(style.getBackgroundTertiary());
         root.setBorderColor(style.getTextMuted());
+        img.setOnlineBackground(style.getBackgroundTertiary());
         setBackground(style.getTextMuted());
     }
 

@@ -65,6 +65,10 @@ public class FragmentPane extends FrameLayout {
         }).start();
     }
 
+    public boolean isEmpty() {
+        return loaded == null;
+    }
+
     public boolean isRunning() {
         return running != null && running.isRunning();
     }

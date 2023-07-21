@@ -32,7 +32,7 @@ public class BasicApiGet extends ApiCall {
 
     public void execute(ObjectConsumer<JSONObject> onResult, String token) throws IOException, ParseException, JSONException {
         try {
-            String uri = new URIBuilder().setPath(path).addParameters(Arrays.stream(params).map(param -> new BasicNameValuePair(param.getKey(), param.getValue())).collect(Collectors.toList())).build().toString().substring(1);
+            String uri = new URIBuilder().setPath(path).addParameters(Arrays.stream(params).map(param -> new BasicNameValuePair(param.getKey(), param.stringValue())).collect(Collectors.toList())).build().toString().substring(1);
             HttpGet httpGet = new HttpGet(uri);
             httpGet.addHeader("Accept", "application/json");
 

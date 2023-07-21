@@ -1,5 +1,6 @@
 package org.luke.diminou.app.pages.join.online;
 
+import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.api.Session;
 import org.luke.diminou.abs.utils.Platform;
@@ -32,11 +33,15 @@ public class Join extends Titled {
     }
 
     public void joined(int id) {
-        User.getForId(id, user -> cards.getLast().loadPlayer(user));
+        User.getForId(id, user -> {
+            owner.playMenuSound(R.raw.joined);
+            cards.getLast().loadPlayer(user);
+        });
     }
 
     public void left(int id) {
         cards.unloadPlayer(id);
+        owner.playMenuSound(R.raw.left);
     }
 
     public String getRoomId() {
