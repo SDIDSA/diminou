@@ -18,7 +18,7 @@ jobs:
     steps:    
     - name: Get version
       run: |
-        echo "version_name=$(grep "versionName" app/build.gradle | awk '{print $2}' | tr -d \''"\\')" >> $GITHUB_ENV
+        echo "version_name=$(grep "versionName" $(printenv github.workspace)/app/build.gradle | awk '{print $2}' | tr -d \''"\\')" >> $GITHUB_ENV
 
     - name: "Create release"
       uses: "actions/github-script@v6"
