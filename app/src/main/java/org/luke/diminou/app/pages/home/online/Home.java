@@ -86,7 +86,9 @@ public class Home extends Page {
         content.setScaleX(.7f);
         content.setScaleY(.7f);
 
-        content.nextInto(Play.class);
+        if(content.isEmpty()) {
+            content.nextInto(Play.class);
+        }
 
 
         new ParallelAnimation(400)
@@ -112,6 +114,13 @@ public class Home extends Page {
                 user.set(key, obj.get(key));
             }
         });
+        addSocketEventHandler("user_change", obj ->
+                User.getForId(obj.getInt("user_id"), u -> {
+                    for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
+                        String key = it.next();
+                        u.set(key, obj.get(key));
+                    }
+        }));
         addSocketEventHandler("request_sent", obj -> {
             int sender = obj.getInt("sender");
             int receiver = obj.getInt("receiver");
@@ -191,7 +200,6 @@ public class Home extends Page {
 
         addSocketEventHandler("leave", data -> {
             int userId = data.getInt("user_id");
-            Room room = new Room(data.getJSONObject("game"));
 
             if(userId != owner.getUser().getId()) {
                 Page loaded = owner.getLoaded();
