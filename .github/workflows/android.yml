@@ -15,7 +15,10 @@ jobs:
     name: "Release"
     runs-on: "ubuntu-latest"
     
-    steps:    
+    steps:
+    - name : Build Apk
+      run : ./gradlew assembleRelease
+    
     - name : Retrieve Version
       run: |
         echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q printVersionName)"
