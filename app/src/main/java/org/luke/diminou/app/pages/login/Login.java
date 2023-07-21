@@ -79,7 +79,7 @@ public class Login extends Page {
                             int userId = res.getInt("user");
                             Bean.clearCache();
                             SessionManager.storeSession(token,
-                                    owner, String.valueOf(userId), t ->
+                                    owner, userId, t ->
                                             User.getForId(userId, user -> {
                                                 handleUser(user, token);
                                                 google.stopLoading();
@@ -90,7 +90,7 @@ public class Login extends Page {
                                 int userId = upres.getInt("user");
                                 Bean.clearCache();
                                 SessionManager.storeSession(token,
-                                        owner, String.valueOf(userId), t ->
+                                        owner, userId, t ->
                                                 User.getForId(userId, user -> {
                                                     handleUser(user, token);
                                                     google.stopLoading();

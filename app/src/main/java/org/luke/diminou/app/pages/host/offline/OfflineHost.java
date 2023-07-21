@@ -23,6 +23,7 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
+import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.cards.offline.OfflineDisplayCards;
 import org.luke.diminou.app.cards.offline.OfflineMirorredCards;
@@ -154,7 +155,7 @@ public class OfflineHost extends Titled {
         offlineMirorredCards.bind(cards);
 
         start.setAlpha(0);
-        start.setTranslationY(40);
+        start.setTranslationY(ViewUtils.by(owner));
         start.setScaleX(.7f);
         start.setScaleY(.7f);
 

@@ -1,5 +1,6 @@
 package org.luke.diminou.app.pages.home.online;
 
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
@@ -33,6 +34,7 @@ import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Home extends Page {
@@ -108,6 +110,11 @@ public class Home extends Page {
         User user = owner.getUser();
         registeredListeners.forEach(owner.getMainSocket()::off);
         registeredListeners.clear();
+
+        owner.getMainSocket().onAnyIncoming(e -> {
+            Log.i("received" ,Arrays.toString(e));
+        });
+
         addSocketEventHandler("user_sync", obj -> {
             for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
                 String key = it.next();
@@ -118,7 +125,8 @@ public class Home extends Page {
                 User.getForId(obj.getInt("user_id"), u -> {
                     for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
                         String key = it.next();
-                        u.set(key, obj.get(key));
+                        if(!key.equals("user_id"))
+                            u.set(key, obj.get(key));
                     }
         }));
         addSocketEventHandler("request_sent", obj -> {

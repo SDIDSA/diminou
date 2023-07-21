@@ -21,7 +21,7 @@ public class SessionManager {
 
     }
 
-    public static void registerSocket(Socket socket, String token, String uid) {
+    public static void registerSocket(Socket socket, String token, int uid) {
         Runnable register = () -> socket.emit("register",
                 JsonUtils.make("socket", socket.id(), "token", token, "user_id", uid));
 
@@ -36,7 +36,7 @@ public class SessionManager {
         register.run();
     }
 
-    public static void storeSession(String token, App owner, String uid, StringConsumer onSuccess) {
+    public static void storeSession(String token, App owner, int uid, StringConsumer onSuccess) {
         Store.setAccessToken(token, onSuccess);
         Socket socket = owner.getMainSocket();
         registerSocket(socket, token, uid);

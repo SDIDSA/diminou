@@ -28,6 +28,8 @@ public class User extends Bean {
 
     private final Property<String> friend;
 
+    private final Property<Boolean> online;
+
     private User(JSONObject obj) {
         points = new Property<>();
         id = new Property<>();
@@ -37,6 +39,7 @@ public class User extends Bean {
         username = new Property<>();
         email = new Property<>();
         friend = new Property<>();
+        online = new Property<>(false);
         init(obj);
     }
 
@@ -134,6 +137,18 @@ public class User extends Bean {
 
     public void setFriend(String val) {
         friend.set(val);
+    }
+
+    public Property<Boolean> onlineProperty() {
+        return online;
+    }
+
+    public Boolean isOnline() {
+        return online.get();
+    }
+
+    public void setOnline(Boolean val) {
+        online.set(val);
     }
 
     public boolean isSelf() {
