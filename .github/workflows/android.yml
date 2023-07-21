@@ -18,7 +18,7 @@ jobs:
     steps:    
     - name : Retrieve Version
       run: |
-        echo "::set-output name=VERSION_NAME::$(${{env.GITHUB_WORKSPACE}}/gradlew -q printVersionName)"
+        echo "::set-output name=VERSION_NAME::$({{env.GITHUB_WORKSPACE}}/gradlew -q printVersionName)"
       id: android_version
       
     - name: Get version
