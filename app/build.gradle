@@ -36,6 +36,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    task printVersionName {
+        doLast {
+            println android.defaultConfig.versionName
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
