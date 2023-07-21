@@ -51,7 +51,7 @@ public class HostDisplay extends HBox implements Styleable {
     public void applyStyle(Style style) {
         setBackground(style.getBackgroundPrimary());
         setBorderColor(style.getTextMuted());
-        avatar.setBackground(style.getBackgroundPrimary());
+        avatar.setOnlineBackground(style.getBackgroundPrimary());
     }
 
     @Override
