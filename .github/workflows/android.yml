@@ -15,15 +15,10 @@ jobs:
     name: "Release"
     runs-on: "ubuntu-latest"
     
-    steps:
-    - name : Retrieve Version
-      run: |
-        echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q printVersionName)"
-      id: android_version
-    
+    steps:    
     - name: Get version
       run: |
-        echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
+        echo "version_name=$(grep "versionName" app/build.gradle | awk '{print $2}' | tr -d \''"\\')" >> $GITHUB_ENV
 
     - name: "Create release"
       uses: "actions/github-script@v6"
