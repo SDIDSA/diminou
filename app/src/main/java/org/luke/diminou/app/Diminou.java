@@ -56,25 +56,25 @@ public class Diminou extends App {
                             }
                         });
                     }
-                }, () -> {
-                    if(isOnline() || getLoaded() instanceof SplashScreen) {
-                        Platform.runLater(() ->
-                                toast("Server unreachable.."));
-                    }
-                });
+                }, () -> loadPage(Login.class));
             }, 2000);
         }, "post_create_thread").start();
     }
     private void initializeSocket(Runnable onConnect, Runnable onError) {
         try {
             Socket mSocket = IO.socket(API.BASE);
+            Runnable off = () -> {
+                mSocket.off(Socket.EVENT_CONNECT);
+                mSocket.off(Socket.EVENT_CONNECT_ERROR);
+            };
             mSocket.on(Socket.EVENT_CONNECT, d -> {
                 putMainSocket(mSocket);
                 onConnect.run();
-                mSocket.off(Socket.EVENT_CONNECT);
+                off.run();
             });
             mSocket.on(Socket.EVENT_CONNECT_ERROR, d -> {
                 onError.run();
+                off.run();
             });
             if(!mSocket.connected()){
                 mSocket.connect();
