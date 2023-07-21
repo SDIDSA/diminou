@@ -129,7 +129,7 @@ public class PlayerCard extends VBox implements Styleable {
             }else {
                 preAvatar.removeAllViews();
                 preAvatar.addView(avatarDisplay, 0);
-                if(host) {
+                if(host || (boundTo != null && boundTo.host)) {
                     if (nv.isSelf()) remove.setImageResource(R.drawable.owner);
                     else remove.setImageResource(R.drawable.close);
                     preAvatar.addView(remove);

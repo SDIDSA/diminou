@@ -188,6 +188,7 @@ public class Top extends VBox implements Styleable {
     public void applyStyle(Style style) {
         newUn.setBackgroundColor(style.getBackgroundTertiary());
         newUn.setBorderColor(Color.TRANSPARENT);
+        pfp.setOnlineBackground(style.getBackgroundPrimary());
     }
 
     @Override

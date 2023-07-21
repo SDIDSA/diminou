@@ -6,7 +6,9 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.layout.linear.HBox;
 import org.luke.diminou.abs.components.layout.linear.VBox;
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.app.cards.offline.OfflineDisplayCards;
 import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 
@@ -55,6 +57,16 @@ public class MirorredCards extends VBox {
     public void unbind() {
         for(PlayerCard card : cards) {
             card.unbind();
+        }
+    }
+
+    public void forEach(ObjectConsumer<PlayerCard> o) {
+        for(PlayerCard card : cards) {
+            try {
+                o.accept(card);
+            } catch (Exception e) {
+                ErrorHandler.handle(e, "running cards foreach");
+            }
         }
     }
 }
