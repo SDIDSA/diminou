@@ -37,7 +37,7 @@ jobs:
         echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
  
     - run: |
-          gh release create ${{version_name}} release.tar.xz
+          gh release create ${{env.version_name}} release.tar.xz
       env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
       shell: bash
