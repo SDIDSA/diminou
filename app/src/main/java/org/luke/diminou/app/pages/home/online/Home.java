@@ -187,6 +187,9 @@ public class Home extends Page {
                     owner.notify(u.getUsername(),
                             "Invited you to join a room",
                             overlay::show,
+                            new NotificationAction(R.drawable.close,
+                                    "Decline",
+                                    () -> overlay.fire("Decline")),
                             new NotificationAction(
                                     R.drawable.play,
                                     "Join",

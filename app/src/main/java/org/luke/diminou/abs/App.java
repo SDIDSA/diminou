@@ -16,6 +16,7 @@ import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -263,8 +264,8 @@ public class App extends AppCompatActivity {
         if (Store.getAmbient().equals("off")) muteAmbient();
         else unmuteAmbient();
 
-        int action_id = getIntent().getIntExtra("id", -1);
-        Runnable action = action_id == -1 ? null : onNotification.get(action_id);
+        int id = getIntent().getIntExtra("id", -1);
+        Runnable action = id == -1 ? null : onNotification.get(id);
         if(action != null) {
             action.run();
         }
@@ -273,7 +274,6 @@ public class App extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
         setIntent(intent);
     }
 
@@ -419,7 +419,7 @@ public class App extends AppCompatActivity {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel =
                     new NotificationChannel("main", "diminou", importance);
             channel.setDescription("main channel to notify users");
@@ -448,7 +448,8 @@ public class App extends AppCompatActivity {
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(head)
                 .setContentText(body)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(createIntent(onOpen))
                 .setAutoCancel(true);
 
@@ -478,7 +479,7 @@ public class App extends AppCompatActivity {
 
         onNotification.put(id, action);
 
-        return PendingIntent.getActivity(this, 0,
+        return PendingIntent.getActivity(this, id,
                 intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
