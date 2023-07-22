@@ -422,6 +422,7 @@ public class App extends AppCompatActivity {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel =
                     new NotificationChannel("main", "diminou", importance);
+            channel.enableVibration(true);
             channel.setDescription("main channel to notify users");
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
@@ -448,8 +449,8 @@ public class App extends AppCompatActivity {
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(head)
                 .setContentText(body)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_SOUND | NotificationCompat.DEFAULT_VIBRATE) //Important for heads-up notification
+                .setPriority(Notification.PRIORITY_MAX)
                 .setContentIntent(createIntent(onOpen))
                 .setAutoCancel(true);
 
