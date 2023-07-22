@@ -431,6 +431,19 @@ public class App extends AppCompatActivity {
     private final HashMap<Integer, Runnable> onNotification = new HashMap<>();
 
     public void notify(String head, String body, Runnable onOpen, NotificationAction...actions) {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        int notificationId = new Random().nextInt(Integer.MAX_VALUE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "main")
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(head)
@@ -443,24 +456,16 @@ public class App extends AppCompatActivity {
             builder.addAction(new NotificationCompat.Action(
                     action.getIcon(),
                     action.getText(),
-                    createIntent(action.getAction())
+                    createIntent(() -> {
+                        notificationManager.cancel(notificationId);
+                        action.getAction().run();
+                    })
             ));
         }
 
         Notification notification = builder.build();
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        notificationManager.notify(Permissions.permissionRequestCode(), notification);
+        notificationManager.notify(notificationId, notification);
     }
 
     private PendingIntent createIntent(Runnable action) {
