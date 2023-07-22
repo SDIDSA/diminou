@@ -17,7 +17,9 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.image.Image;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.observable.ChangeListener;
 import org.luke.diminou.data.property.Property;
@@ -38,6 +40,8 @@ public class AvatarDisplay extends StackPane implements Styleable {
     private final ChangeListener<Boolean> onOnline;
 
     private User old;
+
+    private ObjectConsumer<Boolean> onOnlineChanged;
 
     public AvatarDisplay(App owner, float sizeDp) {
         super(owner);
@@ -84,9 +88,22 @@ public class AvatarDisplay extends StackPane implements Styleable {
         addView(preOnline);
 
         onUrl = (obs, ov, nv) -> ImageProxy.getImage(nv, img::setImageBitmap);
-        onOnline = (obs, ov, nv) -> applyStyle(owner.getStyle());
+        onOnline = (obs, ov, nv) -> {
+            applyStyle(owner.getStyle());
+            if(onOnlineChanged != null) {
+                try {
+                    onOnlineChanged.accept(nv);
+                } catch (Exception e) {
+                    ErrorHandler.handle(e, "handling online change");
+                }
+            }
+        };
 
         applyStyle(owner.getStyle());
+    }
+
+    public void setOnOnlineChanged(ObjectConsumer<Boolean> onOnlineChanged) {
+        this.onOnlineChanged = onOnlineChanged;
     }
 
     public AvatarDisplay(App owner) {

@@ -90,6 +90,7 @@ public class PlayerCard extends VBox implements Styleable {
         setAlpha(.5f);
 
         avatarDisplay = new AvatarDisplay(owner);
+        avatarDisplay.setOnOnlineChanged(online -> applyStyle(owner.getStyle()));
 
         ConfirmKick confirmKick = new ConfirmKick(owner);
         confirmKick.setOnYes(() -> {
@@ -120,6 +121,7 @@ public class PlayerCard extends VBox implements Styleable {
         addView(name);
 
         user.addListener((obs, ov, nv) -> {
+            applyStyle(owner.getStyle());
             if (nv == null) {
                 preAvatar.removeAllViews();
                 preAvatar.addView(loading, 0);
@@ -410,9 +412,11 @@ public class PlayerCard extends VBox implements Styleable {
 
         loading.setFill(style.getTextMuted());
 
+        boolean isOnline = (user.get() != null && user.get().isOnline());
+        int borderColor = isOnline ? style.getTextPositive() : style.getTextMuted();
         remove.setBackgroundColor(style.getBackgroundTertiary());
-        remove.setFill(style.getTextMuted());
-        remove.setBorder(style.getTextMuted());
+        remove.setFill(borderColor);
+        remove.setBorder(borderColor);
     }
 
     @Override

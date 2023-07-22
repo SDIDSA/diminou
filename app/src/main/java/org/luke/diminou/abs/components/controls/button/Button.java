@@ -163,6 +163,10 @@ public class Button extends StackPane {
         return label.getKey();
     }
 
+    public String getText() {
+        return label.getText().toString();
+    }
+
     public void setKey(String name) {
         label.setKey(name);
     }

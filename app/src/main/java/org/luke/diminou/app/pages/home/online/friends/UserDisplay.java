@@ -31,11 +31,8 @@ public class UserDisplay extends StackPane implements Styleable {
     public static UserDisplay get(App owner, int userId) {
         UserDisplay found = cache.get(userId);
         if(found == null) {
-            Log.i("creating", String.valueOf(userId));
             found = new UserDisplay(owner, userId);
             cache.put(userId, found);
-        }else {
-            Log.i("found in cache", String.valueOf(userId));
         }
         if(found.getParent() != null) {
             ((ViewGroup) found.getParent()).removeView(found);

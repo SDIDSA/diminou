@@ -1,6 +1,12 @@
 package org.luke.diminou.abs;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -22,6 +28,9 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.RawRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -30,7 +39,6 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import org.json.JSONObject;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.base.ValueAnimation;
@@ -49,6 +57,7 @@ import org.luke.diminou.abs.components.layout.overlay.media.MediaPickerOverlay;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.style.Style;
+import org.luke.diminou.abs.utils.NotificationAction;
 import org.luke.diminou.abs.utils.Permissions;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
@@ -58,7 +67,6 @@ import org.luke.diminou.app.account.google.GoogleAccountHandler;
 import org.luke.diminou.app.account.google.GoogleOauthContract;
 import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.player.Player;
-import org.luke.diminou.app.pages.home.online.global.RoomId;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Timer;
 import org.luke.diminou.data.beans.Room;
@@ -70,6 +78,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -167,6 +176,7 @@ public class App extends AppCompatActivity {
                     Font.DEFAULT = new Font(nv.getFontFamily());
                 }
             });
+            createNotificationChannel();
         }, "app_init_thread").start();
     }
 
@@ -175,7 +185,7 @@ public class App extends AppCompatActivity {
         googleSignIn.launch("google sign in");
     }
 
-    public void requirePermissions(Runnable onGranted, String...permissions) {
+    public void requirePermissions(Runnable onGranted, String... permissions) {
         if (isGranted(permissions)) {
             onGranted.run();
         } else {
@@ -183,7 +193,7 @@ public class App extends AppCompatActivity {
         }
     }
 
-    private void requestPermission(Runnable onGranted, String...permissions) {
+    private void requestPermission(Runnable onGranted, String... permissions) {
         int code = Permissions.permissionRequestCode();
         onPermission.put(code, onGranted);
         requestPermissions(permissions, code);
@@ -213,7 +223,7 @@ public class App extends AppCompatActivity {
     }
 
     public void pickImage(ObjectConsumer<Media> onRes) {
-        if(mediaPicker == null) {
+        if (mediaPicker == null) {
             mediaPicker = new MediaPickerOverlay(this);
         }
         mediaPicker.setOnMedia(onRes);
@@ -234,6 +244,7 @@ public class App extends AppCompatActivity {
     }
 
     private boolean paused = false;
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -249,21 +260,34 @@ public class App extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         paused = false;
-        if(Store.getAmbient().equals("off")) muteAmbient();
+        if (Store.getAmbient().equals("off")) muteAmbient();
         else unmuteAmbient();
+
+        int action_id = getIntent().getIntExtra("id", -1);
+        Runnable action = action_id == -1 ? null : onNotification.get(action_id);
+        if(action != null) {
+            action.run();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        setIntent(intent);
     }
 
     public void startAmbient() {
         MediaPlayer mp = getSound(R.raw.ambient);
         mp.setLooping(true);
         mp.start();
-        if(Store.getAmbient().equals("off")) muteAmbient();
+        if (Store.getAmbient().equals("off")) muteAmbient();
         else unmuteAmbient();
     }
 
     public void applyAmbient(boolean b) {
         Store.setAmbient(b ? "on" : "off", null);
-        if(b) unmuteAmbient();
+        if (b) unmuteAmbient();
         else muteAmbient();
     }
 
@@ -277,7 +301,7 @@ public class App extends AppCompatActivity {
 
     private synchronized MediaPlayer getSound(@RawRes int res) {
         MediaPlayer mp = sounds.get(res);
-        if(mp == null) {
+        if (mp == null) {
             mp = MediaPlayer.create(this, res);
             sounds.put(res, mp);
         }
@@ -286,20 +310,20 @@ public class App extends AppCompatActivity {
     }
 
     public synchronized void playMenuSound(@RawRes int res) {
-        if(Store.getMenuSounds().equals("on")) playSound(res);
+        if (Store.getMenuSounds().equals("on")) playSound(res);
     }
 
     public synchronized void playGameSound(@RawRes int res) {
-        if(Store.getGameSounds().equals("on")) playSound(res);
+        if (Store.getGameSounds().equals("on")) playSound(res);
     }
 
     private synchronized void playSound(@RawRes int res) {
-        if(paused) return;
+        if (paused) return;
         MediaPlayer mp = getSound(res);
         try {
             mp.seekTo(0);
             mp.start();
-        }catch(Exception x) {
+        } catch (Exception x) {
             sounds.remove(res);
             playSound(res);
         }
@@ -329,7 +353,7 @@ public class App extends AppCompatActivity {
             AtomicReference<Page> page = new AtomicReference<>();
             Page old = loaded;
             if (old != null) {
-                if(!(old instanceof SplashScreen))
+                if (!(old instanceof SplashScreen))
                     playMenuSound(R.raw.page);
                 running = new ParallelAnimation(500).addAnimation(new AlphaAnimation(old, 0)).addAnimation(new TranslateYAnimation(old, ViewUtils.dipToPx(-30, this))).setInterpolator(Interpolator.EASE_OUT).setOnFinished(() -> {
                     root.removeView(old);
@@ -391,6 +415,66 @@ public class App extends AppCompatActivity {
         overlay.applySystemInsets(systemInsets);
 
         loadedOverlay.add(0, overlay);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel =
+                    new NotificationChannel("main", "diminou", importance);
+            channel.setDescription("main channel to notify users");
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private final HashMap<Integer, Runnable> onNotification = new HashMap<>();
+
+    public void notify(String head, String body, Runnable onOpen, NotificationAction...actions) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "main")
+                .setSmallIcon(R.drawable.icon)
+                .setContentTitle(head)
+                .setContentText(body)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(createIntent(onOpen))
+                .setAutoCancel(true);
+
+        for(NotificationAction action : actions) {
+            builder.addAction(new NotificationCompat.Action(
+                    action.getIcon(),
+                    action.getText(),
+                    createIntent(action.getAction())
+            ));
+        }
+
+        Notification notification = builder.build();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        notificationManager.notify(Permissions.permissionRequestCode(), notification);
+    }
+
+    private PendingIntent createIntent(Runnable action) {
+        Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        intent.setPackage(null);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+
+        int id = new Random().nextInt(Integer.MAX_VALUE);
+        intent.putExtra("id", id);
+
+        onNotification.put(id, action);
+
+        return PendingIntent.getActivity(this, 0,
+                intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public void toast(long duration, View... views) {
