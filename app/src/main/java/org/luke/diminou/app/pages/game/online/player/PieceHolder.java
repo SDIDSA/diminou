@@ -270,10 +270,10 @@ public class PieceHolder extends StackPane implements Styleable {
 
     private void applyMove(Move m) {
         game.getPassInit().hide();
-        play(m);
-        setEnabled(false);
 
-        //send move
+        GameRoute.play(owner.getRoom().getId(), m, res -> {
+            if(res.has("err")) owner.toast(res.getString("err"));
+        });
     }
 
     public void play(Move move) {
@@ -353,7 +353,6 @@ public class PieceHolder extends StackPane implements Styleable {
                 Platform.runLater(() -> root.addView(piece, side == Side.TOP || side == Side.RIGHT ? 0 : root.getChildCount()));
                 adding.add(piece);
                 piecesDisplay.put(p, piece);
-                game.updateStock();
 
                 if(side == Side.BOTTOM)
                     owner.playGameSound(PlaySound.SOUND_16.getRes());
@@ -565,7 +564,7 @@ public class PieceHolder extends StackPane implements Styleable {
 
             if (enabled) {
                 timer.setFill(owner.getStyle().get().getTextPositive());
-                int time = owner.getTimer().getDuration();
+                int time = 30;
                 if(timerThread != null && timerThread.isAlive()) {
                     timerThread.interrupt();
                 }
@@ -579,7 +578,8 @@ public class PieceHolder extends StackPane implements Styleable {
 
                         if (factor == 0 && isSelf()) {
                             Platform.runLater(() -> {
-                                if (gameTable.isPlaying() != -1) return;
+                                if (gameTable.isPlaying() != -1 ||
+                                        gameTable.getPossiblePlays(pieces).isEmpty()) return;
                                 Piece p = gameTable.getPossiblePlays(pieces).get(0);
                                 Move m = gameTable.getPossiblePlays(p, null).get(0);
                                 applyMove(m);
@@ -620,7 +620,7 @@ public class PieceHolder extends StackPane implements Styleable {
         });
     }
 
-    private boolean isSelf() {
+    public boolean isSelf() {
         return side == Side.BOTTOM;
     }
 

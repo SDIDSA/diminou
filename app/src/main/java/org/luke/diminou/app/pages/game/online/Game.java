@@ -35,6 +35,7 @@ import org.luke.diminou.app.pages.game.pause.GamePause;
 import org.luke.diminou.app.pages.game.offline.score.OfflineScoreBoard;
 import org.luke.diminou.app.pages.game.online.player.PieceHolder;
 import org.luke.diminou.app.pages.game.online.table.Table;
+import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.game.player.Side;
 import org.luke.diminou.app.pages.home.online.Home;
@@ -146,9 +147,8 @@ public class Game extends Page {
         return null;
     }
 
-    public synchronized void updateStock() {
-        int stock = 28 - holders.stream().mapToInt(PieceHolder::getDisplayedCount).sum() - table.count();
-        Platform.runLater(() -> leftInStock.addParam(0, String.valueOf(stock)));
+    public synchronized void updateStock(int val) {
+        Platform.runLater(() -> leftInStock.addParam(0, String.valueOf(val)));
     }
 
     public ArrayList<PieceHolder> getHolders() {
@@ -303,6 +303,7 @@ public class Game extends Page {
         //TODO error
 
         on("deal", data -> {
+            updateStock(data.getInt("stock"));
             int player = data.getInt("player");
             JSONArray arr = data.getJSONArray("toAdd");
             Piece[] pieces = new Piece[arr.length()];
@@ -313,17 +314,31 @@ public class Game extends Page {
             getForPlayer(player).add(pieces);
         });
 
-        //TODO turn
+        on("turn", data -> {
+           int turn = data.getInt("turn");
+           this.turn.turn(turn);
+        });
 
         //TODO saket
 
         //TODO khabet
 
-        //TODO move
+        on("play", data -> {
+            int player = data.getInt("player");
+            Move move = Move.deserialize(data.getJSONObject("move"));
+            getForPlayer(player).play(move);
+        });
 
         //TODO winner
 
-        //TODO pass
+        on("pass", data -> {
+            int player = data.getInt("player");
+            PieceHolder passed = getForPlayer(player);
+            if(passed.isSelf()) {
+                owner.toast("pass");
+            }
+            owner.playGameSound(R.raw.pass);
+        });
 
         //TODO skip
 

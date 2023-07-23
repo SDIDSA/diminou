@@ -1,5 +1,7 @@
 package org.luke.diminou.data.beans;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.luke.diminou.abs.utils.ErrorHandler;
@@ -45,10 +47,6 @@ public class Room {
         return id;
     }
 
-    public String getState() {
-        return state;
-    }
-
     public int getWinner() {
         return winner;
     }
@@ -82,6 +80,7 @@ public class Room {
         return players[index];
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Room{" +

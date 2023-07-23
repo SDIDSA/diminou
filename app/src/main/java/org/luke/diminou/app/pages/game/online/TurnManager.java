@@ -26,7 +26,7 @@ public class TurnManager {
     }
 
     public void turn(int p) {
-        //TODO turn
+        game.getHolders().forEach(h -> h.setEnabled(h.getPlayer() == p));
     }
 
     public void turn(PieceHolder holder) {

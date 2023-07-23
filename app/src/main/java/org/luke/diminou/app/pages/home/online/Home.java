@@ -94,7 +94,6 @@ public class Home extends Page {
             content.nextInto(Play.class);
         }
 
-
         new ParallelAnimation(400)
                 .addAnimation(new AlphaAnimation(top, 1))
                 .addAnimation(new TranslateYAnimation(top, 0))

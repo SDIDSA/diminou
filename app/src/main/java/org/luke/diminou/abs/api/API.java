@@ -156,5 +156,7 @@ public class API {
         private static final String PREFIX = BASE + "game/";
 
         public static final String DEAL = PREFIX + "deal";
+
+        public static final String PLAY = PREFIX + "play";
     }
 }
