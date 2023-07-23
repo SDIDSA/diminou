@@ -16,7 +16,6 @@ import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -67,7 +66,7 @@ import org.luke.diminou.abs.utils.functional.ObjectConsumer;
 import org.luke.diminou.app.account.google.GoogleAccountHandler;
 import org.luke.diminou.app.account.google.GoogleOauthContract;
 import org.luke.diminou.app.pages.SplashScreen;
-import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.app.pages.settings.Timer;
 import org.luke.diminou.data.beans.Room;
@@ -357,7 +356,7 @@ public class App extends AppCompatActivity {
                     playMenuSound(R.raw.page);
                 running = new ParallelAnimation(500).addAnimation(new AlphaAnimation(old, 0)).addAnimation(new TranslateYAnimation(old, ViewUtils.dipToPx(-30, this))).setInterpolator(Interpolator.EASE_OUT).setOnFinished(() -> {
                     root.removeView(old);
-                    old.destroy();
+                    old.destroy(loaded);
                     if (post != null) post.run();
                 });
                 running.start();
@@ -398,7 +397,7 @@ public class App extends AppCompatActivity {
         if (loaded == null) return;
 
         root.removeView(loaded);
-        loaded.destroy();
+        loaded.destroy(null);
         loaded = null;
     }
 
@@ -702,12 +701,12 @@ public class App extends AppCompatActivity {
         return Timer.byText(getString("timer"));
     }
 
-    public List<Player> getPlayers() {
+    public List<OfflinePlayer> getPlayers() {
         return getTypedData("players");
     }
 
-    public ConcurrentHashMap<Player, Integer> getScore() {
-        ConcurrentHashMap<Player, Integer> score = getTypedData("score");
+    public ConcurrentHashMap<OfflinePlayer, Integer> getScore() {
+        ConcurrentHashMap<OfflinePlayer, Integer> score = getTypedData("score");
         if(score == null) {
             score = new ConcurrentHashMap<>();
             putData("score", score);
@@ -723,7 +722,7 @@ public class App extends AppCompatActivity {
         return getTypedData("socket");
     }
 
-    public Player getWinner() {
+    public OfflinePlayer getWinner() {
         return getTypedData("winner");
     }
 

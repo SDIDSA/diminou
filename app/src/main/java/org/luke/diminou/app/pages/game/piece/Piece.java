@@ -1,11 +1,9 @@
 package org.luke.diminou.app.pages.game.piece;
 
-import android.util.Log;
 import android.view.ViewGroup;
 
 import androidx.annotation.DrawableRes;
 
-import org.json.JSONArray;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;

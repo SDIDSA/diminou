@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.online;
 
 import android.view.Gravity;
 
@@ -63,14 +63,6 @@ public class Cherrat extends HBox {
     }
 
     private void cherra(String name, int drawable, int sound) {
-        Game game = (Game) Page.getInstance(getOwner(), Game.class);
-        assert game != null;
-        game.getBottomHolder().cherra(drawable, sound);
-        if(game.isHost()) {
-            getOwner().getSockets()
-                    .forEach(s -> s.emit(name, game.getBottomHolder().getPlayer().serialize()));
-        } else {
-            getOwner().getSocket().emit(name, game.getBottomHolder().getPlayer().serialize());
-        }
+        //TODO send cherra
     }
 }

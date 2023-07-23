@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.offline;
 
 import android.graphics.Color;
 import android.view.Gravity;
@@ -34,13 +34,13 @@ import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.pages.game.pause.GamePause;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
-import org.luke.diminou.app.pages.game.piece.Stock;
-import org.luke.diminou.app.pages.game.player.PieceHolder;
-import org.luke.diminou.app.pages.game.player.Player;
-import org.luke.diminou.app.pages.game.player.PlayerType;
+import org.luke.diminou.app.pages.game.offline.piece.OfflineStock;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePieceHolder;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayerType;
 import org.luke.diminou.app.pages.game.player.Side;
-import org.luke.diminou.app.pages.game.score.ScoreBoard;
-import org.luke.diminou.app.pages.game.table.Table;
+import org.luke.diminou.app.pages.game.offline.score.OfflineScoreBoard;
+import org.luke.diminou.app.pages.game.offline.table.OfflineTable;
 import org.luke.diminou.app.pages.home.offline.OfflineHome;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
@@ -50,20 +50,20 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Game extends Page {
+public class OfflineGame extends Page {
     private final boolean host;
     private final VBox root;
-    private final ArrayList<PieceHolder> holders;
+    private final ArrayList<OfflinePieceHolder> holders;
 
-    private final Table table;
+    private final OfflineTable table;
 
     private final HBox center;
-    private final Cherrat cherat;
-    private Stock stock;
+    private final OfflineCherrat cherat;
+    private OfflineStock stock;
 
-    private final TurnManager turn;
+    private final OfflineTurnManager turn;
 
-    private final ScoreBoard scoreBoard;
+    private final OfflineScoreBoard scoreBoard;
 
     private final GamePause gamePause;
 
@@ -74,7 +74,7 @@ public class Game extends Page {
     private final Rectangle background;
 
     private final ColoredIcon menu;
-    public Game(App owner) {
+    public OfflineGame(App owner) {
         super(owner);
         setLayoutDirection(LAYOUT_DIRECTION_LTR);
 
@@ -84,7 +84,7 @@ public class Game extends Page {
         root.setGravity(Gravity.BOTTOM | Gravity.CENTER);
         root.setClipChildren(false);
 
-        table = new Table(owner);
+        table = new OfflineTable(owner);
 
         holders = new ArrayList<>();
 
@@ -92,17 +92,17 @@ public class Game extends Page {
         center.addView(ViewUtils.spacer(owner, Orientation.HORIZONTAL));
         center.setClipChildren(false);
 
-        cherat = new Cherrat(owner);
+        cherat = new OfflineCherrat(owner);
 
         root.addView(ViewUtils.spacer(owner, Orientation.VERTICAL));
         root.addView(center);
         root.addView(ViewUtils.spacer(owner, Orientation.VERTICAL));
         root.addView(cherat);
 
-        scoreBoard = new ScoreBoard(owner);
+        scoreBoard = new OfflineScoreBoard(owner);
         scoreBoard.addOnShowing(() -> owner.playMenuSound(R.raw.end));
         scoreBoard.addOnShowing(() -> {
-            for (PieceHolder holder : holders) {
+            for (OfflinePieceHolder holder : holders) {
                 holder.setEnabled(false);
             }
         });
@@ -129,7 +129,7 @@ public class Game extends Page {
         addView(preRoot);
         addView(leftInStock);
 
-        turn = new TurnManager(owner, this);
+        turn = new OfflineTurnManager(owner, this);
 
         gamePause = new GamePause(owner);
 
@@ -140,25 +140,25 @@ public class Game extends Page {
         applyStyle(owner.getStyle());
     }
 
-    public Cherrat getCherrat() {
+    public OfflineCherrat getCherrat() {
         return cherat;
     }
 
-    public PassInit getPassInit() {
+    public OfflinePassInit getPassInit() {
         return cherat.getPassInit();
     }
 
-    public PieceHolder getForPlayer(Player player) {
-        for (PieceHolder holder : holders) {
+    public OfflinePieceHolder getForPlayer(OfflinePlayer player) {
+        for (OfflinePieceHolder holder : holders) {
             if (holder.getPlayer().equals(player)) return holder;
         }
         ErrorHandler.handle(new IllegalStateException("player not found"), "getting pieceHolder for player " + player.serialize());
         return null;
     }
 
-    public Player getForSocket(SocketConnection socket) {
+    public OfflinePlayer getForSocket(SocketConnection socket) {
         if(owner.getPlayers() == null) return null;
-        for(Player p : owner.getPlayers()){
+        for(OfflinePlayer p : owner.getPlayers()){
             if(!p.getIp().isBlank() && p.getIp().equals(socket.getIp())) {
                 return p;
             }
@@ -167,24 +167,24 @@ public class Game extends Page {
     }
 
     public synchronized void updateStock() {
-        int stock = 28 - holders.stream().mapToInt(PieceHolder::getDisplayedCount).sum() - table.count();
+        int stock = 28 - holders.stream().mapToInt(OfflinePieceHolder::getDisplayedCount).sum() - table.count();
         Platform.runLater(() -> leftInStock.addParam(0, String.valueOf(stock)));
     }
 
-    public ArrayList<PieceHolder> getHolders() {
+    public ArrayList<OfflinePieceHolder> getHolders() {
         return holders;
     }
 
-    public Stock getStock() {
+    public OfflineStock getStock() {
         return stock;
     }
 
-    public ScoreBoard getScoreBoard() {
+    public OfflineScoreBoard getScoreBoard() {
         return scoreBoard;
     }
 
-    public int getScoreOf(Player player) {
-        ConcurrentHashMap<Player, Integer> score = owner.getScore();
+    public int getScoreOf(OfflinePlayer player) {
+        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getScore();
 
         Integer i = score.get(player);
         if(i != null)
@@ -194,22 +194,22 @@ public class Game extends Page {
         return 0;
     }
 
-    private void addScoreOf(Player player, int add) {
-        ConcurrentHashMap<Player, Integer> score = owner.getScore();
+    private void addScoreOf(OfflinePlayer player, int add) {
+        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getScore();
 
         int oldScore = getScoreOf(player);
 
         score.put(player, oldScore + add);
     }
 
-    public void setScoreOf(Player player, int val) {
-        ConcurrentHashMap<Player, Integer> score = owner.getScore();
+    public void setScoreOf(OfflinePlayer player, int val) {
+        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getScore();
 
         score.put(player, val);
     }
 
-    public int index(Player player) {
-        List<Player> players = owner.getPlayers();
+    public int index(OfflinePlayer player) {
+        List<OfflinePlayer> players = owner.getPlayers();
         for(int i = 0; i < players.size(); i++) {
             if(players.get(i).equals(player)) {
                 return i;
@@ -218,22 +218,22 @@ public class Game extends Page {
         return -1;
     }
 
-    public Player otherPlayer(Player player) {
-        List<Player> players = owner.getPlayers();
+    public OfflinePlayer otherPlayer(OfflinePlayer player) {
+        List<OfflinePlayer> players = owner.getPlayers();
         return players.get((index(player) + 2) % players.size());
     }
 
-    private int scoreToAdd(Player winner) {
+    private int scoreToAdd(OfflinePlayer winner) {
         int sum = 0;
 
-        ArrayList<Player> winners = new ArrayList<>();
+        ArrayList<OfflinePlayer> winners = new ArrayList<>();
         winners.add(winner);
 
         if(owner.getFourMode() == FourMode.TEAM_MODE) {
             winners.add(otherPlayer(winner));
         }
 
-        for(PieceHolder holder : holders) {
+        for(OfflinePieceHolder holder : holders) {
             if(!winners.contains(holder.getPlayer())) {
                 sum += holder.sum();
             }
@@ -241,7 +241,7 @@ public class Game extends Page {
         return sum;
     }
 
-    public void pass(PieceHolder holder) {
+    public void pass(OfflinePieceHolder holder) {
         if(host) {
             owner.getSockets().forEach(socket -> socket.emit("pass", holder.getPlayer().serialize()));
         }
@@ -254,11 +254,11 @@ public class Game extends Page {
         Platform.runAfter(() -> turn.nextTurn(holder), 1000);
     }
 
-    public TurnManager getTurn() {
+    public OfflineTurnManager getTurn() {
         return turn;
     }
 
-    public Table getTable() {
+    public OfflineTable getTable() {
         return table;
     }
 
@@ -266,8 +266,8 @@ public class Game extends Page {
         return stock.deal();
     }
 
-    public Player checkForWinner() {
-        AtomicReference<Player> winner = new AtomicReference<>();
+    public OfflinePlayer checkForWinner() {
+        AtomicReference<OfflinePlayer> winner = new AtomicReference<>();
         holders.forEach(h -> {
             if(h.getPieces().isEmpty()) {
                 winner.set(h.getPlayer());
@@ -276,7 +276,7 @@ public class Game extends Page {
         return winner.get();
     }
 
-    public void emitWin(Player winner) {
+    public void emitWin(OfflinePlayer winner) {
         if(host) {
             int scoreToAdd = scoreToAdd(winner);
 
@@ -291,11 +291,11 @@ public class Game extends Page {
         }
     }
 
-    private JSONArray scoreBoard(Player winner) {
+    private JSONArray scoreBoard(OfflinePlayer winner) {
         JSONArray arr = new JSONArray();
         try {
-            List<Player> players = owner.getPlayers();
-            for(Player player : players) {
+            List<OfflinePlayer> players = owner.getPlayers();
+            for(OfflinePlayer player : players) {
                 JSONObject obj = new JSONObject();
                 if(player.equals(winner)) {
                     obj.put("winner", true);
@@ -323,7 +323,7 @@ public class Game extends Page {
             try {
                 for(int i = 0; i < data.length(); i++) {
                     JSONObject obj = data.getJSONObject(i);
-                    Player player = Player.deserialize(obj.getJSONObject("player"));
+                    OfflinePlayer player = OfflinePlayer.deserialize(obj.getJSONObject("player"));
                     int score = obj.getInt("score");
                     if(obj.has("winner")) owner.putData("winner", player);
                     setScoreOf(player, score);
@@ -335,7 +335,7 @@ public class Game extends Page {
         Platform.runAfter(scoreBoard::show, 200);
     }
 
-    private void playerLeft(Player left, SocketConnection socket) {
+    private void playerLeft(OfflinePlayer left, SocketConnection socket) {
         if(host) {
             owner.getSockets().forEach(s -> s.emit("leave", left.serialize()));
             owner.getSockets().remove(socket);
@@ -358,7 +358,7 @@ public class Game extends Page {
         ended = false;
         root.setBackground(Color.TRANSPARENT);
         leftInStock.setAlpha(0);
-        stock = new Stock();
+        stock = new OfflineStock();
         table.clear();
         holders.forEach(h -> {
             root.removeView(h);
@@ -369,11 +369,11 @@ public class Game extends Page {
         cherat.setAlpha(0);
         cherat.setTranslationY(ViewUtils.dipToPx(80, owner));
 
-        List<Player> players = owner.getPlayers();
+        List<OfflinePlayer> players = owner.getPlayers();
 
         int index = 0;
         for (int i = 0; i < players.size(); i++) {
-            Player ati = players.get(i);
+            OfflinePlayer ati = players.get(i);
 
             if (ati.isSelf(host))
                 index = i;
@@ -381,32 +381,32 @@ public class Game extends Page {
 
         int pos = 0;
         while (pos < players.size()) {
-            Player p = players.get(index);
+            OfflinePlayer p = players.get(index);
 
             switch (pos) {
                 case 0 -> {
-                    PieceHolder ph = new PieceHolder(owner, this, p, Side.BOTTOM, true);
+                    OfflinePieceHolder ph = new OfflinePieceHolder(owner, this, p, Side.BOTTOM, true);
                     root.addView(ph);
                     holders.add(ph);
                 }
                 case 1 -> {
                     if (players.size() == 2) {
-                        PieceHolder ph = new PieceHolder(owner, this, p, Side.TOP, false);
+                        OfflinePieceHolder ph = new OfflinePieceHolder(owner, this, p, Side.TOP, false);
                         root.addView(ph, 0);
                         holders.add(ph);
                     } else {
-                        PieceHolder ph = new PieceHolder(owner, this, p, Side.RIGHT, false);
+                        OfflinePieceHolder ph = new OfflinePieceHolder(owner, this, p, Side.RIGHT, false);
                         center.addView(ph);
                         holders.add(ph);
                     }
                 }
                 case 2 -> {
-                    PieceHolder ph = new PieceHolder(owner, this, p, Side.TOP, false);
+                    OfflinePieceHolder ph = new OfflinePieceHolder(owner, this, p, Side.TOP, false);
                     root.addView(ph, 0);
                     holders.add(ph);
                 }
                 case 3 -> {
-                    PieceHolder ph = new PieceHolder(owner, this, p, Side.LEFT, false);
+                    OfflinePieceHolder ph = new OfflinePieceHolder(owner, this, p, Side.LEFT, false);
                     center.addView(ph, 0);
                     holders.add(ph);
                 }
@@ -436,7 +436,7 @@ public class Game extends Page {
                     }
                 })
                 .addAnimations(
-                        holders.stream().map(PieceHolder::setup).toArray(Animation[]::new))
+                        holders.stream().map(OfflinePieceHolder::setup).toArray(Animation[]::new))
                 .addAnimation(new TranslateYAnimation(menu, -ViewUtils.by(owner), 0))
                 .addAnimation(new AlphaAnimation(menu, 0, 1))
                 .setOnUpdate(v -> {
@@ -457,15 +457,15 @@ public class Game extends Page {
         if (host) {
             owner.getSockets().forEach(socket -> {
                 socket.setOnError(() -> {
-                    Player client = getForSocket(socket);
-                    if(client == null || client.getType() == PlayerType.BOT) return;
+                    OfflinePlayer client = getForSocket(socket);
+                    if(client == null || client.getType() == OfflinePlayerType.BOT) return;
                     playerLeft(client, socket);
                 });
 
                 socket.on("deal", data -> {
                     JSONArray arr = new JSONArray();
-                    Player player = Player.deserialize(new JSONObject(data));
-                    PieceHolder holder = getForPlayer(player);
+                    OfflinePlayer player = OfflinePlayer.deserialize(new JSONObject(data));
+                    OfflinePieceHolder holder = getForPlayer(player);
 
                     assert holder != null;
                     assert player != null;
@@ -480,9 +480,9 @@ public class Game extends Page {
                 });
                 socket.on("move", data -> {
                     JSONObject obj = new JSONObject(data);
-                    Player player = Player.deserialize(obj.getJSONObject("player"));
+                    OfflinePlayer player = OfflinePlayer.deserialize(obj.getJSONObject("player"));
                     Move move = Move.deserialize(obj.getJSONObject("move"));
-                    PieceHolder holder = getForPlayer(player);
+                    OfflinePieceHolder holder = getForPlayer(player);
 
                     assert holder != null;
                     assert move != null;
@@ -492,25 +492,25 @@ public class Game extends Page {
                 });
                 socket.on("khabet", data -> {
                     owner.getSockets().forEach(s -> s.emit("khabet", data));
-                    Player player = Player.deserialize(new JSONObject(data));
+                    OfflinePlayer player = OfflinePlayer.deserialize(new JSONObject(data));
                     getForPlayer(player).cherra(R.drawable.khabet, R.raw.khabet);
                 });
                 socket.on("saket", data -> {
                     owner.getSockets().forEach(s -> s.emit("saket", data));
-                    Player player = Player.deserialize(new JSONObject(data));
+                    OfflinePlayer player = OfflinePlayer.deserialize(new JSONObject(data));
                     getForPlayer(player).cherra(R.drawable.saket, R.raw.saket);
                 });
                 socket.on("turn", data -> {
-                    Player winner = checkForWinner();
+                    OfflinePlayer winner = checkForWinner();
                     if(winner != null) {
                         emitWin(winner);
                         return;
                     }
-                    Player p = Player.deserialize(new JSONObject(data));
+                    OfflinePlayer p = OfflinePlayer.deserialize(new JSONObject(data));
                     turn.turn(p);
                 });
                 socket.on("leave", data ->
-                        playerLeft(Player.deserialize(new JSONObject(data)), socket));
+                        playerLeft(OfflinePlayer.deserialize(new JSONObject(data)), socket));
             });
         } else {
             SocketConnection socket = owner.getSocket();
@@ -522,8 +522,8 @@ public class Game extends Page {
             }));
             socket.on("deal", data -> {
                 JSONObject all = new JSONObject(data);
-                Player player = Player.deserialize(all.getJSONObject("player"));
-                PieceHolder holder = getForPlayer(player);
+                OfflinePlayer player = OfflinePlayer.deserialize(all.getJSONObject("player"));
+                OfflinePieceHolder holder = getForPlayer(player);
 
                 assert holder != null;
                 assert player != null;
@@ -537,26 +537,26 @@ public class Game extends Page {
                 holder.add(pieces.toArray(new Piece[0]));
             });
             socket.on("turn", data -> {
-                Player p = Player.deserialize(new JSONObject(data));
+                OfflinePlayer p = OfflinePlayer.deserialize(new JSONObject(data));
                 turn.turn(p);
             });
             socket.on("saket", data -> {
-                Player player = Player.deserialize(new JSONObject(data));
+                OfflinePlayer player = OfflinePlayer.deserialize(new JSONObject(data));
                 assert player != null;
                 if(player.equals(getBottomHolder().getPlayer())) return;
                 getForPlayer(player).cherra(R.drawable.saket, R.raw.saket);
             });
             socket.on("khabet", data -> {
-                Player player = Player.deserialize(new JSONObject(data));
+                OfflinePlayer player = OfflinePlayer.deserialize(new JSONObject(data));
                 assert player != null;
                 if(player.equals(getBottomHolder().getPlayer())) return;
                 getForPlayer(player).cherra(R.drawable.khabet, R.raw.khabet);
             });
             socket.on("move", data -> {
                 JSONObject obj = new JSONObject(data);
-                Player player = Player.deserialize(obj.getJSONObject("player"));
+                OfflinePlayer player = OfflinePlayer.deserialize(obj.getJSONObject("player"));
                 Move move = Move.deserialize(obj.getJSONObject("move"));
-                PieceHolder holder = getForPlayer(player);
+                OfflinePieceHolder holder = getForPlayer(player);
 
                 assert holder != null;
                 assert move != null;
@@ -566,7 +566,7 @@ public class Game extends Page {
             });
             socket.on("winner", data -> victory(new JSONArray(data)));
             socket.on("pass", data -> {
-                Player p = Player.deserialize(new JSONObject(data));
+                OfflinePlayer p = OfflinePlayer.deserialize(new JSONObject(data));
                 Platform.runAfter(() -> {
                     assert p != null;
                     if(p.isSelf(false))
@@ -585,14 +585,14 @@ public class Game extends Page {
                 endGame();
             }));
             socket.on("leave", data ->
-                    playerLeft(Player.deserialize(new JSONObject(data)), socket));
+                    playerLeft(OfflinePlayer.deserialize(new JSONObject(data)), socket));
         }
 
         Platform.runBack(() -> {
             boolean empty = true;
             while (empty) {
                 empty = false;
-                for (PieceHolder holder : holders) {
+                for (OfflinePieceHolder holder : holders) {
                     if (holder.getPieces().isEmpty()) {
                         empty = true;
                         break;
@@ -605,24 +605,24 @@ public class Game extends Page {
         });
     }
 
-    public PieceHolder getTopHolder() {
+    public OfflinePieceHolder getTopHolder() {
         return getHolderAt(Side.TOP);
     }
 
-    public PieceHolder getBottomHolder() {
+    public OfflinePieceHolder getBottomHolder() {
         return getHolderAt(Side.BOTTOM);
     }
 
-    public PieceHolder getRightHolder() {
+    public OfflinePieceHolder getRightHolder() {
         return getHolderAt(Side.RIGHT);
     }
 
-    public PieceHolder getLeftHolder() {
+    public OfflinePieceHolder getLeftHolder() {
         return getHolderAt(Side.LEFT);
     }
 
-    public PieceHolder getHolderAt(Side side) {
-        for(PieceHolder holder : holders) {
+    public OfflinePieceHolder getHolderAt(Side side) {
+        for(OfflinePieceHolder holder : holders) {
             if(holder.getSide() == side) {
                 return holder;
             }
@@ -656,14 +656,14 @@ public class Game extends Page {
         owner.putData("score", null);
         owner.putData("winner", null);
         owner.putData("players", null);
-        holders.forEach(PieceHolder::deselect);
+        holders.forEach(OfflinePieceHolder::deselect);
         holders.forEach(h -> h.setEnabled(false));
         Style style = owner.getStyle().get();
         new ParallelAnimation(400)
                 .addAnimation(new AlphaAnimation(table, 0))
                 .addAnimation(new ScaleXYAnimation(table, .5f))
                 .addAnimations(
-                        holders.stream().map(PieceHolder::hideAnimation).toArray(Animation[]::new))
+                        holders.stream().map(OfflinePieceHolder::hideAnimation).toArray(Animation[]::new))
                 .addAnimation(new PaddingAnimation(400, preRoot,
                         0,
                         0,
@@ -719,8 +719,8 @@ public class Game extends Page {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void destroy(Page newPage) {
+        super.destroy(newPage);
         preRoot.setPadding(0,0,0,0);
         root.setCornerRadius(0);
     }

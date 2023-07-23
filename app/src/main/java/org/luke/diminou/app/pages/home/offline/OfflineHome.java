@@ -320,8 +320,8 @@ public class OfflineHome extends Page {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void destroy(Page newPage) {
+        super.destroy(newPage);
         destroyed = true;
     }
 

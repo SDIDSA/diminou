@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.online;
 
 import android.view.Gravity;
 import android.view.View;

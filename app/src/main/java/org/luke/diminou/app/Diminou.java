@@ -9,7 +9,6 @@ import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.image.ImageProxy;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
-import org.luke.diminou.app.pages.SplashScreen;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.login.Login;

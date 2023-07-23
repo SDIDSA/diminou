@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game;
+package org.luke.diminou.app.pages.game.offline;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -6,29 +6,29 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.app.pages.game.piece.Piece;
-import org.luke.diminou.app.pages.game.player.PieceHolder;
-import org.luke.diminou.app.pages.game.player.Player;
-import org.luke.diminou.app.pages.game.player.PlayerType;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePieceHolder;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayerType;
 import org.luke.diminou.app.pages.settings.FourMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TurnManager {
+public class OfflineTurnManager {
     private final App owner;
-    private final Game game;
+    private final OfflineGame game;
 
-    public TurnManager(App owner, Game game) {
+    public OfflineTurnManager(App owner, OfflineGame game) {
         this.owner = owner;
         this.game = game;
     }
 
-    public void turn(Player p) {
+    public void turn(OfflinePlayer p) {
         if(game.isEnded() || owner.isPaused()) return;
         game.getHolders().forEach(h -> h.setEnabled(p.equals(h.getPlayer())));
         if(game.isHost()) {
             owner.getSockets().forEach(socket -> socket.emit("turn", p.serialize()));
-            PieceHolder holder = game.getForPlayer(p);
+            OfflinePieceHolder holder = game.getForPlayer(p);
             assert holder != null;
             ArrayList<Piece> toAdd = new ArrayList<>(holder.getPieces());
             boolean lostTurn = false;
@@ -57,20 +57,20 @@ public class TurnManager {
                     ErrorHandler.handle(x, "dealing pieces");
                 }
             }
-            if(p.getType() == PlayerType.BOT && !lostTurn && game.checkForWinner() == null) {
+            if(p.getType() == OfflinePlayerType.BOT && !lostTurn && game.checkForWinner() == null) {
                 holder.playBot();
             }
         }
     }
 
-    public void turn(PieceHolder holder) {
+    public void turn(OfflinePieceHolder holder) {
         turn(holder.getPlayer());
     }
 
-    public void nextTurn(PieceHolder holder) {
+    public void nextTurn(OfflinePieceHolder holder) {
         if(game.isEnded() || owner.isPaused()) return;
         if(game.getHolders().isEmpty()) return;
-        PieceHolder next = game.getHolders().get((game.getHolders().indexOf(holder) + 1)
+        OfflinePieceHolder next = game.getHolders().get((game.getHolders().indexOf(holder) + 1)
                 % game.getHolders().size());
         if(!game.isHost()) {
             owner.getSocket().emit("turn", next.getPlayer().serialize());
@@ -78,17 +78,17 @@ public class TurnManager {
         if(game.isHost()) {
             boolean m9foul = game.getStock().isEmpty();
             if(m9foul) {
-                for(PieceHolder h : game.getHolders()) {
+                for(OfflinePieceHolder h : game.getHolders()) {
                     if(!game.getTable().getPossiblePlays(h.getPieces()).isEmpty()) {
                         m9foul = false;
                     }
                 }
             }
             if(m9foul) {
-                ArrayList<Player> winner = new ArrayList<>();
+                ArrayList<OfflinePlayer> winner = new ArrayList<>();
                 int min = Integer.MAX_VALUE;
 
-                for(PieceHolder h : game.getHolders()) {
+                for(OfflinePieceHolder h : game.getHolders()) {
                     int sum = h.sum();
                     if(sum <= min) {
                         if(sum < min) {
@@ -117,14 +117,14 @@ public class TurnManager {
 
     public void init() {
         if (game.isHost()) {
-            Player winner = owner.getWinner();
+            OfflinePlayer winner = owner.getWinner();
             if (winner != null)
                 turn(winner);
             else {
                 List<Piece> priority = Piece.priority();
                 for (Piece piece : priority) {
                     boolean found = false;
-                    for (PieceHolder holder : game.getHolders()) {
+                    for (OfflinePieceHolder holder : game.getHolders()) {
                         if (holder.getPieces().contains(piece)) {
                             turn(holder);
                             found = true;

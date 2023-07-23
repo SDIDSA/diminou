@@ -11,6 +11,7 @@ import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.api.Session;
+import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.button.PrimaryButton;
 import org.luke.diminou.abs.components.controls.text.font.Font;
@@ -19,6 +20,7 @@ import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.cards.online.DisplayCards;
 import org.luke.diminou.app.cards.online.MirorredCards;
 import org.luke.diminou.app.pages.Titled;
+import org.luke.diminou.app.pages.game.online.Game;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.home.online.global.RoomId;
 import org.luke.diminou.data.beans.Room;
@@ -48,17 +50,22 @@ public class Host extends Titled {
 
         invite = new Invite(owner);
 
-        mirorredCards.forEach(card -> {
-            card.setOnClickListener(v -> {
-                if(!card.isLoaded()) {
-                    invite.show();
-                }
-            });
-        });
+        mirorredCards.forEach(card ->
+                card.setOnClickListener(v -> {
+                    if(!card.isLoaded()) {
+                        invite.show();
+                    }
+                })
+        );
 
         Button start = new PrimaryButton(owner, "start_game");
         start.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
         start.setFont(new Font(18));
+        start.setOnClick(() ->
+                Session.begin(roomId, res -> {
+                    if(res.has("err")) owner.toast(res.getString("err"));
+                })
+        );
 
         content.addView(idDisp);
         content.addView(cards);
@@ -81,10 +88,6 @@ public class Host extends Titled {
                 .addAnimation(new AlphaAnimation(start, 1))
                 .addAnimation(new ScaleXYAnimation(start, 1))
                 .setInterpolator(Interpolator.OVERSHOOT);
-    }
-
-    public String getRoomId() {
-        return roomId;
     }
 
     public void joined(int id) {
@@ -128,12 +131,14 @@ public class Host extends Titled {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void destroy(Page newPage) {
+        super.destroy(newPage);
 
-        Session.endGame(roomId, res -> {
-            //IGNORE
-        });
+        if(!(newPage instanceof Game)) {
+            Session.endGame(roomId, res -> {
+                //IGNORE
+            });
+        }
     }
 
     @Override

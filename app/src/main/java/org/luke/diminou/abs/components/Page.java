@@ -57,7 +57,7 @@ public abstract class Page extends StackPane implements Styleable {
 
     }
 
-    public void destroy() {
+    public void destroy(Page newPage) {
 
     }
 

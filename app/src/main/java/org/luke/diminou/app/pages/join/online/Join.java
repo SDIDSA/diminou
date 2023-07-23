@@ -3,9 +3,11 @@ package org.luke.diminou.app.pages.join.online;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.api.Session;
+import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.app.cards.online.DisplayCards;
 import org.luke.diminou.app.pages.Titled;
+import org.luke.diminou.app.pages.game.online.Game;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.home.online.global.RoomId;
 import org.luke.diminou.data.beans.Room;
@@ -73,12 +75,14 @@ public class Join extends Titled {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void destroy(Page newPage) {
+        super.destroy(newPage);
 
-        Session.leave(owner.getUser().getId(), roomId, res -> {
-            //IGNORE
-        });
+        if(!(newPage instanceof Game)) {
+            Session.leave(owner.getUser().getId(), roomId, res -> {
+                //IGNORE
+            });
+        }
     }
 
     @Override

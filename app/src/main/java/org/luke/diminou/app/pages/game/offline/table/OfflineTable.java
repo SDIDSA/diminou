@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game.table;
+package org.luke.diminou.app.pages.game.offline.table;
 
 import android.graphics.Rect;
 import android.view.Gravity;
@@ -20,21 +20,21 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
-import org.luke.diminou.app.pages.game.Game;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
 import org.luke.diminou.app.pages.game.PlaySound;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
 import org.luke.diminou.app.pages.game.piece.PieceRotation;
 import org.luke.diminou.app.pages.game.piece.PlayedPiece;
-import org.luke.diminou.app.pages.game.player.PieceHolder;
-import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePieceHolder;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
 import org.luke.diminou.app.pages.game.player.Side;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Table extends StackPane {
+public class OfflineTable extends StackPane {
     private static final int SPACING = 2;
     private static final int CENTER_SIZE = 8;
     private final App owner;
@@ -44,7 +44,7 @@ public class Table extends StackPane {
     private final ArrayList<PlayedPiece> left_down = new ArrayList<>();
     private final ArrayList<PlayedPiece> right = new ArrayList<>();
     private final ArrayList<PlayedPiece> right_up = new ArrayList<>();
-    public Table(App owner) {
+    public OfflineTable(App owner) {
         super(owner);
         this.owner = owner;
 
@@ -289,8 +289,8 @@ public class Table extends StackPane {
         });
     }
 
-    private volatile Player playing = null;
-    public void play(Move move, ColorIcon source, Player player) {
+    private volatile OfflinePlayer playing = null;
+    public void play(Move move, ColorIcon source, OfflinePlayer player) {
         playing = player;
         owner.putData("winner", null);
         ColorIcon target = getPlayPosition(move);
@@ -400,7 +400,7 @@ public class Table extends StackPane {
 
     }
 
-    public Player isPlaying() {
+    public OfflinePlayer isPlaying() {
         return playing;
     }
 
@@ -673,11 +673,11 @@ public class Table extends StackPane {
     private Rect bounds = null;
     private Rect tableBounds() {
         if(bounds == null) {
-            Game game = owner.getLoaded();
-            PieceHolder leftHolder = game.getLeftHolder();
-            PieceHolder rightHolder = game.getRightHolder();
-            PieceHolder topHolder = game.getTopHolder();
-            PieceHolder bottomHolder = game.getBottomHolder();
+            OfflineGame game = owner.getLoaded();
+            OfflinePieceHolder leftHolder = game.getLeftHolder();
+            OfflinePieceHolder rightHolder = game.getRightHolder();
+            OfflinePieceHolder topHolder = game.getTopHolder();
+            OfflinePieceHolder bottomHolder = game.getBottomHolder();
             int maxLeft = (leftHolder == null ? ViewUtils.dipToPx(5, owner) : getXInParent(leftHolder) + leftHolder.getWidth()) + ViewUtils.dipToPx(10, owner);
             int maxRight = (rightHolder == null ? owner.getScreenWidth() - ViewUtils.dipToPx(5, owner) : getXInParent(rightHolder)) - ViewUtils.dipToPx(10, owner);
             int maxTop = getYInParent(topHolder) + topHolder.getHeight() + ViewUtils.dipToPx(5, owner);

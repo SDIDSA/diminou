@@ -1,14 +1,16 @@
-package org.luke.diminou.app.pages.game.piece;
+package org.luke.diminou.app.pages.game.offline.piece;
+
+import org.luke.diminou.app.pages.game.piece.Piece;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-public class Stock {
+public class OfflineStock {
     private final ArrayList<Piece> stock;
     private final Semaphore stockMutex = new Semaphore(1);
 
-    public Stock() {
+    public OfflineStock() {
         stock = Piece.pack();
     }
 

@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game.player;
+package org.luke.diminou.app.pages.game.offline.player;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
@@ -30,11 +30,12 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
-import org.luke.diminou.app.pages.game.Game;
+import org.luke.diminou.app.pages.game.player.Side;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
 import org.luke.diminou.app.pages.game.PlaySound;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
-import org.luke.diminou.app.pages.game.table.Table;
+import org.luke.diminou.app.pages.game.offline.table.OfflineTable;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
@@ -43,7 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PieceHolder extends StackPane implements Styleable {
+public class OfflinePieceHolder extends StackPane implements Styleable {
     private final App owner;
     private final ArrayList<Piece> pieces;
     private final ConcurrentHashMap<Piece, ColorIcon> piecesDisplay;
@@ -52,10 +53,10 @@ public class PieceHolder extends StackPane implements Styleable {
     private final boolean mine;
     private final Side side;
     private final int padding;
-    private final Game game;
-    private final Table gameTable;
+    private final OfflineGame game;
+    private final OfflineTable gameTable;
     private final LinearBox root;
-    private final Player player;
+    private final OfflinePlayer player;
     private final Label name;
     private final Label score;
     private final Rectangle timer;
@@ -67,7 +68,7 @@ public class PieceHolder extends StackPane implements Styleable {
     private Animation yellow, red;
 
     @SuppressLint("RtlHardcoded")
-    public PieceHolder(App owner, Game game, Player player, Side side, boolean mine) {
+    public OfflinePieceHolder(App owner, OfflineGame game, OfflinePlayer player, Side side, boolean mine) {
         super(owner);
         this.owner = owner;
         this.game = game;
@@ -544,7 +545,7 @@ public class PieceHolder extends StackPane implements Styleable {
         return res;
     }
 
-    public Player getPlayer() {
+    public OfflinePlayer getPlayer() {
         return player;
     }
 
@@ -559,7 +560,7 @@ public class PieceHolder extends StackPane implements Styleable {
                 if (enabled && owner.getFourMode() == FourMode.TEAM_MODE && player.isWinner(owner)) {
                     game.getPassInit().show(() -> {
                         game.getPassInit().hide();
-                        Player mate = game.otherPlayer(player);
+                        OfflinePlayer mate = game.otherPlayer(player);
                         game.getTurn().turn(mate);
                         if(!game.isHost()) {
                             owner.getSocket().emit("turn", mate.serialize());

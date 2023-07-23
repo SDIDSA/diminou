@@ -13,6 +13,7 @@ import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
+import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.scratches.ColoredSeparator;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
@@ -29,9 +30,9 @@ import org.luke.diminou.app.cards.offline.OfflineDisplayCards;
 import org.luke.diminou.app.cards.offline.OfflineMirorredCards;
 import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 import org.luke.diminou.app.pages.Titled;
-import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.player.Player;
-import org.luke.diminou.app.pages.game.player.PlayerType;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayerType;
 import org.luke.diminou.app.pages.home.offline.OfflineHome;
 import org.luke.diminou.app.pages.settings.FourMode;
 
@@ -68,14 +69,14 @@ public class OfflineHost extends Titled {
         TeamModeOverlay teamModeOverlay = new TeamModeOverlay(owner);
 
         Runnable begin = () -> {
-            ArrayList<Player> players = new ArrayList<>();
+            ArrayList<OfflinePlayer> players = new ArrayList<>();
 
             cards.forEach(pc -> {
                 if(pc.isLoaded())
                     players.add(
-                            new Player(
+                            new OfflinePlayer(
                                     pc.getType() == OfflinePlayerCard.Type.BOT ?
-                                            PlayerType.BOT : PlayerType.PLAYER,
+                                            OfflinePlayerType.BOT : OfflinePlayerType.PLAYER,
                                     pc.getUsername(),
                                     pc.getAvatar(),
                                     pc.getConnection() != null ?
@@ -105,7 +106,7 @@ public class OfflineHost extends Titled {
 
             owner.putData("to_game", true);
 
-            owner.loadPage(Game.class);
+            owner.loadPage(OfflineGame.class);
         };
 
         teamModeOverlay.setOnDone(begin);
@@ -286,8 +287,8 @@ public class OfflineHost extends Titled {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void destroy(Page newPage) {
+        super.destroy(newPage);
 
         offlineMirorredCards.unbind();
 

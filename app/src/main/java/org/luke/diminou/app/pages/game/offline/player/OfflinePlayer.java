@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game.player;
+package org.luke.diminou.app.pages.game.offline.player;
 
 import androidx.annotation.NonNull;
 
@@ -8,28 +8,28 @@ import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.net.Local;
 import org.luke.diminou.abs.utils.ErrorHandler;
-import org.luke.diminou.app.pages.game.Game;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
 
 import java.util.Objects;
 
-public class Player {
+public class OfflinePlayer {
     private static final String TYPE = "type";
     private static final String NAME = "name";
     private static final String AVATAR = "avatar";
     private static final String IP = "ip";
-    private PlayerType type;
+    private OfflinePlayerType type;
     private final String name;
     private final String avatar;
     private String ip;
 
-    public Player(PlayerType type, String name, String avatar, String ip) {
+    public OfflinePlayer(OfflinePlayerType type, String name, String avatar, String ip) {
         this.type = type;
         this.name = name;
         this.avatar = avatar;
         this.ip = ip;
     }
 
-    public PlayerType getType() {
+    public OfflinePlayerType getType() {
         return type;
     }
 
@@ -42,13 +42,13 @@ public class Player {
     }
 
     public boolean isSelf(boolean host) {
-        return host ? (ip.isBlank() && type != PlayerType.BOT) : Local.getMyIp().contains(ip);
+        return host ? (ip.isBlank() && type != OfflinePlayerType.BOT) : Local.getMyIp().contains(ip);
     }
 
     public boolean isWinner(App owner) {
-        Game game = (Game) Page.getInstance(owner, Game.class);
+        OfflineGame game = (OfflineGame) Page.getInstance(owner, OfflineGame.class);
 
-        Player winner = owner.getWinner();
+        OfflinePlayer winner = owner.getWinner();
         if (equals(winner)) return true;
         assert game != null;
         return game.otherPlayer(this).equals(winner);
@@ -67,10 +67,10 @@ public class Player {
         return obj;
     }
 
-    public static Player deserialize(JSONObject obj) {
+    public static OfflinePlayer deserialize(JSONObject obj) {
         try {
-            return new Player(
-              PlayerType.valueOf(obj.getString(TYPE)),
+            return new OfflinePlayer(
+              OfflinePlayerType.valueOf(obj.getString(TYPE)),
               obj.getString(NAME),
               obj.getString(AVATAR),
               obj.getString(IP)
@@ -92,7 +92,7 @@ public class Player {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Player player = (Player) o;
+        OfflinePlayer player = (OfflinePlayer) o;
 
         if (type != player.type) return false;
         if (!Objects.equals(name, player.name)) return false;
@@ -114,7 +114,7 @@ public class Player {
     }
 
     public void makeBot() {
-        type = PlayerType.BOT;
+        type = OfflinePlayerType.BOT;
         ip = "";
     }
 }

@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game.score;
+package org.luke.diminou.app.pages.game.offline.score;
 
 import android.view.Gravity;
 
@@ -14,17 +14,17 @@ import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
-import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
-public class PlayerScore extends HBox implements Styleable {
+public class OfflinePlayerScore extends HBox implements Styleable {
     private final Label name;
     private final Label score;
 
     private final int scoreVal;
-    public PlayerScore(App owner, Player player, int score) {
+    public OfflinePlayerScore(App owner, OfflinePlayer player, int score) {
         super(owner);
         this.scoreVal = score;
         setGravity(Gravity.CENTER);
@@ -44,7 +44,7 @@ public class PlayerScore extends HBox implements Styleable {
 
         HBox pieces = new HBox(owner);
         ViewUtils.setMarginRight(pieces, owner, 7);
-        Game game = (Game) Page.getInstance(owner, Game.class);
+        OfflineGame game = (OfflineGame) Page.getInstance(owner, OfflineGame.class);
         assert game != null;
         game.getForPlayer(player).getPieces().forEach(piece -> {
             ColorIcon image = piece.getImage(owner, 12);

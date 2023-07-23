@@ -1,5 +1,6 @@
 package org.luke.diminou.app.pages.home.online;
 
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.Insets;
@@ -22,6 +23,7 @@ import org.luke.diminou.abs.utils.NotificationAction;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.pages.game.online.Game;
 import org.luke.diminou.app.pages.home.online.friends.Friends;
 import org.luke.diminou.app.pages.home.online.global.Bottom;
 import org.luke.diminou.app.pages.home.online.global.HomeFragment;
@@ -34,7 +36,7 @@ import org.luke.diminou.data.beans.Room;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Home extends Page {
@@ -108,9 +110,6 @@ public class Home extends Page {
 
     private void registerSocket() {
         User user = owner.getUser();
-        registeredListeners.forEach(owner.getMainSocket()::off);
-        registeredListeners.clear();
-
         addSocketEventHandler("user_sync", obj -> {
             for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
                 String key = it.next();
@@ -247,11 +246,18 @@ public class Home extends Page {
                 join.swap(i1, i2);
             }
         });
+
+        addSocketEventHandler("begin", data -> {
+            Room room = new Room(data.getJSONObject("game"));
+            owner.putRoom(room);
+
+            Log.i("stock", Arrays.toString(room.getStock()));
+
+            owner.loadPage(Game.class);
+        });
     }
 
-    private final ArrayList<String> registeredListeners = new ArrayList<>();
     private void addSocketEventHandler(String event, ObjectConsumer<JSONObject> handler) {
-        registeredListeners.add(event);
         owner.getMainSocket().off(event);
         owner.getMainSocket().on(event,
                 data -> Platform.runLater(() -> {
