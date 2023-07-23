@@ -11,20 +11,10 @@ import org.luke.diminou.data.SessionManager;
 
 import java.io.File;
 
-public class Session {
+public class Session extends AuthRoute {
 
-	private Session() {
+	Session() {
 
-	}
-
-	private static void call(String path, String action, ObjectConsumer<JSONObject> onResult, Param... params) {
-		String session = SessionManager.getSession();
-		Log.i("session", session);
-		API.asyncJsonPost(path, action, onResult, session, params);
-	}
-
-	private static void callMulti(String path, String action, ObjectConsumer<JSONObject> onResult, Part... parts) {
-		API.asyncMultiPost(path, action, onResult, SessionManager.getSession(), parts);
 	}
 
 	public static void getForId(String type, int id, ObjectConsumer<JSONObject> onResult) {
@@ -112,5 +102,11 @@ public class Session {
 				new Param("room_id", roomId),
 				new Param("i1", i1),
 				new Param("i2", i2));
+	}
+
+	public static void begin(String roomId, String mode,ObjectConsumer<JSONObject> onResult) {
+		call(API.Session.BEGIN, "begin game", onResult,
+				new Param("room_id", roomId),
+				new Param("mode", mode));
 	}
 }

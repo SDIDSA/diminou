@@ -6,6 +6,7 @@ import android.widget.LinearLayout;
 import androidx.core.graphics.Insets;
 
 import org.json.JSONObject;
+import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.easing.Interpolator;
@@ -18,9 +19,11 @@ import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ErrorHandler;
+import org.luke.diminou.abs.utils.NotificationAction;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.pages.game.online.Game;
 import org.luke.diminou.app.pages.home.online.friends.Friends;
 import org.luke.diminou.app.pages.home.online.global.Bottom;
 import org.luke.diminou.app.pages.home.online.global.HomeFragment;
@@ -33,7 +36,6 @@ import org.luke.diminou.data.beans.Room;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -92,7 +94,6 @@ public class Home extends Page {
             content.nextInto(Play.class);
         }
 
-
         new ParallelAnimation(400)
                 .addAnimation(new AlphaAnimation(top, 1))
                 .addAnimation(new TranslateYAnimation(top, 0))
@@ -108,13 +109,6 @@ public class Home extends Page {
 
     private void registerSocket() {
         User user = owner.getUser();
-        registeredListeners.forEach(owner.getMainSocket()::off);
-        registeredListeners.clear();
-
-        owner.getMainSocket().onAnyIncoming(e -> {
-            Log.i("received" ,Arrays.toString(e));
-        });
-
         addSocketEventHandler("user_sync", obj -> {
             for (Iterator<String> it = obj.keys(); it.hasNext(); ) {
                 String key = it.next();
@@ -185,8 +179,24 @@ public class Home extends Page {
             int from = data.getInt("from");
             Room room = new Room(data.getJSONObject("game"));
 
-            User.getForId(from, u ->
-                    new Invited(owner, u.getUsername(), room).show());
+            User.getForId(from, u -> {
+                Invited overlay = new Invited(owner, u.getUsername(), room);
+                if(owner.isPaused()) {
+                    owner.notify(u.getUsername(),
+                            "Invited you to join a room",
+                            overlay::show,
+                            new NotificationAction(R.drawable.close,
+                                    "Decline",
+                                    () -> overlay.fire("Decline")),
+                            new NotificationAction(
+                                    R.drawable.play,
+                                    "Join",
+                                    () -> overlay.fire("Join now"))
+                            );
+                }else {
+                    overlay.show();
+                }
+            });
         });
 
         addSocketEventHandler("join", data -> {
@@ -235,11 +245,18 @@ public class Home extends Page {
                 join.swap(i1, i2);
             }
         });
+
+        addSocketEventHandler("begin", data -> {
+            Room room = new Room(data.getJSONObject("game"));
+            owner.putRoom(room);
+
+            owner.putString("mode", room.getMode());
+
+            owner.loadPage(Game.class);
+        });
     }
 
-    private final ArrayList<String> registeredListeners = new ArrayList<>();
     private void addSocketEventHandler(String event, ObjectConsumer<JSONObject> handler) {
-        registeredListeners.add(event);
         owner.getMainSocket().off(event);
         owner.getMainSocket().on(event,
                 data -> Platform.runLater(() -> {

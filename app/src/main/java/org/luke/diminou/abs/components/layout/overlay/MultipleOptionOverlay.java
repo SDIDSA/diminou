@@ -1,5 +1,6 @@
 package org.luke.diminou.abs.components.layout.overlay;
 
+import android.util.Log;
 import android.view.Gravity;
 
 import org.luke.diminou.abs.App;
@@ -9,6 +10,7 @@ import org.luke.diminou.abs.components.controls.text.font.Font;
 import org.luke.diminou.abs.components.controls.text.transformationMethods.Capitalize;
 import org.luke.diminou.abs.components.layout.linear.VBox;
 import org.luke.diminou.abs.style.Style;
+import org.luke.diminou.abs.utils.NotificationAction;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.data.ConcurrentArrayList;
 
@@ -71,6 +73,19 @@ public class MultipleOptionOverlay extends PartialSlideOverlay {
                 b.stopLoading();
             }
         }
+    }
+
+    public void fire(String key) {
+        for(Button b : buttons) {
+            if(b.getKey().equals(key)) {
+                b.fire();
+            }
+        }
+    }
+
+    @Override
+    public void show() {
+        super.show();
     }
 
     @Override

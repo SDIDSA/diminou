@@ -10,7 +10,6 @@ public class Invited extends MultipleOptionOverlay {
         super(owner, username + " invited you to join a room", s -> s.equals("Join now"));
 
         addButton("Decline", this::hide);
-
         addButton("Join now", () -> {
             hide();
             Session.join(room.getId(), res -> {

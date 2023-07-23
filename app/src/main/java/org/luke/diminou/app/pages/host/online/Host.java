@@ -2,6 +2,8 @@ package org.luke.diminou.app.pages.host.online;
 
 import android.widget.LinearLayout;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
@@ -11,18 +13,30 @@ import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
 import org.luke.diminou.abs.api.Session;
+import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.button.PrimaryButton;
 import org.luke.diminou.abs.components.controls.text.font.Font;
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
+import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
+import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 import org.luke.diminou.app.cards.online.DisplayCards;
 import org.luke.diminou.app.cards.online.MirorredCards;
 import org.luke.diminou.app.pages.Titled;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayerType;
+import org.luke.diminou.app.pages.game.online.Game;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.home.online.global.RoomId;
+import org.luke.diminou.app.pages.host.TeamModeOverlay;
+import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.beans.Room;
 import org.luke.diminou.data.beans.User;
+
+import java.util.ArrayList;
 
 public class Host extends Titled {
     private final RoomId idDisp;
@@ -48,13 +62,13 @@ public class Host extends Titled {
 
         invite = new Invite(owner);
 
-        mirorredCards.forEach(card -> {
-            card.setOnClickListener(v -> {
-                if(!card.isLoaded()) {
-                    invite.show();
-                }
-            });
-        });
+        mirorredCards.forEach(card ->
+                card.setOnClickListener(v -> {
+                    if(!card.isLoaded()) {
+                        invite.show();
+                    }
+                })
+        );
 
         Button start = new PrimaryButton(owner, "start_game");
         start.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
@@ -81,10 +95,31 @@ public class Host extends Titled {
                 .addAnimation(new AlphaAnimation(start, 1))
                 .addAnimation(new ScaleXYAnimation(start, 1))
                 .setInterpolator(Interpolator.OVERSHOOT);
-    }
 
-    public String getRoomId() {
-        return roomId;
+
+
+        TeamModeOverlay teamModeOverlay = new TeamModeOverlay(owner);
+
+        Runnable begin = () -> Session.begin(roomId, owner.getFourMode().getText(), res -> {
+            if(res.has("err")) owner.toast(res.getString("err"));
+        });
+
+        teamModeOverlay.setOnDone(begin);
+
+        start.setOnClick(() -> {
+            if(cards.size() == 4) {
+                FourMode mode = FourMode.byText(Store.getFourMode());
+                if(mode == FourMode.ASK_EVERYTIME) {
+                    teamModeOverlay.show();
+                }else {
+                    owner.putString("mode", Store.getFourMode());
+                    begin.run();
+                }
+            }else {
+                owner.putString("mode", FourMode.NORMAL_MODE.getText());
+                begin.run();
+            }
+        });
     }
 
     public void joined(int id) {
@@ -128,12 +163,14 @@ public class Host extends Titled {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void destroy(Page newPage) {
+        super.destroy(newPage);
 
-        Session.endGame(roomId, res -> {
-            //IGNORE
-        });
+        if(!(newPage instanceof Game)) {
+            Session.endGame(roomId, res -> {
+                //IGNORE
+            });
+        }
     }
 
     @Override

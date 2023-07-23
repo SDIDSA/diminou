@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game.score;
+package org.luke.diminou.app.pages.game.offline.score;
 
 import android.graphics.Color;
 import android.view.Gravity;
@@ -23,20 +23,20 @@ import org.luke.diminou.abs.components.layout.overlay.Overlay;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
-import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ScoreBoard extends Overlay implements Styleable {
+public class OfflineScoreBoard extends Overlay implements Styleable {
     private final App owner;
     private final VBox root;
     private final Label waiting;
     private final Button skip;
-    public ScoreBoard(App owner) {
+    public OfflineScoreBoard(App owner) {
         super(owner);
         this.owner = owner;
         setLayoutParams(new ViewGroup.LayoutParams(-1, -1));
@@ -99,18 +99,18 @@ public class ScoreBoard extends Overlay implements Styleable {
     private void loadScores() {
         root.removeAllViews();
         boolean gameEnd = false;
-        ArrayList<Player> players = new ArrayList<>(owner.getPlayers());
+        ArrayList<OfflinePlayer> players = new ArrayList<>(owner.getPlayers());
 
-        Game game = (Game) Page.getInstance(owner, Game.class);
+        OfflineGame game = (OfflineGame) Page.getInstance(owner, OfflineGame.class);
         assert game != null;
 
         if(owner.getFourMode() == FourMode.NORMAL_MODE) {
             root.setPadding(15);
             players.sort((p1, p2) -> Integer.compare(getScoreOf(p2), getScoreOf(p1)));
 
-            for(Player player : players) {
+            for(OfflinePlayer player : players) {
                 int score = getScoreOf(player);
-                root.addView(new PlayerScore(owner, player, score));
+                root.addView(new OfflinePlayerScore(owner, player, score));
                 if(score >= 100) {
                     gameEnd = true;
                 }
@@ -118,9 +118,9 @@ public class ScoreBoard extends Overlay implements Styleable {
         }else {
             root.setPadding(0);
 
-            Player[][] teams = new Player[2][2];
-            teams[0] = new Player[] { players.get(0), players.get(2)};
-            teams[1] = new Player[] { players.get(1), players.get(3)};
+            OfflinePlayer[][] teams = new OfflinePlayer[2][2];
+            teams[0] = new OfflinePlayer[] { players.get(0), players.get(2)};
+            teams[1] = new OfflinePlayer[] { players.get(1), players.get(3)};
 
             int start = getScoreOf(players.get(0)) > getScoreOf(players.get(1)) ? 0 : 1;
             int end = start == 0 ? 1 : 0;
@@ -132,9 +132,9 @@ public class ScoreBoard extends Overlay implements Styleable {
                 team.setCornerRadius(7);
                 team.setBackground(owner.getStyle().get().getBackgroundPrimary());
 
-                for(Player player : teams[i]) {
+                for(OfflinePlayer player : teams[i]) {
                     int score = getScoreOf(player);
-                    team.addView(new PlayerScore(owner, player, score));
+                    team.addView(new OfflinePlayerScore(owner, player, score));
                     if(score >= 100) {
                         gameEnd = true;
                         team.setBackground(ColorUtils.blendARGB(owner.getStyle().get().getBackgroundPrimary(), owner.getStyle().get().getTextPositive(), .4f));
@@ -165,8 +165,8 @@ public class ScoreBoard extends Overlay implements Styleable {
         applyStyle(owner.getStyle());
     }
 
-    private int getScoreOf(Player player) {
-        ConcurrentHashMap<Player, Integer> score = owner.getScore();
+    private int getScoreOf(OfflinePlayer player) {
+        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getOfflineScore();
 
         Integer i = score.get(player);
         if(i != null)

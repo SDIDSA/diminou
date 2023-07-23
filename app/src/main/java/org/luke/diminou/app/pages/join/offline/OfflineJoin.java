@@ -14,6 +14,7 @@ import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
+import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.image.Image;
 import org.luke.diminou.abs.components.controls.scratches.Loading;
@@ -33,8 +34,8 @@ import org.luke.diminou.app.avatar.Avatar;
 import org.luke.diminou.app.cards.offline.OfflineDisplayCards;
 import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 import org.luke.diminou.app.pages.Titled;
-import org.luke.diminou.app.pages.game.Game;
-import org.luke.diminou.app.pages.game.player.Player;
+import org.luke.diminou.app.pages.game.offline.OfflineGame;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
 import org.luke.diminou.app.pages.home.offline.OfflineHome;
 
 import java.io.IOException;
@@ -405,16 +406,16 @@ public class OfflineJoin extends Titled {
                                     Platform.runLater(this::left);
                                     owner.putData("host", false);
                                     JSONObject dataObj = new JSONObject(data);
-                                    ArrayList<Player> players = new ArrayList<>();
+                                    ArrayList<OfflinePlayer> players = new ArrayList<>();
                                     JSONArray arr = dataObj.getJSONArray("players");
                                     for(int i = 0; i < arr.length(); i++) {
-                                        players.add(Player.deserialize(arr.getJSONObject(i)));
+                                        players.add(OfflinePlayer.deserialize(arr.getJSONObject(i)));
                                     }
                                     owner.putData("players", players);
                                     owner.putData("socket", server);
                                     owner.putString("mode", dataObj.getString("mode"));
                                     owner.putString("timer", dataObj.getString("timer"));
-                                    owner.loadPage(Game.class);
+                                    owner.loadPage(OfflineGame.class);
                                 });
                             } else {
                                 party.getConnection().stop();
@@ -500,8 +501,8 @@ public class OfflineJoin extends Titled {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void destroy(Page newPage) {
+        super.destroy(newPage);
         loading.stopLoading();
         loader.interrupt();
         destroyed = true;

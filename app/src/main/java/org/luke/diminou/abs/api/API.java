@@ -145,8 +145,18 @@ public class API {
 
         public static final String SWAP = PREFIX + "swap";
 
+        public static final String BEGIN = PREFIX + "begin";
+
         private Session() {
 
         }
+    }
+
+    public static class Game {
+        private static final String PREFIX = BASE + "game/";
+
+        public static final String DEAL = PREFIX + "deal";
+
+        public static final String PLAY = PREFIX + "play";
     }
 }
