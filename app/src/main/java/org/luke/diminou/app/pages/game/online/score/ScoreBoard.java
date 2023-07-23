@@ -1,4 +1,4 @@
-package org.luke.diminou.app.pages.game.offline.score;
+package org.luke.diminou.app.pages.game.online.score;
 
 import android.graphics.Color;
 import android.view.Gravity;
@@ -14,6 +14,7 @@ import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
+import org.luke.diminou.abs.api.Session;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.text.Label;
@@ -23,20 +24,21 @@ import org.luke.diminou.abs.components.layout.overlay.Overlay;
 import org.luke.diminou.abs.style.Style;
 import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
-import org.luke.diminou.app.pages.game.offline.OfflineGame;
-import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
+import org.luke.diminou.app.pages.game.online.Game;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.property.Property;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class OfflineScoreBoard extends Overlay implements Styleable {
+public class ScoreBoard extends Overlay implements Styleable {
     private final App owner;
     private final VBox root;
     private final Label waiting;
     private final Button skip;
-    public OfflineScoreBoard(App owner) {
+    public ScoreBoard(App owner) {
         super(owner);
         this.owner = owner;
         setLayoutParams(new ViewGroup.LayoutParams(-1, -1));
@@ -99,18 +101,20 @@ public class OfflineScoreBoard extends Overlay implements Styleable {
     private void loadScores() {
         root.removeAllViews();
         boolean gameEnd = false;
-        ArrayList<OfflinePlayer> players = new ArrayList<>(owner.getPlayers());
+        List<Integer> players = IntStream.of(owner.getRoom().getPlayers()).boxed()
+                .filter(i -> i != -1)
+                .collect(Collectors.toList());
 
-        OfflineGame game = (OfflineGame) Page.getInstance(owner, OfflineGame.class);
+        Game game = Page.getInstance(owner, Game.class);
         assert game != null;
 
         if(owner.getFourMode() == FourMode.NORMAL_MODE) {
             root.setPadding(15);
             players.sort((p1, p2) -> Integer.compare(getScoreOf(p2), getScoreOf(p1)));
 
-            for(OfflinePlayer player : players) {
+            for(int player : players) {
                 int score = getScoreOf(player);
-                root.addView(new OfflinePlayerScore(owner, player, score));
+                root.addView(new PlayerScore(owner, player, score));
                 if(score >= 100) {
                     gameEnd = true;
                 }
@@ -118,9 +122,9 @@ public class OfflineScoreBoard extends Overlay implements Styleable {
         }else {
             root.setPadding(0);
 
-            OfflinePlayer[][] teams = new OfflinePlayer[2][2];
-            teams[0] = new OfflinePlayer[] { players.get(0), players.get(2)};
-            teams[1] = new OfflinePlayer[] { players.get(1), players.get(3)};
+            int[][] teams = new int[2][2];
+            teams[0] = new int[] { players.get(0), players.get(2)};
+            teams[1] = new int[] { players.get(1), players.get(3)};
 
             int start = getScoreOf(players.get(0)) > getScoreOf(players.get(1)) ? 0 : 1;
             int end = start == 0 ? 1 : 0;
@@ -132,9 +136,9 @@ public class OfflineScoreBoard extends Overlay implements Styleable {
                 team.setCornerRadius(7);
                 team.setBackground(owner.getStyle().get().getBackgroundPrimary());
 
-                for(OfflinePlayer player : teams[i]) {
+                for(int player : teams[i]) {
                     int score = getScoreOf(player);
-                    team.addView(new OfflinePlayerScore(owner, player, score));
+                    team.addView(new PlayerScore(owner, player, score));
                     if(score >= 100) {
                         gameEnd = true;
                         team.setBackground(ColorUtils.blendARGB(owner.getStyle().get().getBackgroundPrimary(), owner.getStyle().get().getTextPositive(), .4f));
@@ -154,8 +158,10 @@ public class OfflineScoreBoard extends Overlay implements Styleable {
         if(game.isHost()) {
             skip.setOnClick(() -> {
                 hide();
-                owner.getLoaded().setup();
-                owner.getSockets().forEach(s -> s.emit("skip", ""));
+
+                Session.begin(owner.getRoom().getId(), owner.getFourMode().getText(), res -> {
+                    if(res.has("err")) owner.toast(res.getString("err"));
+                });
             });
             root.addView(skip);
         }else {
@@ -165,8 +171,8 @@ public class OfflineScoreBoard extends Overlay implements Styleable {
         applyStyle(owner.getStyle());
     }
 
-    private int getScoreOf(OfflinePlayer player) {
-        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getOfflineScore();
+    private int getScoreOf(int player) {
+        ConcurrentHashMap<Integer, Integer> score = owner.getScore();
 
         Integer i = score.get(player);
         if(i != null)

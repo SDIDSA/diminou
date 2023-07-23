@@ -184,7 +184,7 @@ public class OfflineGame extends Page {
     }
 
     public int getScoreOf(OfflinePlayer player) {
-        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getScore();
+        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getOfflineScore();
 
         Integer i = score.get(player);
         if(i != null)
@@ -195,7 +195,7 @@ public class OfflineGame extends Page {
     }
 
     private void addScoreOf(OfflinePlayer player, int add) {
-        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getScore();
+        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getOfflineScore();
 
         int oldScore = getScoreOf(player);
 
@@ -203,7 +203,7 @@ public class OfflineGame extends Page {
     }
 
     public void setScoreOf(OfflinePlayer player, int val) {
-        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getScore();
+        ConcurrentHashMap<OfflinePlayer, Integer> score = owner.getOfflineScore();
 
         score.put(player, val);
     }

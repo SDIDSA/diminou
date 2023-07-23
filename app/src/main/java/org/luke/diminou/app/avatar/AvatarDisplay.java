@@ -132,6 +132,10 @@ public class AvatarDisplay extends StackPane implements Styleable {
         user.onlineProperty().addListener(onOnline);
     }
 
+    public void setUrl(String url) {
+        ImageProxy.getImage(url, img::setImageBitmap);
+    }
+
     public void setValue(String val) {
         setValue(Avatar.valueOf(val));
     }

@@ -250,7 +250,7 @@ public class Home extends Page {
             Room room = new Room(data.getJSONObject("game"));
             owner.putRoom(room);
 
-            Log.i("stock", Arrays.toString(room.getStock()));
+            owner.putString("mode", room.getMode());
 
             owner.loadPage(Game.class);
         });

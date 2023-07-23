@@ -12,6 +12,7 @@ import java.util.Arrays;
 public class Room {
     private String id;
     private String state;
+    private String mode;
     private int host;
     private int winner;
     private Piece[] stock;
@@ -21,6 +22,7 @@ public class Room {
         try {
             id = data.getString("id");
             state = data.getString("state");
+            mode = data.getString("mode");
             host = data.getInt("host");
             winner = data.getInt("winner");
             players = new int[4];
@@ -37,6 +39,14 @@ public class Room {
         }catch(Exception x) {
             ErrorHandler.handle(x, "initializing room object");
         }
+    }
+
+    public void setWinner(int winner) {
+        this.winner = winner;
+    }
+
+    public String getMode() {
+        return mode;
     }
 
     public Piece[] getStock() {

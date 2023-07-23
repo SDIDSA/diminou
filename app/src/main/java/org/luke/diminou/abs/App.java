@@ -705,8 +705,17 @@ public class App extends AppCompatActivity {
         return getTypedData("players");
     }
 
-    public ConcurrentHashMap<OfflinePlayer, Integer> getScore() {
-        ConcurrentHashMap<OfflinePlayer, Integer> score = getTypedData("score");
+    public ConcurrentHashMap<OfflinePlayer, Integer> getOfflineScore() {
+        ConcurrentHashMap<OfflinePlayer, Integer> score = getTypedData("offline_score");
+        if(score == null) {
+            score = new ConcurrentHashMap<>();
+            putData("score", score);
+        }
+        return score;
+    }
+
+    public ConcurrentHashMap<Integer, Integer> getScore() {
+        ConcurrentHashMap<Integer, Integer> score = getTypedData("score");
         if(score == null) {
             score = new ConcurrentHashMap<>();
             putData("score", score);

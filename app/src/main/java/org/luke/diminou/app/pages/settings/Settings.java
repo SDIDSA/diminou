@@ -64,6 +64,7 @@ public class Settings extends Titled {
         sound.addSetting(new Setting(owner, "other_sounds", Store::getMenuSounds,
                 v -> Store.setMenuSounds(v, null), false, "on", "off"));
 
+        addGroup(game);
         addGroup(display);
         addGroup(sound);
 
@@ -94,10 +95,6 @@ public class Settings extends Titled {
     @Override
     public void setup() {
         super.setup();
-        removeGroup(game);
-        if(!owner.isOnline()) {
-            addGroup(game);
-        }
         SettingsGroup open = getForKey((String) owner.getData("open_cat"));
         if(open != null) Platform.runBack(() -> {
             while(!open.isLaidOut()) {

@@ -104,8 +104,9 @@ public class Session extends AuthRoute {
 				new Param("i2", i2));
 	}
 
-	public static void begin(String roomId,ObjectConsumer<JSONObject> onResult) {
+	public static void begin(String roomId, String mode,ObjectConsumer<JSONObject> onResult) {
 		call(API.Session.BEGIN, "begin game", onResult,
-				new Param("room_id", roomId));
+				new Param("room_id", roomId),
+				new Param("mode", mode));
 	}
 }

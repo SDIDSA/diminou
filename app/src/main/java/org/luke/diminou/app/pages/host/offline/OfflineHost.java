@@ -34,6 +34,7 @@ import org.luke.diminou.app.pages.game.offline.OfflineGame;
 import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
 import org.luke.diminou.app.pages.game.offline.player.OfflinePlayerType;
 import org.luke.diminou.app.pages.home.offline.OfflineHome;
+import org.luke.diminou.app.pages.host.TeamModeOverlay;
 import org.luke.diminou.app.pages.settings.FourMode;
 
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
 package org.luke.diminou.app.pages.game.online;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 
 import androidx.core.graphics.Insets;
@@ -31,8 +32,9 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
+import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
+import org.luke.diminou.app.pages.game.online.score.ScoreBoard;
 import org.luke.diminou.app.pages.game.pause.GamePause;
-import org.luke.diminou.app.pages.game.offline.score.OfflineScoreBoard;
 import org.luke.diminou.app.pages.game.online.player.PieceHolder;
 import org.luke.diminou.app.pages.game.online.table.Table;
 import org.luke.diminou.app.pages.game.piece.Move;
@@ -44,6 +46,8 @@ import org.luke.diminou.data.beans.Room;
 import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Game extends Page {
     private final VBox root;
@@ -56,7 +60,7 @@ public class Game extends Page {
 
     private final TurnManager turn;
 
-    private final OfflineScoreBoard scoreBoard;
+    private final ScoreBoard scoreBoard;
 
     private final GamePause gamePause;
 
@@ -90,7 +94,7 @@ public class Game extends Page {
         root.addView(ViewUtils.spacer(owner, Orientation.VERTICAL));
         root.addView(cherat);
 
-        scoreBoard = new OfflineScoreBoard(owner);
+        scoreBoard = new ScoreBoard(owner);
         scoreBoard.addOnShowing(() -> owner.playMenuSound(R.raw.end));
         scoreBoard.addOnShowing(() -> {
             for (PieceHolder holder : holders) {
@@ -155,13 +159,33 @@ public class Game extends Page {
         return holders;
     }
 
-    public OfflineScoreBoard getScoreBoard() {
+    public ScoreBoard getScoreBoard() {
         return scoreBoard;
     }
 
     public int getScoreOf(int player) {
-        Room room = owner.getRoom();
+        ConcurrentHashMap<Integer, Integer> score = owner.getScore();
+
+        Integer i = score.get(player);
+        if(i != null)
+            return i;
+
+        score.put(player, 0);
         return 0;
+    }
+
+    public void setScoreOf(int player, int val) {
+        ConcurrentHashMap<Integer, Integer> score = owner.getScore();
+
+        score.put(player, val);
+    }
+
+    private void addScoreOf(int player, int add) {
+        ConcurrentHashMap<Integer, Integer> score = owner.getScore();
+
+        int oldScore = getScoreOf(player);
+
+        score.put(player, oldScore + add);
     }
 
     public int index(int player) {
@@ -173,15 +197,23 @@ public class Game extends Page {
         return room.playerAt((index(player) + 2) % 4);
     }
 
-    public TurnManager getTurn() {
-        return turn;
-    }
-
     public Table getTable() {
         return table;
     }
 
-    public void victory(JSONArray data) {
+    public void victory(JSONObject data) {
+        try {
+            int winner = data.getInt("winner");
+            owner.getRoom().setWinner(winner);
+            JSONObject scores = data.getJSONObject("scores");
+            for (Iterator<String> it = scores.keys(); it.hasNext(); ) {
+                String key = it.next();
+                int player = Integer.parseInt(key);
+                addScoreOf(player, scores.getInt(key));
+            }
+        }catch(Exception x) {
+            ErrorHandler.handle(x, "receiving scoreBoard");
+        }
         Platform.runAfter(scoreBoard::show, 200);
     }
 
@@ -201,6 +233,7 @@ public class Game extends Page {
     public void setup() {
         super.setup();
         ended = false;
+        scoreBoard.hide();
         root.setBackground(Color.TRANSPARENT);
         leftInStock.setAlpha(0);
         table.clear();
@@ -329,7 +362,10 @@ public class Game extends Page {
             getForPlayer(player).play(move);
         });
 
-        //TODO winner
+        on("win", data-> {
+            Log.i("win", data.toString());
+            victory(data);
+        });
 
         on("pass", data -> {
             int player = data.getInt("player");
@@ -372,6 +408,10 @@ public class Game extends Page {
         return null;
     }
 
+    public boolean isHost() {
+        return owner.getUser().getId() == owner.getRoom().getHost();
+    }
+
     @Override
     public boolean onBack() {
         gamePause.setOnExit(() -> {
@@ -393,7 +433,7 @@ public class Game extends Page {
         ended = true;
         gamePause.hide();
         owner.putData("score", null);
-        owner.putData("winner", null);
+        owner.getRoom().setWinner(-1);
         owner.putData("players", null);
         holders.forEach(PieceHolder::deselect);
         holders.forEach(h -> h.setEnabled(false));

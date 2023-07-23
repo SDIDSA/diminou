@@ -291,7 +291,7 @@ public class Table extends StackPane {
     private volatile int playing = -1;
     public void play(Move move, ColorIcon source, int player) {
         playing = player;
-        owner.putData("winner", null);
+        owner.getRoom().setWinner(-1);
         ColorIcon target = getPlayPosition(move);
         target.setAlpha(0f);
 
