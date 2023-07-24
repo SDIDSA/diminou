@@ -8,7 +8,7 @@ import org.luke.diminou.abs.animation.base.Animation;
 import org.luke.diminou.abs.animation.combine.ParallelAnimation;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
-import org.luke.diminou.abs.components.Page;
+import org.luke.diminou.abs.api.GameRoute;
 import org.luke.diminou.abs.components.controls.image.ColoredIcon;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.layout.linear.HBox;
@@ -30,9 +30,9 @@ public class Cherrat extends HBox {
         ColoredIcon sakt = new ColoredIcon(owner, Style::getTextNormal, R.drawable.saket_static);
         sakt.setSize(38);
 
-        khabt.setOnClick(() -> cherra("khabet", R.drawable.khabet, R.raw.khabet));
+        khabt.setOnClick(() -> cherra(R.drawable.khabet, R.raw.khabet));
 
-        sakt.setOnClick(() -> cherra("saket", R.drawable.saket, R.raw.saket));
+        sakt.setOnClick(() -> cherra(R.drawable.saket, R.raw.saket));
 
         passInit = new PassInit(owner);
 
@@ -62,7 +62,9 @@ public class Cherrat extends HBox {
                 .addAnimation(new TranslateYAnimation(this, ViewUtils.dipToPx(80, getOwner())));
     }
 
-    private void cherra(String name, int drawable, int sound) {
-        //TODO send cherra
+    private void cherra(int icon, int sound) {
+        GameRoute.cherra(getOwner().getRoom().getId(), icon, sound, res -> {
+            if(res.has("err")) getOwner().toast(res.getString("err"));
+        });
     }
 }

@@ -63,7 +63,7 @@ public class OfflineCherrat extends HBox {
     }
 
     private void cherra(String name, int drawable, int sound) {
-        OfflineGame game = (OfflineGame) Page.getInstance(getOwner(), OfflineGame.class);
+        OfflineGame game = Page.getInstance(getOwner(), OfflineGame.class);
         assert game != null;
         game.getBottomHolder().cherra(drawable, sound);
         if(game.isHost()) {

@@ -32,7 +32,6 @@ import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
-import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
 import org.luke.diminou.app.pages.game.online.score.ScoreBoard;
 import org.luke.diminou.app.pages.game.pause.GamePause;
 import org.luke.diminou.app.pages.game.online.player.PieceHolder;
@@ -355,6 +354,14 @@ public class Game extends Page {
         //TODO saket
 
         //TODO khabet
+
+        on("cherra", data -> {
+            int player = data.getInt("player");
+            int icon = data.getInt("icon");
+            int sound = data.getInt("sound");
+
+            getForPlayer(player).cherra(icon, sound);
+        });
 
         on("play", data -> {
             int player = data.getInt("player");

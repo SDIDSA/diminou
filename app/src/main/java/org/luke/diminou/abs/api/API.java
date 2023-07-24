@@ -152,11 +152,13 @@ public class API {
         }
     }
 
-    public static class Game {
+    public static class GameAPI {
         private static final String PREFIX = BASE + "game/";
 
         public static final String DEAL = PREFIX + "deal";
 
         public static final String PLAY = PREFIX + "play";
+
+        public static final String CHERRA = PREFIX + "cherra";
     }
 }
