@@ -653,7 +653,7 @@ public class OfflineGame extends Page {
     private void endGame() {
         ended = true;
         gamePause.hide();
-        owner.putData("score", null);
+        owner.putData("offline_score", null);
         owner.putData("winner", null);
         owner.putData("players", null);
         holders.forEach(OfflinePieceHolder::deselect);

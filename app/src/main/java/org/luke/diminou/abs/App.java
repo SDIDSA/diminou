@@ -709,7 +709,7 @@ public class App extends AppCompatActivity {
         ConcurrentHashMap<OfflinePlayer, Integer> score = getTypedData("offline_score");
         if(score == null) {
             score = new ConcurrentHashMap<>();
-            putData("score", score);
+            putData("offline_score", score);
         }
         return score;
     }
