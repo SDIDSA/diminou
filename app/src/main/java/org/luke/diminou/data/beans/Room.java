@@ -53,6 +53,10 @@ public class Room {
         return stock;
     }
 
+    public String getState() {
+        return state;
+    }
+
     public String getId() {
         return id;
     }

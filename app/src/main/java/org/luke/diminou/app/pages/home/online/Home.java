@@ -254,6 +254,18 @@ public class Home extends Page {
 
             owner.loadPage(Game.class);
         });
+
+        addSocketEventHandler("in_game", data -> {
+            Room room = new Room(data);
+            if(room.getState().equals("init")) {
+                owner.putRoom(room);
+                if(room.getHost() == owner.getUser().getId()) {
+                    owner.loadPage(Host.class);
+                }else {
+                    owner.loadPage(Join.class);
+                }
+            }
+        });
     }
 
     private void addSocketEventHandler(String event, ObjectConsumer<JSONObject> handler) {

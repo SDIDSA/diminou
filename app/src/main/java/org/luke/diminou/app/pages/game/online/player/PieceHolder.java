@@ -2,7 +2,6 @@ package org.luke.diminou.app.pages.game.online.player;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 

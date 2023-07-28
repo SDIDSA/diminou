@@ -2,8 +2,6 @@ package org.luke.diminou.app.pages.host.online;
 
 import android.widget.LinearLayout;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.luke.diminou.R;
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.animation.base.Animation;
@@ -17,17 +15,12 @@ import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.button.Button;
 import org.luke.diminou.abs.components.controls.button.PrimaryButton;
 import org.luke.diminou.abs.components.controls.text.font.Font;
-import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.Store;
 import org.luke.diminou.abs.utils.ViewUtils;
-import org.luke.diminou.app.cards.offline.OfflinePlayerCard;
 import org.luke.diminou.app.cards.online.DisplayCards;
 import org.luke.diminou.app.cards.online.MirorredCards;
 import org.luke.diminou.app.pages.Titled;
-import org.luke.diminou.app.pages.game.offline.OfflineGame;
-import org.luke.diminou.app.pages.game.offline.player.OfflinePlayer;
-import org.luke.diminou.app.pages.game.offline.player.OfflinePlayerType;
 import org.luke.diminou.app.pages.game.online.Game;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.home.online.global.RoomId;
@@ -36,7 +29,8 @@ import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.beans.Room;
 import org.luke.diminou.data.beans.User;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Host extends Titled {
     private final RoomId idDisp;
@@ -107,6 +101,16 @@ public class Host extends Titled {
         teamModeOverlay.setOnDone(begin);
 
         start.setOnClick(() -> {
+            AtomicBoolean ready = new AtomicBoolean(true);
+            cards.forEach(card -> {
+                if(card.isLoaded() && !card.getUser().isOnline()) {
+                    owner.toast(card.getUser().getUsername() + " is offline");
+                    ready.set(false);
+                }
+            });
+
+            if(!ready.get()) return;
+
             if(cards.size() == 4) {
                 FourMode mode = FourMode.byText(Store.getFourMode());
                 if(mode == FourMode.ASK_EVERYTIME) {
@@ -159,6 +163,8 @@ public class Host extends Titled {
                 User u = User.getForIdSync(player);
                 Platform.runLater(() -> cards.getLast().loadPlayer(u));
             }
+
+            Platform.runLater(this::checkCount);
         });
     }
 
