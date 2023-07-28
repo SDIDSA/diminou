@@ -2,6 +2,7 @@ package org.luke.diminou.app.pages.game.online.player;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 
@@ -499,13 +500,20 @@ public class PieceHolder extends StackPane implements Styleable {
                     .setInterpolator(Interpolator.EASE_OUT)
                     .start();
             Platform.runLater(() -> {
-                if(isHost() && isSelf()) {
-                    GameRoute.deal(owner.getRoom().getId(),
-                            dat -> {
-                                if(dat.has("err")) owner.toast(dat.getString("err"));
-                            }
-                    );
+                Piece[] hand = owner.getRoom().gatHandFor(player);
+                if(hand.length == 0) {
+                    if(isHost() && isSelf()) {
+                        GameRoute.deal(owner.getRoom().getId(),
+                                dat -> {
+                                    if(dat.has("err")) owner.toast(dat.getString("err"));
+                                }
+                        );
+                    }
+                } else {
+                    add(hand);
+                    setEnabled(owner.getRoom().getTurn() == player);
                 }
+
             });
         });
 

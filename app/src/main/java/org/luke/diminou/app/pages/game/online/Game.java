@@ -38,6 +38,7 @@ import org.luke.diminou.app.pages.game.online.player.PieceHolder;
 import org.luke.diminou.app.pages.game.online.table.Table;
 import org.luke.diminou.app.pages.game.piece.Move;
 import org.luke.diminou.app.pages.game.piece.Piece;
+import org.luke.diminou.app.pages.game.piece.PlayedPiece;
 import org.luke.diminou.app.pages.game.player.Side;
 import org.luke.diminou.app.pages.home.online.Home;
 import org.luke.diminou.app.pages.settings.FourMode;
@@ -46,6 +47,7 @@ import org.luke.diminou.data.property.Property;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.socket.client.Socket;
@@ -316,6 +318,44 @@ public class Game extends Page {
         show.start();
 
         leftInStock.addParam(0, String.valueOf(28));
+
+        if(room.getTable().length != 0) {
+            Log.i("boza", room.getBoza());
+            Piece boza = Piece.valueOf(room.getBoza());
+            int bozaIndex = -1;
+            for(int i = 0; i < room.getTable().length; i++) {
+                if(room.getTable()[i].getPiece() == boza) {
+                    bozaIndex = i;
+                    break;
+                }
+            }
+
+
+            int finalBozaIndex = bozaIndex;
+            Platform.runBack(() -> {
+                //topPart
+                for(int i = finalBozaIndex; i >= 0; i--) {
+                    PlayedPiece pp = room.getTable()[i];
+                    Platform.runLater(
+                            () -> {
+                                table.play(new Move(pp, Side.TOP), null, 0);
+                            }
+                    );
+                    Platform.sleep(50);
+                }
+                //bottom part
+                for(int i = finalBozaIndex + 1; i < room.getTable().length; i++) {
+                    PlayedPiece pp = room.getTable()[i];
+                    Platform.runLater(
+                            () -> {
+                                table.play(new Move(pp, Side.BOTTOM), null, 0);
+                            }
+                    );
+                    Platform.sleep(50);
+                }
+                Platform.runLater(table::adjustBoard);
+            });
+        }
 
         //TODO onError
 

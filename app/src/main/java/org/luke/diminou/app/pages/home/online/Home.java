@@ -257,13 +257,16 @@ public class Home extends Page {
 
         addSocketEventHandler("in_game", data -> {
             Room room = new Room(data);
+            owner.putRoom(room);
             if(room.getState().equals("init")) {
-                owner.putRoom(room);
                 if(room.getHost() == owner.getUser().getId()) {
                     owner.loadPage(Host.class);
                 }else {
                     owner.loadPage(Join.class);
                 }
+            }else if(room.getState().equals("going")) {
+                owner.putString("mode", room.getMode());
+                owner.loadPage(Game.class);
             }
         });
     }

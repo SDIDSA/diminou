@@ -58,4 +58,8 @@ public class PlayedPiece {
             return null;
         }
     }
+
+    public PieceRotation getRotation() {
+        return rotation;
+    }
 }

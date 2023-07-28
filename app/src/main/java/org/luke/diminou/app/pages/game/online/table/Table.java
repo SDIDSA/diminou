@@ -328,23 +328,28 @@ public class Table extends StackPane {
             Platform.runLater(() -> {
                 float oldX = target.getTranslationX();
                 float oldY = target.getTranslationY();
+                if(source != null) {
+                    int thisX = getXInParent(target);
+                    int thisY = getYInParent(target);
 
-                int thisX = getXInParent(target);
-                int thisY = getYInParent(target);
+                    int otherX = getXInParent(source);
+                    int otherY = getYInParent(source);
 
-                int otherX = getXInParent(source);
-                int otherY = getYInParent(source);
+                    target.setTranslationX(otherX - thisX);
+                    target.setTranslationY(otherY - thisY);
 
-                target.setTranslationX(otherX - thisX);
-                target.setTranslationY(otherY - thisY);
-
-                ParallelAnimation anim = new ParallelAnimation(400)
-                        .addAnimation(new TranslateXAnimation(target, oldX))
-                        .addAnimation(new TranslateYAnimation(target, oldY))
-                        .addAnimation(new AlphaAnimation(target, 1))
-                        .setInterpolator(Interpolator.EASE_OUT)
-                        .setOnFinished(this::adjustBoard);
-                anim.start();
+                    ParallelAnimation anim = new ParallelAnimation(400)
+                            .addAnimation(new TranslateXAnimation(target, oldX))
+                            .addAnimation(new TranslateYAnimation(target, oldY))
+                            .addAnimation(new AlphaAnimation(target, 1))
+                            .setInterpolator(Interpolator.EASE_OUT)
+                            .setOnFinished(this::adjustBoard);
+                    anim.start();
+                }else {
+                    target.setAlpha(1f);
+                    target.setTranslationX(oldX);
+                    target.setTranslationY(oldY);
+                }
             });
         });
     }
