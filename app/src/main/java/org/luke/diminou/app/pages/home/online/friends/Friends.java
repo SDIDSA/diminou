@@ -133,21 +133,14 @@ public class Friends extends HomeFragment implements Styleable {
     public void displayFriends() {
         if(search.getValue().length() >= MIN_SEARCH) return;
         displayLoading();
-        Session.getFriends(res -> {
+        Session.getFriends(friends -> {
             ArrayList<View> toDisplay = new ArrayList<>();
-            JSONArray friends = res.getJSONArray("friends");
-            if(friends.length() == 0) {
+            if(friends.size() == 0) {
                 displayHint("You don't have friends :(");
                 toDisplay.add(hint);
             } else {
-                List<View> friendViews = IntStream.range(0,friends.length()).mapToObj(i-> {
-                    try {
-                        int id = friends.getInt(i);
-                        return idToDisp(id);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).collect(Collectors.toList());
+                List<View> friendViews = friends.stream().map(this::idToDisp)
+                        .collect(Collectors.toList());
                 toDisplay.addAll(0, friendViews);
                 toDisplay.add(0, this.friends);
             }

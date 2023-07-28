@@ -17,7 +17,7 @@ import org.luke.diminou.abs.utils.functional.StringConsumer;
 public class API {
     public static final String VERSION = "1.0.0";
     public static final String DEV_BASE = "http://10.0.2.2:4000/";
-    public static final String TEST_BASE = "http://192.168.221.161:4000/";
+    public static final String TEST_BASE = "http://192.168.54.161:4000/";
     public static final String REL_BASE = "https://mesa69.herokuapp.com/";
     public static final String BASE = TEST_BASE;
     public static JSONObject netErr;

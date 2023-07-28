@@ -80,10 +80,6 @@ public class PieceHolder extends StackPane implements Styleable {
         padding = size / 3;
         this.player = player;
 
-        User.getForId(player, u -> {
-            Log.i("creating holder", "for " + u.getUsername());
-        });
-
         root = new LinearBox(owner);
         root.setOrientation(side.isHorizontal() ? LinearBox.HORIZONTAL : LinearBox.VERTICAL);
         root.setGravity(Gravity.CENTER);
@@ -188,6 +184,11 @@ public class PieceHolder extends StackPane implements Styleable {
 
         User.getForId(player, u -> {
             name.setText(u.getUsername());
+            u.onlineProperty().addListener((obs, ov, nv) -> {
+                if(ov != nv) {
+                    owner.toast(u.getUsername() + " " + (nv ? "reconnected" : "disconnected"));
+                }
+            });
         });
 
         applyStyle(owner.getStyle());

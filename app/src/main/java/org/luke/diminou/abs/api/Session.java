@@ -1,15 +1,20 @@
 package org.luke.diminou.abs.api;
 
-import android.util.Log;
-
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.luke.diminou.abs.api.json.Param;
 import org.luke.diminou.abs.api.multipart.FilePart;
-import org.luke.diminou.abs.api.multipart.Part;
+import org.luke.diminou.abs.utils.ErrorHandler;
+import org.luke.diminou.abs.utils.Platform;
 import org.luke.diminou.abs.utils.functional.ObjectConsumer;
-import org.luke.diminou.data.SessionManager;
+import org.luke.diminou.data.beans.User;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Session extends AuthRoute {
 
@@ -43,8 +48,36 @@ public class Session extends AuthRoute {
 				new Param("username", username));
 	}
 
-	public static void getFriends(ObjectConsumer<JSONObject> onResult) {
-		call(API.Session.GET_FRIENDS, "get friends", onResult);
+	public static void getFriends(ObjectConsumer<List<Integer>> onResult) {
+		call(API.Session.GET_FRIENDS, "get friends", res -> {
+			JSONArray friends = res.getJSONArray("friends");
+			List<Integer> ids = IntStream.range(0, friends.length()).boxed().map(index -> {
+				try {
+					return friends.getInt(index);
+				} catch (JSONException e) {
+					throw new RuntimeException(e);
+				}
+			}).collect(Collectors.toList());
+
+			Platform.runBack(() -> {
+				ArrayList<User> friendList = new ArrayList<>();
+				ids.forEach(id -> friendList.add(User.getForIdSync(id)));
+				friendList.sort((u0, u1) -> {
+					int o = -Boolean.compare(u0.isOnline(), u1.isOnline());
+					if(o == 0) {
+						o = u0.getUsername().compareTo(u1.getUsername());
+					}
+					return o;
+				});
+				Platform.runLater(() -> {
+					try {
+						onResult.accept(friendList.stream().map(User::getId).collect(Collectors.toList()));
+					} catch (Exception e) {
+						ErrorHandler.handle(e, "handling results of [get friends]");
+					}
+				});
+			});
+		});
 	}
 
 	public static void getRequests(ObjectConsumer<JSONObject> onResult) {

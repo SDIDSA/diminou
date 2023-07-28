@@ -2,10 +2,11 @@ package org.luke.diminou.app.pages.game.online.score;
 
 import android.view.Gravity;
 
+import androidx.core.graphics.ColorUtils;
+
 import org.luke.diminou.abs.App;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.image.ColorIcon;
-import org.luke.diminou.abs.components.controls.image.ImageProxy;
 import org.luke.diminou.abs.components.controls.scratches.Orientation;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
@@ -16,12 +17,14 @@ import org.luke.diminou.abs.style.Styleable;
 import org.luke.diminou.abs.utils.ViewUtils;
 import org.luke.diminou.app.avatar.AvatarDisplay;
 import org.luke.diminou.app.pages.game.online.Game;
+import org.luke.diminou.app.pages.home.online.friends.Username;
 import org.luke.diminou.app.pages.settings.FourMode;
 import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.property.Property;
 
 public class PlayerScore extends HBox implements Styleable {
-    private final Label name;
+    private final AvatarDisplay ad;
+    private final Username name;
     private final Label score;
 
     private final int scoreVal;
@@ -31,10 +34,10 @@ public class PlayerScore extends HBox implements Styleable {
         setGravity(Gravity.CENTER);
         setCornerRadius(7);
 
-        AvatarDisplay ad = new AvatarDisplay(owner);
+        ad = new AvatarDisplay(owner);
         ViewUtils.setMarginRight(ad, owner, 15);
 
-        name = new Label(owner, "");
+        name = new Username(owner);
         name.setFont(new Font(18));
 
         this.score = new Label(owner, "");
@@ -65,8 +68,8 @@ public class PlayerScore extends HBox implements Styleable {
         addView(this.score);
 
         User.getForId(player, user -> {
-            ad.setUrl(user.getAvatar());
-            name.setText(user.getUsername());
+            ad.setUser(user);
+            name.setUser(user);
         });
 
         applyStyle(owner.getStyle());
@@ -74,12 +77,18 @@ public class PlayerScore extends HBox implements Styleable {
 
     @Override
     public void applyStyle(Style style) {
+        boolean normal = getOwner().getFourMode() == FourMode.NORMAL_MODE;
         name.setFill(style.getTextNormal());
         score.setFill(style.getTextNormal());
-        if(scoreVal >= 100 && getOwner().getFourMode() == FourMode.NORMAL_MODE) {
-            setPadding(15);
-            setBackground(App.adjustAlpha(style.getTextPositive(), .4f));
+        int back = normal ? style.getBackgroundTertiary() : style.getBackgroundPrimary();
+        if(scoreVal >= 100) {
+            back = ColorUtils.blendARGB(back, style.getTextPositive(), .4f);
+            if(normal) {
+                setPadding(15);
+            }
         }
+        setBackground(back);
+        ad.setOnlineBackground(back);
     }
 
     @Override

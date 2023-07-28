@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.socket.client.Socket;
+
 public class Game extends Page {
     private final VBox root;
     private final ArrayList<PieceHolder> holders;
@@ -56,8 +58,6 @@ public class Game extends Page {
 
     private final HBox center;
     private final Cherrat cherat;
-
-    private final TurnManager turn;
 
     private final ScoreBoard scoreBoard;
 
@@ -123,8 +123,6 @@ public class Game extends Page {
         addView(preRoot);
         addView(leftInStock);
 
-        turn = new TurnManager(owner, this);
-
         gamePause = new GamePause(owner);
 
         menu.setOnClick(this::onBack);
@@ -154,14 +152,6 @@ public class Game extends Page {
         Platform.runLater(() -> leftInStock.addParam(0, String.valueOf(val)));
     }
 
-    public ArrayList<PieceHolder> getHolders() {
-        return holders;
-    }
-
-    public ScoreBoard getScoreBoard() {
-        return scoreBoard;
-    }
-
     public int getScoreOf(int player) {
         ConcurrentHashMap<Integer, Integer> score = owner.getScore();
 
@@ -185,15 +175,6 @@ public class Game extends Page {
         int oldScore = getScoreOf(player);
 
         score.put(player, oldScore + add);
-    }
-
-    public int index(int player) {
-        return owner.getRoom().indexOf(player);
-    }
-
-    public int otherPlayer(int player) {
-        Room room = owner.getRoom();
-        return room.playerAt((index(player) + 2) % 4);
     }
 
     public Table getTable() {
@@ -226,6 +207,10 @@ public class Game extends Page {
                         ErrorHandler.handle(e, "handling socket event " + event);
                     }
                 }));
+    }
+
+    public void turn(int p) {
+        holders.forEach(h -> h.setEnabled(h.getPlayer() == p));
     }
 
     @Override
@@ -332,7 +317,7 @@ public class Game extends Page {
 
         leftInStock.addParam(0, String.valueOf(28));
 
-        //TODO error
+        //TODO onError
 
         on("deal", data -> {
             updateStock(data.getInt("stock"));
@@ -348,12 +333,8 @@ public class Game extends Page {
 
         on("turn", data -> {
            int turn = data.getInt("turn");
-           this.turn.turn(turn);
+           turn(turn);
         });
-
-        //TODO saket
-
-        //TODO khabet
 
         on("cherra", data -> {
             int player = data.getInt("player");
@@ -382,8 +363,6 @@ public class Game extends Page {
             }
             owner.playGameSound(R.raw.pass);
         });
-
-        //TODO skip
 
         //TODO end
 

@@ -39,27 +39,19 @@ public class Invite extends PartialSlideOverlay {
         addOnShowing(() -> {
             fdisp.removeAllViews();
 
-            Session.getFriends(res -> {
-                JSONArray friends = res.getJSONArray("friends");
-                if(friends.length() == 0) {
+            Session.getFriends(friends -> {
+                if(friends.size() == 0) {
                     fdisp.addView(noFriends);
                 } else {
-                    IntStream.range(0, friends.length()).map(i -> {
-                        try {
-                            return friends.getInt(i);
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).forEach(user_id -> {
+                    friends.forEach(user_id -> {
                         UserDisplay disp = UserDisplay.get(owner, user_id);
-                        disp.setOnClickListener(v -> {
-                            Session.invite(user_id, owner.getRoom().getId(), ires -> {
-                                hide();
-                                owner.toast(ires.has("err") ?
-                                        ires.getString("err")
-                                        : "Player invited");
-                            });
-                        });
+                        disp.setOnClickListener(v ->
+                                Session.invite(user_id, owner.getRoom().getId(), ires -> {
+                                    hide();
+                                    owner.toast(ires.has("err") ?
+                                            ires.getString("err")
+                                            : "Player invited");
+                        }));
                         fdisp.addView(disp);
                     });
                 }

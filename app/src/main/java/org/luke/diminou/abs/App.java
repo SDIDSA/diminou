@@ -47,6 +47,7 @@ import org.luke.diminou.abs.animation.easing.Interpolator;
 import org.luke.diminou.abs.animation.view.AlphaAnimation;
 import org.luke.diminou.abs.animation.view.position.TranslateYAnimation;
 import org.luke.diminou.abs.animation.view.scale.ScaleXYAnimation;
+import org.luke.diminou.abs.api.API;
 import org.luke.diminou.abs.components.Page;
 import org.luke.diminou.abs.components.controls.text.Label;
 import org.luke.diminou.abs.components.controls.text.font.Font;
@@ -57,6 +58,7 @@ import org.luke.diminou.abs.components.layout.overlay.media.MediaPickerOverlay;
 import org.luke.diminou.abs.locale.Locale;
 import org.luke.diminou.abs.net.SocketConnection;
 import org.luke.diminou.abs.style.Style;
+import org.luke.diminou.abs.utils.ErrorHandler;
 import org.luke.diminou.abs.utils.NotificationAction;
 import org.luke.diminou.abs.utils.Permissions;
 import org.luke.diminou.abs.utils.Platform;
@@ -74,6 +76,7 @@ import org.luke.diminou.data.beans.User;
 import org.luke.diminou.data.media.Media;
 import org.luke.diminou.data.property.Property;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +85,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class App extends AppCompatActivity {
@@ -669,6 +673,30 @@ public class App extends AppCompatActivity {
 
     public void setLocale(Locale locale) {
         Platform.runBack(() -> this.locale.set(locale));
+    }
+
+    protected void initializeSocket(Runnable onConnect, Runnable onError) {
+        try {
+            Socket mSocket = IO.socket(API.BASE);
+            Runnable off = () -> {
+                mSocket.off(Socket.EVENT_CONNECT);
+                mSocket.off(Socket.EVENT_CONNECT_ERROR);
+            };
+            mSocket.on(Socket.EVENT_CONNECT, d -> {
+                putMainSocket(mSocket);
+                onConnect.run();
+                off.run();
+            });
+            mSocket.on(Socket.EVENT_CONNECT_ERROR, d -> {
+                onError.run();
+                off.run();
+            });
+            if(!mSocket.connected()){
+                mSocket.connect();
+            }
+        } catch (URISyntaxException e) {
+            ErrorHandler.handle(e, "initializing socket");
+        }
     }
 
     @SuppressWarnings("unchecked")
